@@ -1,0 +1,21 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224640",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "grade",
+  "fields": [
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["unique", "required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Grade",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [],
+  "service": "no"
+}

@@ -1,0 +1,78 @@
+entity Transport{
+brand String minlength(2) required
+model String minlength(2) required
+vin String minlength(17) maxlength(17) unique required
+}
+
+entity Driver{
+firstname String minlength(2) required
+patronymic String minlength(2)
+lastname String minlength(2) required
+phone String minlength(3) unique required
+experience BigDecimal required
+}
+
+entity Address{
+country String minlength(2) required
+city String minlength(2) required
+postcode String minlength(2) unique required
+}
+
+entity Product{
+name String minlength(2) required
+number Long required
+cost BigDecimal required
+}
+
+entity Trip{
+distance BigDecimal required
+}
+
+entity ImportProd{
+arrivaldate Instant required
+}
+
+entity ExportProd{
+departuredate Instant required
+}
+
+entity Grade{
+description String unique required
+}
+
+
+relationship ManyToOne{
+Trip{transport} to Transport
+}
+
+relationship ManyToOne{
+Trip{driver} to Driver
+}
+
+relationship ManyToOne{
+Trip{address} to Address 
+}
+
+relationship ManyToOne{
+Trip{product} to Product  
+}
+
+relationship ManyToOne{
+Trip{user(login)} to User  
+}
+
+relationship OneToOne{
+ImportProd{trip} to Trip
+}
+
+relationship OneToOne{
+ExportProd{trip} to Trip
+}
+
+relationship ManyToOne{
+ImportProd{grade} to Grade
+}
+
+relationship ManyToOne{
+ExportProd{grade} to Grade
+}

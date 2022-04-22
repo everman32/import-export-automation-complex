@@ -1,0 +1,26 @@
+{
+  "accountingImportExportProductsApp": {
+    "importProd": {
+      "home": {
+        "title": "Import Prods",
+        "refreshListLabel": "Обновить список",
+        "createLabel": "Создать новый Import Prod",
+        "createOrEditLabel": "Создать или отредактировать Import Prod",
+        "notFound": "Import Prods не найдено"
+      },
+      "created": "Новый Import Prod создан с идентификатором {{ param }}",
+      "updated": "Import Prod обновлен с идентификатором {{ param }}",
+      "deleted": "Import Prod удален с идентификатором {{ param }}",
+      "delete": {
+        "question": "Вы уверены что хотите удалить Import Prod {{ id }}?"
+      },
+      "detail": {
+        "title": "Import Prod"
+      },
+      "id": "ID",
+      "arrivaldate": "Arrivaldate",
+      "trip": "Trip",
+      "grade": "Grade"
+    }
+  }
+}

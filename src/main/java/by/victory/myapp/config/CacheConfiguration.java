@@ -48,6 +48,14 @@ public class CacheConfiguration {
             createCache(cm, by.victory.myapp.domain.User.class.getName());
             createCache(cm, by.victory.myapp.domain.Authority.class.getName());
             createCache(cm, by.victory.myapp.domain.User.class.getName() + ".authorities");
+            createCache(cm, by.victory.myapp.domain.Transport.class.getName());
+            createCache(cm, by.victory.myapp.domain.Driver.class.getName());
+            createCache(cm, by.victory.myapp.domain.Address.class.getName());
+            createCache(cm, by.victory.myapp.domain.Product.class.getName());
+            createCache(cm, by.victory.myapp.domain.Trip.class.getName());
+            createCache(cm, by.victory.myapp.domain.ImportProd.class.getName());
+            createCache(cm, by.victory.myapp.domain.ExportProd.class.getName());
+            createCache(cm, by.victory.myapp.domain.Grade.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

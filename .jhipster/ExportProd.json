@@ -1,0 +1,35 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224639",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "export_prod",
+  "fields": [
+    {
+      "fieldName": "departuredate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "ExportProd",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "exportProd",
+      "ownerSide": true,
+      "relationshipName": "trip",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "grade",
+      "otherEntityRelationshipName": "exportProd",
+      "relationshipName": "grade",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

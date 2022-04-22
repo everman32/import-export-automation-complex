@@ -1,0 +1,53 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224637",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "trip",
+  "fields": [
+    {
+      "fieldName": "distance",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Trip",
+  "pagination": "no",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "transport",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "transport",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "driver",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "driver",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "address",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "address",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "product",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "user",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

@@ -1,0 +1,24 @@
+{
+  "accountingImportExportProductsApp": {
+    "grade": {
+      "home": {
+        "title": "Grades",
+        "refreshListLabel": "Обновить список",
+        "createLabel": "Создать новый Grade",
+        "createOrEditLabel": "Создать или отредактировать Grade",
+        "notFound": "Grades не найдено"
+      },
+      "created": "Новый Grade создан с идентификатором {{ param }}",
+      "updated": "Grade обновлен с идентификатором {{ param }}",
+      "deleted": "Grade удален с идентификатором {{ param }}",
+      "delete": {
+        "question": "Вы уверены что хотите удалить Grade {{ id }}?"
+      },
+      "detail": {
+        "title": "Grade"
+      },
+      "id": "ID",
+      "description": "Description"
+    }
+  }
+}
