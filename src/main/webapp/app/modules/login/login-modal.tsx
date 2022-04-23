@@ -49,7 +49,7 @@ const LoginModal = (props: ILoginModalProps) => {
                 required
                 autoFocus
                 data-cy="username"
-                validate={{ required: 'Username cannot be empty!' }}
+                validate={{ required: translate('register.messages.validate.login.required') }}
                 register={register}
                 error={errors.username}
                 isTouched={touchedFields.username}
@@ -61,7 +61,7 @@ const LoginModal = (props: ILoginModalProps) => {
                 placeholder={translate('login.form.password.placeholder')}
                 required
                 data-cy="password"
-                validate={{ required: 'Password cannot be empty!' }}
+                validate={{ required: translate('global.messages.validate.newpassword.required') }}
                 register={register}
                 error={errors.password}
                 isTouched={touchedFields.password}

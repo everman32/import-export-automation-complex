@@ -2,20 +2,20 @@
   "accountingImportExportProductsApp": {
     "address": {
       "home": {
-        "title": "Addresses",
+        "title": "Адреса",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Address",
-        "createOrEditLabel": "Создать или отредактировать Address",
-        "notFound": "Addresses не найдено"
+        "createLabel": "Создать новый адрес",
+        "createOrEditLabel": "Создать или отредактировать адрес",
+        "notFound": "Адресов не найдено"
       },
-      "created": "Новый Address создан с идентификатором {{ param }}",
-      "updated": "Address обновлен с идентификатором {{ param }}",
-      "deleted": "Address удален с идентификатором {{ param }}",
+      "created": "Новый адрес создан с идентификатором {{ param }}",
+      "updated": "Адрес обновлен с идентификатором {{ param }}",
+      "deleted": "Адрес удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Address {{ id }}?"
+        "question": "Вы уверены что хотите удалить адрес {{ id }}?"
       },
       "detail": {
-        "title": "Address"
+        "title": "Адрес"
       },
       "id": "ID",
       "country": "Country",

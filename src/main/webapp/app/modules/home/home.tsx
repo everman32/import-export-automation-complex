@@ -13,11 +13,11 @@ export const Home = () => {
   return (
     <Row>
       <Col md="3" className="pad">
-        <span className="hipster rounded" />
+        {/* <span className="hipster rounded" /> */}
       </Col>
       <Col md="9">
         <h2>
-          <Translate contentKey="home.title">Welcome, Java Hipster!</Translate>
+          <Translate contentKey="home.title">Welcome!</Translate>
         </h2>
         <p className="lead">
           <Translate contentKey="home.subtitle">This is your homepage</Translate>
@@ -33,16 +33,18 @@ export const Home = () => {
         ) : (
           <div>
             <Alert color="warning">
-              <Translate contentKey="global.messages.info.authenticated.prefix">If you want to </Translate>
+              <Translate contentKey="global.messages.info.authenticated.prefix">You can </Translate>
 
               <Link to="/login" className="alert-link">
                 <Translate contentKey="global.messages.info.authenticated.link"> sign in</Translate>
               </Link>
+              {/*
               <Translate contentKey="global.messages.info.authenticated.suffix">
                 , you can try the default accounts:
                 <br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;)
                 <br />- User (login=&quot;user&quot; and password=&quot;user&quot;).
               </Translate>
+              */}
             </Alert>
 
             <Alert color="warning">
@@ -53,6 +55,7 @@ export const Home = () => {
             </Alert>
           </div>
         )}
+        {/*
         <p>
           <Translate contentKey="home.question">If you have any question on JHipster:</Translate>
         </p>
@@ -92,6 +95,7 @@ export const Home = () => {
           </a>
           !
         </p>
+        */}
       </Col>
     </Row>
   );

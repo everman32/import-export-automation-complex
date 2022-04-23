@@ -1,20 +1,20 @@
 {
   "global": {
-    "title": "AccountingImportExportProductsApp",
+    "title": "Учет импорта-экспорта продукции",
     "browsehappy": "Ваш браузер <strong>устарел</strong>. Пожалуйста <a href=\"http://browsehappy.com/?locale=ru\">обновите ваш браузер</a>.",
     "menu": {
       "home": "Главная",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
-        "main": "Сущности",
-        "transport": "Transport",
-        "driver": "Driver",
-        "address": "Address",
-        "product": "Product",
-        "trip": "Trip",
-        "importProd": "Import Prod",
-        "exportProd": "Export Prod",
-        "grade": "Grade",
+        "main": "Учет",
+        "transport": "Транспорт",
+        "driver": "Водители",
+        "address": "Адреса",
+        "product": "Продукция",
+        "trip": "Рейсы",
+        "importProd": "Импорт продукции",
+        "exportProd": "Экспрорт продукции",
+        "grade": "Оценки",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {
@@ -22,9 +22,9 @@
         "settings": "Настройки",
         "password": "Пароль",
         "sessions": "Сессии",
-        "login": "Войти",
-        "logout": "Выйти",
-        "register": "Зарегистрироваться"
+        "login": "Вход",
+        "logout": "Выход",
+        "register": "Регистрация"
       },
       "admin": {
         "main": "Администрирование",
@@ -55,7 +55,7 @@
     "messages": {
       "info": {
         "authenticated": {
-          "prefix": "Если вы хотите ",
+          "prefix": "Вы можете ",
           "link": "авторизироваться",
           "suffix": ", вы можете попробовать аккаунты по умолчанию:<br/>- Администратор (логин=\"admin\" и пароль=\"admin\") <br/>- Пользователь (логин=\"user\" и пароль=\"user\")."
         },
@@ -75,7 +75,7 @@
           "strength": "Сложность пароля:"
         },
         "confirmpassword": {
-          "required": "подтверждение пароля должно быть указано.",
+          "required": "Подтверждение пароля должно быть указано.",
           "minlength": "Длина подтверждения пароля должна быть хотя-бы 4 символов",
           "maxlength": "Подтверждение пароля не может быть больше чем 50 символов"
         },
@@ -144,5 +144,5 @@
       "not.image": "Файл должен был быть изображением, но было установлено, что \"{{ fileType }}\""
     }
   },
-  "footer": "Это ваш футтер"
+  "footer": "(C) Виктор Бородын, 2022"
 }

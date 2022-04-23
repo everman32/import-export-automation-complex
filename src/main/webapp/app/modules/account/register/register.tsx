@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import PasswordStrengthBar from 'app/shared/layout/password/password-strength-bar';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { handleRegister, reset } from './register.reducer';
+import { Link } from 'react-router-dom';
 
 export const RegisterPage = () => {
   const [password, setPassword] = useState('');
@@ -108,18 +109,18 @@ export const RegisterPage = () => {
           <p>&nbsp;</p>
           <Alert color="warning">
             <span>
-              <Translate contentKey="global.messages.info.authenticated.prefix">If you want to </Translate>
+              <Translate contentKey="global.messages.info.authenticated.prefix">You can </Translate>
             </span>
-            <a className="alert-link">
+            <Link to="/account/login">
               <Translate contentKey="global.messages.info.authenticated.link"> sign in</Translate>
-            </a>
-            <span>
+            </Link>
+            {/* <span>
               <Translate contentKey="global.messages.info.authenticated.suffix">
                 , you can try the default accounts:
                 <br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;)
                 <br />- User (login=&quot;user&quot; and password=&quot;user&quot;).
               </Translate>
-            </span>
+            </span> */}
           </Alert>
         </Col>
       </Row>

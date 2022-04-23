@@ -9,7 +9,7 @@ const Footer = () => (
     <Row>
       <Col md="12">
         <p>
-          <Translate contentKey="footer">Your footer</Translate>
+          <Translate contentKey="footer">(C) Victor Borodyn, 2022</Translate>
         </p>
       </Col>
     </Row>
