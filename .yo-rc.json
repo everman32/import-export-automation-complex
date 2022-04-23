@@ -21,7 +21,7 @@
     "enableTranslation": true,
     "entities": ["Transport", "Driver", "Address", "Product", "Trip", "ImportProd", "ExportProd", "Grade"],
     "entitySuffix": "",
-    "herokuAppName": "import-export",
+    "herokuAppName": "accounting-import-export",
     "herokuDeployType": "git",
     "herokuJavaVersion": "14",
     "jhiPrefix": "jhi",
