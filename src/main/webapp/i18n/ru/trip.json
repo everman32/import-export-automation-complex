@@ -2,20 +2,20 @@
   "accountingImportExportProductsApp": {
     "trip": {
       "home": {
-        "title": "Trips",
+        "title": "Маршруты",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Trip",
-        "createOrEditLabel": "Создать или отредактировать Trip",
-        "notFound": "Trips не найдено"
+        "createLabel": "Создать новый маршрут",
+        "createOrEditLabel": "Создать или отредактировать маршрут",
+        "notFound": "Маршрутов не найдено"
       },
-      "created": "Новый Trip создан с идентификатором {{ param }}",
-      "updated": "Trip обновлен с идентификатором {{ param }}",
-      "deleted": "Trip удален с идентификатором {{ param }}",
+      "created": "Новый маршрут создан с идентификатором {{ param }}",
+      "updated": "Маршрут обновлен с идентификатором {{ param }}",
+      "deleted": "Маршрут удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Trip {{ id }}?"
+        "question": "Вы уверены что хотите удалить маршрут {{ id }}?"
       },
       "detail": {
-        "title": "Trip"
+        "title": "Маршрут"
       },
       "id": "ID",
       "distance": "Distance",

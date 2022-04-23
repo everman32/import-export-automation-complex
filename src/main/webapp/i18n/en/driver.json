@@ -4,15 +4,15 @@
       "home": {
         "title": "Drivers",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Driver",
-        "createOrEditLabel": "Create or edit a Driver",
-        "notFound": "No Drivers found"
+        "createLabel": "Create a new driver",
+        "createOrEditLabel": "Create or edit a driver",
+        "notFound": "No drivers found"
       },
-      "created": "A new Driver is created with identifier {{ param }}",
-      "updated": "A Driver is updated with identifier {{ param }}",
-      "deleted": "A Driver is deleted with identifier {{ param }}",
+      "created": "A new driver is created with identifier {{ param }}",
+      "updated": "A driver is updated with identifier {{ param }}",
+      "deleted": "A driver is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Driver {{ id }}?"
+        "question": "Are you sure you want to delete driver {{ id }}?"
       },
       "detail": {
         "title": "Driver"

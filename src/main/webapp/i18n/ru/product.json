@@ -2,20 +2,20 @@
   "accountingImportExportProductsApp": {
     "product": {
       "home": {
-        "title": "Products",
+        "title": "Продукты",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Product",
-        "createOrEditLabel": "Создать или отредактировать Product",
-        "notFound": "Products не найдено"
+        "createLabel": "Создать новый продукт",
+        "createOrEditLabel": "Создать или отредактировать продукт",
+        "notFound": "Продуктов не найдено"
       },
-      "created": "Новый Product создан с идентификатором {{ param }}",
-      "updated": "Product обновлен с идентификатором {{ param }}",
-      "deleted": "Product удален с идентификатором {{ param }}",
+      "created": "Новый продукт создан с идентификатором {{ param }}",
+      "updated": "Продукт обновлен с идентификатором {{ param }}",
+      "deleted": "Продукт удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Product {{ id }}?"
+        "question": "Вы уверены что хотите удалить продукт {{ id }}?"
       },
       "detail": {
-        "title": "Product"
+        "title": "Продукт"
       },
       "id": "ID",
       "name": "Name",
