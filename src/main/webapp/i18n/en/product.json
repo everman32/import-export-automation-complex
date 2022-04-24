@@ -19,8 +19,8 @@
       },
       "id": "ID",
       "name": "Name",
-      "number": "Number",
-      "cost": "Cost"
+      "number": "Number (pieces)",
+      "cost": "Cost(conventional units)"
     }
   }
 }

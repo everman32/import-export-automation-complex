@@ -18,9 +18,9 @@
         "title": "Адрес"
       },
       "id": "ID",
-      "country": "Country",
-      "city": "City",
-      "postcode": "Postcode"
+      "country": "Страна",
+      "city": "Город",
+      "postcode": "Почтовый индекс"
     }
   }
 }

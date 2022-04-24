@@ -18,9 +18,9 @@
         "title": "Импорт"
       },
       "id": "ID",
-      "arrivaldate": "Arrivaldate",
-      "trip": "Trip",
-      "grade": "Grade"
+      "arrivaldate": "Дата прибытия",
+      "trip": "Рейс",
+      "grade": "Оценка"
     }
   }
 }

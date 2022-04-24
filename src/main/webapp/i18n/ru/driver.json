@@ -18,11 +18,11 @@
         "title": "Водитель"
       },
       "id": "ID",
-      "firstname": "Firstname",
-      "patronymic": "Patronymic",
-      "lastname": "Lastname",
-      "phone": "Phone",
-      "experience": "Experience"
+      "firstname": "Имя",
+      "patronymic": "Отчество",
+      "lastname": "Фамилия",
+      "phone": "Контактный телефон",
+      "experience": "Опыт (лет)"
     }
   }
 }

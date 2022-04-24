@@ -2,28 +2,28 @@
   "accountingImportExportProductsApp": {
     "trip": {
       "home": {
-        "title": "Маршруты",
+        "title": "Рейс",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый маршрут",
-        "createOrEditLabel": "Создать или отредактировать маршрут",
-        "notFound": "Маршрутов не найдено"
+        "createLabel": "Создать новый рейс",
+        "createOrEditLabel": "Создать или отредактировать рейс",
+        "notFound": "Рейсов не найдено"
       },
-      "created": "Новый маршрут создан с идентификатором {{ param }}",
-      "updated": "Маршрут обновлен с идентификатором {{ param }}",
-      "deleted": "Маршрут удален с идентификатором {{ param }}",
+      "created": "Новый рейс создан с идентификатором {{ param }}",
+      "updated": "Рейс обновлен с идентификатором {{ param }}",
+      "deleted": "Рейс удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить маршрут {{ id }}?"
+        "question": "Вы уверены что хотите удалить рейс {{ id }}?"
       },
       "detail": {
-        "title": "Маршрут"
+        "title": "Рейс"
       },
       "id": "ID",
-      "distance": "Distance",
-      "transport": "Transport",
-      "driver": "Driver",
-      "address": "Address",
-      "product": "Product",
-      "user": "User"
+      "distance": "Расстояние",
+      "transport": "Транспорт",
+      "driver": "Водитель",
+      "address": "Адресс",
+      "product": "Продукция",
+      "user": "Проверил"
     }
   }
 }

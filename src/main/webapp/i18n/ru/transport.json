@@ -18,9 +18,9 @@
         "title": "Транспорт"
       },
       "id": "ID",
-      "brand": "Brand",
-      "model": "Model",
-      "vin": "Vin"
+      "brand": "Бренд",
+      "model": "Модель",
+      "vin": "VIN"
     }
   }
 }

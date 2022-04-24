@@ -22,7 +22,7 @@
       "patronymic": "Patronymic",
       "lastname": "Lastname",
       "phone": "Phone",
-      "experience": "Experience"
+      "experience": "Experience (years)"
     }
   }
 }

@@ -18,9 +18,9 @@
         "title": "Экспорт"
       },
       "id": "ID",
-      "departuredate": "Departuredate",
-      "trip": "Trip",
-      "grade": "Grade"
+      "departuredate": "Дата отправления",
+      "trip": "Рейс",
+      "grade": "Оценка"
     }
   }
 }
