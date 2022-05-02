@@ -5,6 +5,9 @@
     "logged": {
       "message": "Вы вошли как пользователь \"{{username}}\"."
     },
+    "loggedout": {
+      "message": "Выход выполнен успешно!"
+    },
     "question": "Если у Вас возникли вопросы по JHipster:",
     "link": {
       "homepage": "JHipster домашняя страница",

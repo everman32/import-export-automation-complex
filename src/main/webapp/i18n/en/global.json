@@ -145,5 +145,5 @@
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
     }
   },
-  "footer": "(C) Victor Borodyn, 2022"
+  "footer": "Contact email: vitek.borodyn@gmail.com"
 }

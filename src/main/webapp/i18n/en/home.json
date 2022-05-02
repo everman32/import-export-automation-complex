@@ -5,6 +5,9 @@
     "logged": {
       "message": "You are logged in as user \"{{username}}\"."
     },
+    "loggedout": {
+      "message": "Logged out successfully!"
+    },
     "question": "If you have any question on JHipster:",
     "link": {
       "homepage": "JHipster homepage",

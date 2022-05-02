@@ -12,8 +12,8 @@
         "address": "Адреса",
         "product": "Продукция",
         "trip": "Рейсы",
-        "importProd": "Импорт продукции",
-        "exportProd": "Экспрорт продукции",
+        "importProd": "Импорт",
+        "exportProd": "Экспорт",
         "grade": "Оценки",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
@@ -56,7 +56,7 @@
       "info": {
         "authenticated": {
           "prefix": "Вы можете ",
-          "link": "авторизироваться",
+          "link": "авторизоваться",
           "suffix": ", вы можете попробовать аккаунты по умолчанию:<br/>- Администратор (логин=\"admin\" и пароль=\"admin\") <br/>- Пользователь (логин=\"user\" и пароль=\"user\")."
         },
         "register": {
@@ -144,5 +144,5 @@
       "not.image": "Файл должен был быть изображением, но было установлено, что \"{{ fileType }}\""
     }
   },
-  "footer": "(C) Виктор Бородын, 2022"
+  "footer": "Контактный email: vitek.borodyn@gmail.com"
 }
