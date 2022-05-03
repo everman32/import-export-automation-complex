@@ -20,7 +20,7 @@ export const AddressDeleteDialog = (props: RouteComponentProps<{ id: string }>) 
   const updateSuccess = useAppSelector(state => state.address.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/address');
+    props.history.push('/address' + props.location.search);
   };
 
   useEffect(() => {

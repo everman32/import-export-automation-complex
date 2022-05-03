@@ -10,7 +10,7 @@
       },
       "created": "A new import is created with identifier {{ param }}",
       "updated": "A import is updated with identifier {{ param }}",
-      "deleted": "A import is deleted with identifier {{ param }}",
+      "deleted": "A import Prod is deleted with identifier {{ param }}",
       "delete": {
         "question": "Are you sure you want to delete import {{ id }}?"
       },
@@ -18,7 +18,7 @@
         "title": "Import"
       },
       "id": "ID",
-      "arrivaldate": "Arrivaldate",
+      "arrivaldate": "Arrival date",
       "trip": "Trip",
       "grade": "Grade"
     }

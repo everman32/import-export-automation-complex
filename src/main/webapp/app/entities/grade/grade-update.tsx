@@ -20,7 +20,7 @@ export const GradeUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const updating = useAppSelector(state => state.grade.updating);
   const updateSuccess = useAppSelector(state => state.grade.updateSuccess);
   const handleClose = () => {
-    props.history.push('/grade');
+    props.history.push('/grade' + props.location.search);
   };
 
   useEffect(() => {

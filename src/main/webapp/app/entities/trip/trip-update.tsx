@@ -35,7 +35,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const updating = useAppSelector(state => state.trip.updating);
   const updateSuccess = useAppSelector(state => state.trip.updateSuccess);
   const handleClose = () => {
-    props.history.push('/trip');
+    props.history.push('/trip' + props.location.search);
   };
 
   useEffect(() => {

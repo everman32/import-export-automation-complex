@@ -76,3 +76,5 @@ ImportProd{grade} to Grade
 relationship ManyToOne{
 ExportProd{grade} to Grade
 }
+
+paginate Transport, Driver, Address, Product, Trip, ImportProd, ExportProd, Grade with pagination 

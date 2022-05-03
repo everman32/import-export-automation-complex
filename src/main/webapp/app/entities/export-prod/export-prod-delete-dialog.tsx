@@ -20,7 +20,7 @@ export const ExportProdDeleteDialog = (props: RouteComponentProps<{ id: string }
   const updateSuccess = useAppSelector(state => state.exportProd.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/export-prod');
+    props.history.push('/export-prod' + props.location.search);
   };
 
   useEffect(() => {

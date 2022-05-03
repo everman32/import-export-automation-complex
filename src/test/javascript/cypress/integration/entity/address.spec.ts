@@ -92,6 +92,9 @@ describe('Address e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/addresses?page=0&size=20>; rel="last",<http://localhost/api/addresses?page=0&size=20>; rel="first"',
+              },
               body: [address],
             }
           ).as('entitiesRequestInternal');

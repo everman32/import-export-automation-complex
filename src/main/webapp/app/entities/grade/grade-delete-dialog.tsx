@@ -20,7 +20,7 @@ export const GradeDeleteDialog = (props: RouteComponentProps<{ id: string }>) =>
   const updateSuccess = useAppSelector(state => state.grade.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/grade');
+    props.history.push('/grade' + props.location.search);
   };
 
   useEffect(() => {

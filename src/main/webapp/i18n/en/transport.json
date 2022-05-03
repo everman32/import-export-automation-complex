@@ -2,11 +2,11 @@
   "accountingImportExportProductsApp": {
     "transport": {
       "home": {
-        "title": "Transports",
+        "title": "Transport",
         "refreshListLabel": "Refresh list",
         "createLabel": "Create a new transport",
         "createOrEditLabel": "Create or edit a transport",
-        "notFound": "No transports found"
+        "notFound": "No transport found"
       },
       "created": "A new transport is created with identifier {{ param }}",
       "updated": "A transport is updated with identifier {{ param }}",

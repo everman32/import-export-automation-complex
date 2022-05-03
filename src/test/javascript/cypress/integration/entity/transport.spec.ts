@@ -92,6 +92,9 @@ describe('Transport e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/transports?page=0&size=20>; rel="last",<http://localhost/api/transports?page=0&size=20>; rel="first"',
+              },
               body: [transport],
             }
           ).as('entitiesRequestInternal');

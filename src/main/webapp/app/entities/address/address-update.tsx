@@ -20,7 +20,7 @@ export const AddressUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const updating = useAppSelector(state => state.address.updating);
   const updateSuccess = useAppSelector(state => state.address.updateSuccess);
   const handleClose = () => {
-    props.history.push('/address');
+    props.history.push('/address' + props.location.search);
   };
 
   useEffect(() => {

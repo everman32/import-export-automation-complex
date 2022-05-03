@@ -20,7 +20,7 @@ export const DriverUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const updating = useAppSelector(state => state.driver.updating);
   const updateSuccess = useAppSelector(state => state.driver.updateSuccess);
   const handleClose = () => {
-    props.history.push('/driver');
+    props.history.push('/driver' + props.location.search);
   };
 
   useEffect(() => {

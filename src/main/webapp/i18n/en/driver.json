@@ -18,11 +18,11 @@
         "title": "Driver"
       },
       "id": "ID",
-      "firstname": "Firstname",
+      "firstname": "First name",
       "patronymic": "Patronymic",
-      "lastname": "Lastname",
+      "lastname": "Last name",
       "phone": "Phone",
-      "experience": "Experience (years)"
+      "experience": "Experience"
     }
   }
 }

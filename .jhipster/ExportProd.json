@@ -14,7 +14,7 @@
   "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "ExportProd",
-  "pagination": "no",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [
     {

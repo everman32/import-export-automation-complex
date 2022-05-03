@@ -20,7 +20,7 @@ export const DriverDeleteDialog = (props: RouteComponentProps<{ id: string }>) =
   const updateSuccess = useAppSelector(state => state.driver.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/driver');
+    props.history.push('/driver' + props.location.search);
   };
 
   useEffect(() => {

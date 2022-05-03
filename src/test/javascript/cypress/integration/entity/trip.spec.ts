@@ -92,6 +92,9 @@ describe('Trip e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/trips?page=0&size=20>; rel="last",<http://localhost/api/trips?page=0&size=20>; rel="first"',
+              },
               body: [trip],
             }
           ).as('entitiesRequestInternal');

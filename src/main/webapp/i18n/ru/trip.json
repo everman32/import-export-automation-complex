@@ -2,7 +2,7 @@
   "accountingImportExportProductsApp": {
     "trip": {
       "home": {
-        "title": "Рейс",
+        "title": "Рейсы",
         "refreshListLabel": "Обновить список",
         "createLabel": "Создать новый рейс",
         "createOrEditLabel": "Создать или отредактировать рейс",
@@ -21,9 +21,9 @@
       "distance": "Расстояние",
       "transport": "Транспорт",
       "driver": "Водитель",
-      "address": "Адресс",
+      "address": "Адрес",
       "product": "Продукция",
-      "user": "Проверил"
+      "user": "Утвердил"
     }
   }
 }

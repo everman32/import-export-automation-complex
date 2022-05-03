@@ -92,6 +92,9 @@ describe('ImportProd e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/import-prods?page=0&size=20>; rel="last",<http://localhost/api/import-prods?page=0&size=20>; rel="first"',
+              },
               body: [importProd],
             }
           ).as('entitiesRequestInternal');

@@ -20,7 +20,7 @@ export const TransportDeleteDialog = (props: RouteComponentProps<{ id: string }>
   const updateSuccess = useAppSelector(state => state.transport.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/transport');
+    props.history.push('/transport' + props.location.search);
   };
 
   useEffect(() => {

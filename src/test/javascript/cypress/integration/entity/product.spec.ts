@@ -92,6 +92,9 @@ describe('Product e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/products?page=0&size=20>; rel="last",<http://localhost/api/products?page=0&size=20>; rel="first"',
+              },
               body: [product],
             }
           ).as('entitiesRequestInternal');

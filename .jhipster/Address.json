@@ -27,7 +27,7 @@
   "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "Address",
-  "pagination": "no",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [],
   "service": "no"

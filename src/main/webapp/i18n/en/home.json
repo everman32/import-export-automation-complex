@@ -3,7 +3,7 @@
     "title": "Welcome!",
     "subtitle": "This is your homepage",
     "logged": {
-      "message": "You are logged in as user \"{{username}}\"."
+      "message": "You are logged in as \"{{username}}\"."
     },
     "loggedout": {
       "message": "Logged out successfully!"

@@ -14,7 +14,7 @@
   "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "ImportProd",
-  "pagination": "no",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [
     {

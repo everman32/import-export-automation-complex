@@ -20,7 +20,7 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const updating = useAppSelector(state => state.product.updating);
   const updateSuccess = useAppSelector(state => state.product.updateSuccess);
   const handleClose = () => {
-    props.history.push('/product');
+    props.history.push('/product' + props.location.search);
   };
 
   useEffect(() => {
