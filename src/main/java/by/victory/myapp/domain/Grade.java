@@ -30,12 +30,12 @@ public class Grade implements Serializable {
     @Column(name = "description", nullable = false, unique = true)
     private String description;
 
-    @OneToMany(mappedBy = "grade")
+    @OneToMany(mappedBy = "grade", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ImportProd> importProds = new HashSet<>();
 
-    @OneToMany(mappedBy = "grade")
+    @OneToMany(mappedBy = "grade", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ExportProd> exportProds = new HashSet<>();

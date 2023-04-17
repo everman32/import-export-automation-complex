@@ -34,7 +34,7 @@ public class ProductUnit implements Serializable {
     @Column(name = "description", nullable = false, unique = true)
     private String description;
 
-    @OneToMany(mappedBy = "productUnit")
+    @OneToMany(mappedBy = "productUnit", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statements", "productUnit" }, allowSetters = true)
     private Set<Product> products = new HashSet<>();

@@ -37,12 +37,12 @@ public class Positioning implements Serializable {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @OneToMany(mappedBy = "positioning")
+    @OneToMany(mappedBy = "positioning", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();
 
-    @OneToMany(mappedBy = "hubPositioning")
+    @OneToMany(mappedBy = "hubPositioning", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },

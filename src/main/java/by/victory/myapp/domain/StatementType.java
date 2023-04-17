@@ -30,7 +30,7 @@ public class StatementType implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "statementType")
+    @OneToMany(mappedBy = "statementType", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();

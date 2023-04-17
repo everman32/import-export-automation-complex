@@ -35,7 +35,7 @@ public class Product implements Serializable {
     @Column(name = "cost_per_piece", nullable = false)
     private Double costPerPiece;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();

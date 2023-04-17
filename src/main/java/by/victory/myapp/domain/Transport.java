@@ -40,7 +40,7 @@ public class Transport implements Serializable {
     @Column(name = "vin", length = 17, nullable = false, unique = true)
     private String vin;
 
-    @OneToMany(mappedBy = "transport")
+    @OneToMany(mappedBy = "transport", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },

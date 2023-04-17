@@ -35,7 +35,7 @@ public class Trip implements Serializable {
     @Column(name = "threshold", nullable = false)
     private Double threshold;
 
-    @OneToMany(mappedBy = "trip")
+    @OneToMany(mappedBy = "trip", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();

@@ -49,7 +49,7 @@ public class Driver implements Serializable {
     @Column(name = "experience", nullable = false)
     private Double experience;
 
-    @OneToMany(mappedBy = "driver")
+    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
