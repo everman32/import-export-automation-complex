@@ -1,0 +1,34 @@
+{
+  "applications": "*",
+  "changelogDate": "20230417145214",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "product_unit",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["unique", "required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "3"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "ProductUnit",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "productUnit",
+      "relationshipName": "product",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

@@ -6,7 +6,7 @@
   "entityTableName": "export_prod",
   "fields": [
     {
-      "fieldName": "departuredate",
+      "fieldName": "departureDate",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     }

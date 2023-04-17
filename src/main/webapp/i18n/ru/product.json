@@ -2,25 +2,26 @@
   "accountingImportExportProductsApp": {
     "product": {
       "home": {
-        "title": "Продукция",
+        "title": "Products",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новую продукцию",
-        "createOrEditLabel": "Создать или отредактировать продукцию",
-        "notFound": "Продукция не найдена"
+        "createLabel": "Создать новый Product",
+        "createOrEditLabel": "Создать или отредактировать Product",
+        "notFound": "Products не найдено"
       },
-      "created": "Новая продукция создана с идентификатором {{ param }}",
-      "updated": "Продукция обновлена с идентификатором {{ param }}",
-      "deleted": "Продукция удалена с идентификатором {{ param }}",
+      "created": "Новый Product создан с идентификатором {{ param }}",
+      "updated": "Product обновлен с идентификатором {{ param }}",
+      "deleted": "Product удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить продукцию {{ id }}?"
+        "question": "Вы уверены что хотите удалить Product {{ id }}?"
       },
       "detail": {
-        "title": "Продукция"
+        "title": "Product"
       },
       "id": "ID",
-      "name": "Наименование",
-      "number": "Количество (измерение по СИ)",
-      "cost": "Стоимость (у.е.)"
+      "name": "Name",
+      "costPerPiece": "Cost Per Piece",
+      "statement": "Statement",
+      "productUnit": "Product Unit"
     }
   }
 }

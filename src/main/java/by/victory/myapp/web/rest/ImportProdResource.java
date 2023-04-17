@@ -131,8 +131,8 @@ public class ImportProdResource {
         Optional<ImportProd> result = importProdRepository
             .findById(importProd.getId())
             .map(existingImportProd -> {
-                if (importProd.getArrivaldate() != null) {
-                    existingImportProd.setArrivaldate(importProd.getArrivaldate());
+                if (importProd.getArrivalDate() != null) {
+                    existingImportProd.setArrivalDate(importProd.getArrivalDate());
                 }
 
                 return existingImportProd;

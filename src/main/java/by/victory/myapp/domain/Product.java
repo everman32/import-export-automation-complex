@@ -1,7 +1,9 @@
 package by.victory.myapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -29,12 +31,18 @@ public class Product implements Serializable {
     private String name;
 
     @NotNull
-    @Column(name = "number", nullable = false)
-    private Long number;
+    @DecimalMin(value = "1")
+    @Column(name = "cost_per_piece", nullable = false)
+    private Double costPerPiece;
 
-    @NotNull
-    @Column(name = "cost", precision = 21, scale = 2, nullable = false)
-    private BigDecimal cost;
+    @OneToMany(mappedBy = "product")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
+    private Set<Statement> statements = new HashSet<>();
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "products" }, allowSetters = true)
+    private ProductUnit productUnit;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -64,30 +72,61 @@ public class Product implements Serializable {
         this.name = name;
     }
 
-    public Long getNumber() {
-        return this.number;
+    public Double getCostPerPiece() {
+        return this.costPerPiece;
     }
 
-    public Product number(Long number) {
-        this.setNumber(number);
+    public Product costPerPiece(Double costPerPiece) {
+        this.setCostPerPiece(costPerPiece);
         return this;
     }
 
-    public void setNumber(Long number) {
-        this.number = number;
+    public void setCostPerPiece(Double costPerPiece) {
+        this.costPerPiece = costPerPiece;
     }
 
-    public BigDecimal getCost() {
-        return this.cost;
+    public Set<Statement> getStatements() {
+        return this.statements;
     }
 
-    public Product cost(BigDecimal cost) {
-        this.setCost(cost);
+    public void setStatements(Set<Statement> statements) {
+        if (this.statements != null) {
+            this.statements.forEach(i -> i.setProduct(null));
+        }
+        if (statements != null) {
+            statements.forEach(i -> i.setProduct(this));
+        }
+        this.statements = statements;
+    }
+
+    public Product statements(Set<Statement> statements) {
+        this.setStatements(statements);
         return this;
     }
 
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
+    public Product addStatement(Statement statement) {
+        this.statements.add(statement);
+        statement.setProduct(this);
+        return this;
+    }
+
+    public Product removeStatement(Statement statement) {
+        this.statements.remove(statement);
+        statement.setProduct(null);
+        return this;
+    }
+
+    public ProductUnit getProductUnit() {
+        return this.productUnit;
+    }
+
+    public void setProductUnit(ProductUnit productUnit) {
+        this.productUnit = productUnit;
+    }
+
+    public Product productUnit(ProductUnit productUnit) {
+        this.setProductUnit(productUnit);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -115,8 +154,7 @@ public class Product implements Serializable {
         return "Product{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", number=" + getNumber() +
-            ", cost=" + getCost() +
+            ", costPerPiece=" + getCostPerPiece() +
             "}";
     }
 }

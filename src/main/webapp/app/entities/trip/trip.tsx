@@ -103,9 +103,16 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('id')}>
                   <Translate contentKey="accountingImportExportProductsApp.trip.id">ID</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
-                <th className="hand" onClick={sort('distance')}>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.distance">Distance</Translate>{' '}
+                <th className="hand" onClick={sort('authorizedCapital')}>
+                  <Translate contentKey="accountingImportExportProductsApp.trip.authorizedCapital">Authorized Capital</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
+                </th>
+                <th className="hand" onClick={sort('threshold')}>
+                  <Translate contentKey="accountingImportExportProductsApp.trip.threshold">Threshold</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
+                </th>
+                <th>
+                  <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.trip.transport">Transport</Translate>{' '}
@@ -115,13 +122,8 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                   <Translate contentKey="accountingImportExportProductsApp.trip.driver">Driver</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.address">Address</Translate> <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.product">Product</Translate> <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate> <FontAwesomeIcon icon="sort" />
+                  <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -134,12 +136,12 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                       {trip.id}
                     </Button>
                   </td>
-                  <td>{trip.distance}</td>
+                  <td>{trip.authorizedCapital}</td>
+                  <td>{trip.threshold}</td>
+                  <td>{trip.user ? trip.user.login : ''}</td>
                   <td>{trip.transport ? <Link to={`transport/${trip.transport.id}`}>{trip.transport.id}</Link> : ''}</td>
                   <td>{trip.driver ? <Link to={`driver/${trip.driver.id}`}>{trip.driver.id}</Link> : ''}</td>
-                  <td>{trip.address ? <Link to={`address/${trip.address.id}`}>{trip.address.id}</Link> : ''}</td>
-                  <td>{trip.product ? <Link to={`product/${trip.product.id}`}>{trip.product.id}</Link> : ''}</td>
-                  <td>{trip.user ? trip.user.login : ''}</td>
+                  <td>{trip.hubPositioning ? <Link to={`positioning/${trip.hubPositioning.id}`}>{trip.hubPositioning.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${trip.id}`} color="info" size="sm" data-cy="entityDetailsButton">

@@ -1,6 +1,5 @@
 package by.victory.myapp.web.rest;
 
-import static by.victory.myapp.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -9,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Product;
 import by.victory.myapp.repository.ProductRepository;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,11 +32,8 @@ class ProductResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final Long DEFAULT_NUMBER = 1L;
-    private static final Long UPDATED_NUMBER = 2L;
-
-    private static final BigDecimal DEFAULT_COST = new BigDecimal(1);
-    private static final BigDecimal UPDATED_COST = new BigDecimal(2);
+    private static final Double DEFAULT_COST_PER_PIECE = 1D;
+    private static final Double UPDATED_COST_PER_PIECE = 2D;
 
     private static final String ENTITY_API_URL = "/api/products";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -64,7 +59,7 @@ class ProductResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Product createEntity(EntityManager em) {
-        Product product = new Product().name(DEFAULT_NAME).number(DEFAULT_NUMBER).cost(DEFAULT_COST);
+        Product product = new Product().name(DEFAULT_NAME).costPerPiece(DEFAULT_COST_PER_PIECE);
         return product;
     }
 
@@ -75,7 +70,7 @@ class ProductResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Product createUpdatedEntity(EntityManager em) {
-        Product product = new Product().name(UPDATED_NAME).number(UPDATED_NUMBER).cost(UPDATED_COST);
+        Product product = new Product().name(UPDATED_NAME).costPerPiece(UPDATED_COST_PER_PIECE);
         return product;
     }
 
@@ -98,8 +93,7 @@ class ProductResourceIT {
         assertThat(productList).hasSize(databaseSizeBeforeCreate + 1);
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testProduct.getNumber()).isEqualTo(DEFAULT_NUMBER);
-        assertThat(testProduct.getCost()).isEqualByComparingTo(DEFAULT_COST);
+        assertThat(testProduct.getCostPerPiece()).isEqualTo(DEFAULT_COST_PER_PIECE);
     }
 
     @Test
@@ -139,27 +133,10 @@ class ProductResourceIT {
 
     @Test
     @Transactional
-    void checkNumberIsRequired() throws Exception {
+    void checkCostPerPieceIsRequired() throws Exception {
         int databaseSizeBeforeTest = productRepository.findAll().size();
         // set the field null
-        product.setNumber(null);
-
-        // Create the Product, which fails.
-
-        restProductMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(product)))
-            .andExpect(status().isBadRequest());
-
-        List<Product> productList = productRepository.findAll();
-        assertThat(productList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkCostIsRequired() throws Exception {
-        int databaseSizeBeforeTest = productRepository.findAll().size();
-        // set the field null
-        product.setCost(null);
+        product.setCostPerPiece(null);
 
         // Create the Product, which fails.
 
@@ -184,8 +161,7 @@ class ProductResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(product.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].number").value(hasItem(DEFAULT_NUMBER.intValue())))
-            .andExpect(jsonPath("$.[*].cost").value(hasItem(sameNumber(DEFAULT_COST))));
+            .andExpect(jsonPath("$.[*].costPerPiece").value(hasItem(DEFAULT_COST_PER_PIECE.doubleValue())));
     }
 
     @Test
@@ -201,8 +177,7 @@ class ProductResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(product.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.number").value(DEFAULT_NUMBER.intValue()))
-            .andExpect(jsonPath("$.cost").value(sameNumber(DEFAULT_COST)));
+            .andExpect(jsonPath("$.costPerPiece").value(DEFAULT_COST_PER_PIECE.doubleValue()));
     }
 
     @Test
@@ -224,7 +199,7 @@ class ProductResourceIT {
         Product updatedProduct = productRepository.findById(product.getId()).get();
         // Disconnect from session so that the updates on updatedProduct are not directly saved in db
         em.detach(updatedProduct);
-        updatedProduct.name(UPDATED_NAME).number(UPDATED_NUMBER).cost(UPDATED_COST);
+        updatedProduct.name(UPDATED_NAME).costPerPiece(UPDATED_COST_PER_PIECE);
 
         restProductMockMvc
             .perform(
@@ -239,8 +214,7 @@ class ProductResourceIT {
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testProduct.getNumber()).isEqualTo(UPDATED_NUMBER);
-        assertThat(testProduct.getCost()).isEqualByComparingTo(UPDATED_COST);
+        assertThat(testProduct.getCostPerPiece()).isEqualTo(UPDATED_COST_PER_PIECE);
     }
 
     @Test
@@ -324,8 +298,7 @@ class ProductResourceIT {
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testProduct.getNumber()).isEqualTo(DEFAULT_NUMBER);
-        assertThat(testProduct.getCost()).isEqualByComparingTo(DEFAULT_COST);
+        assertThat(testProduct.getCostPerPiece()).isEqualTo(DEFAULT_COST_PER_PIECE);
     }
 
     @Test
@@ -340,7 +313,7 @@ class ProductResourceIT {
         Product partialUpdatedProduct = new Product();
         partialUpdatedProduct.setId(product.getId());
 
-        partialUpdatedProduct.name(UPDATED_NAME).number(UPDATED_NUMBER).cost(UPDATED_COST);
+        partialUpdatedProduct.name(UPDATED_NAME).costPerPiece(UPDATED_COST_PER_PIECE);
 
         restProductMockMvc
             .perform(
@@ -355,8 +328,7 @@ class ProductResourceIT {
         assertThat(productList).hasSize(databaseSizeBeforeUpdate);
         Product testProduct = productList.get(productList.size() - 1);
         assertThat(testProduct.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testProduct.getNumber()).isEqualTo(UPDATED_NUMBER);
-        assertThat(testProduct.getCost()).isEqualByComparingTo(UPDATED_COST);
+        assertThat(testProduct.getCostPerPiece()).isEqualTo(UPDATED_COST_PER_PIECE);
     }
 
     @Test

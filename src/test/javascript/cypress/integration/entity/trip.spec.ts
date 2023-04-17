@@ -16,7 +16,7 @@ describe('Trip e2e test', () => {
   const tripPageUrlPattern = new RegExp('/trip(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const tripSample = { distance: 43669 };
+  const tripSample = { authorizedCapital: 29679, threshold: 54031 };
 
   let trip: any;
 
@@ -153,7 +153,9 @@ describe('Trip e2e test', () => {
     });
 
     it('should create an instance of Trip', () => {
-      cy.get(`[data-cy="distance"]`).type('48824').should('have.value', '48824');
+      cy.get(`[data-cy="authorizedCapital"]`).type('48825').should('have.value', '48825');
+
+      cy.get(`[data-cy="threshold"]`).type('43669').should('have.value', '43669');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

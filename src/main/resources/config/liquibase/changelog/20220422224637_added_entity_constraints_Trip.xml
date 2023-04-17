@@ -8,6 +8,12 @@
     -->
     <changeSet id="20220422224637-2" author="jhipster">
 
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="trip"
+                                 constraintName="fk_trip__user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
+
         <addForeignKeyConstraint baseColumnNames="transport_id"
                                  baseTableName="trip"
                                  constraintName="fk_trip__transport_id"
@@ -20,22 +26,10 @@
                                  referencedColumnNames="id"
                                  referencedTableName="driver"/>
 
-        <addForeignKeyConstraint baseColumnNames="address_id"
+        <addForeignKeyConstraint baseColumnNames="hub_positioning_id"
                                  baseTableName="trip"
-                                 constraintName="fk_trip__address_id"
+                                 constraintName="fk_trip__hub_positioning_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="address"/>
-
-        <addForeignKeyConstraint baseColumnNames="product_id"
-                                 baseTableName="trip"
-                                 constraintName="fk_trip__product_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="product"/>
-
-        <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="trip"
-                                 constraintName="fk_trip__user_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
+                                 referencedTableName="positioning"/>
     </changeSet>
 </databaseChangeLog>

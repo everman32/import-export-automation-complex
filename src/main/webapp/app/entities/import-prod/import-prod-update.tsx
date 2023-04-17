@@ -47,7 +47,7 @@ export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
   }, [updateSuccess]);
 
   const saveEntity = values => {
-    values.arrivaldate = convertDateTimeToServer(values.arrivaldate);
+    values.arrivalDate = convertDateTimeToServer(values.arrivalDate);
 
     const entity = {
       ...importProdEntity,
@@ -66,11 +66,11 @@ export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
   const defaultValues = () =>
     isNew
       ? {
-          arrivaldate: displayDefaultDateTime(),
+          arrivalDate: displayDefaultDateTime(),
         }
       : {
           ...importProdEntity,
-          arrivaldate: convertDateTimeFromServer(importProdEntity.arrivaldate),
+          arrivalDate: convertDateTimeFromServer(importProdEntity.arrivalDate),
           trip: importProdEntity?.trip?.id,
           grade: importProdEntity?.grade?.id,
         };
@@ -103,10 +103,10 @@ export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
                 />
               ) : null}
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.importProd.arrivaldate')}
-                id="import-prod-arrivaldate"
-                name="arrivaldate"
-                data-cy="arrivaldate"
+                label={translate('accountingImportExportProductsApp.importProd.arrivalDate')}
+                id="import-prod-arrivalDate"
+                name="arrivalDate"
+                data-cy="arrivalDate"
                 type="datetime-local"
                 placeholder="YYYY-MM-DD HH:mm"
                 validate={{

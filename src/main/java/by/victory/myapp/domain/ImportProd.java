@@ -25,15 +25,19 @@ public class ImportProd implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "arrivaldate", nullable = false)
-    private Instant arrivaldate;
+    @Column(name = "arrival_date", nullable = false)
+    private Instant arrivalDate;
 
-    @JsonIgnoreProperties(value = { "transport", "driver", "address", "product", "user" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
+        allowSetters = true
+    )
     @OneToOne
     @JoinColumn(unique = true)
     private Trip trip;
 
     @ManyToOne
+    @JsonIgnoreProperties(value = { "importProds", "exportProds" }, allowSetters = true)
     private Grade grade;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -51,17 +55,17 @@ public class ImportProd implements Serializable {
         this.id = id;
     }
 
-    public Instant getArrivaldate() {
-        return this.arrivaldate;
+    public Instant getArrivalDate() {
+        return this.arrivalDate;
     }
 
-    public ImportProd arrivaldate(Instant arrivaldate) {
-        this.setArrivaldate(arrivaldate);
+    public ImportProd arrivalDate(Instant arrivalDate) {
+        this.setArrivalDate(arrivalDate);
         return this;
     }
 
-    public void setArrivaldate(Instant arrivaldate) {
-        this.arrivaldate = arrivaldate;
+    public void setArrivalDate(Instant arrivalDate) {
+        this.arrivalDate = arrivalDate;
     }
 
     public Trip getTrip() {
@@ -114,7 +118,7 @@ public class ImportProd implements Serializable {
     public String toString() {
         return "ImportProd{" +
             "id=" + getId() +
-            ", arrivaldate='" + getArrivaldate() + "'" +
+            ", arrivalDate='" + getArrivalDate() + "'" +
             "}";
     }
 }

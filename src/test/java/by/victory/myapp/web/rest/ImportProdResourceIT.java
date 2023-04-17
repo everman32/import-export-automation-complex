@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ImportProdResourceIT {
 
-    private static final Instant DEFAULT_ARRIVALDATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_ARRIVALDATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_ARRIVAL_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_ARRIVAL_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/import-prods";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -58,7 +58,7 @@ class ImportProdResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ImportProd createEntity(EntityManager em) {
-        ImportProd importProd = new ImportProd().arrivaldate(DEFAULT_ARRIVALDATE);
+        ImportProd importProd = new ImportProd().arrivalDate(DEFAULT_ARRIVAL_DATE);
         return importProd;
     }
 
@@ -69,7 +69,7 @@ class ImportProdResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ImportProd createUpdatedEntity(EntityManager em) {
-        ImportProd importProd = new ImportProd().arrivaldate(UPDATED_ARRIVALDATE);
+        ImportProd importProd = new ImportProd().arrivalDate(UPDATED_ARRIVAL_DATE);
         return importProd;
     }
 
@@ -91,7 +91,7 @@ class ImportProdResourceIT {
         List<ImportProd> importProdList = importProdRepository.findAll();
         assertThat(importProdList).hasSize(databaseSizeBeforeCreate + 1);
         ImportProd testImportProd = importProdList.get(importProdList.size() - 1);
-        assertThat(testImportProd.getArrivaldate()).isEqualTo(DEFAULT_ARRIVALDATE);
+        assertThat(testImportProd.getArrivalDate()).isEqualTo(DEFAULT_ARRIVAL_DATE);
     }
 
     @Test
@@ -114,10 +114,10 @@ class ImportProdResourceIT {
 
     @Test
     @Transactional
-    void checkArrivaldateIsRequired() throws Exception {
+    void checkArrivalDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = importProdRepository.findAll().size();
         // set the field null
-        importProd.setArrivaldate(null);
+        importProd.setArrivalDate(null);
 
         // Create the ImportProd, which fails.
 
@@ -141,7 +141,7 @@ class ImportProdResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(importProd.getId().intValue())))
-            .andExpect(jsonPath("$.[*].arrivaldate").value(hasItem(DEFAULT_ARRIVALDATE.toString())));
+            .andExpect(jsonPath("$.[*].arrivalDate").value(hasItem(DEFAULT_ARRIVAL_DATE.toString())));
     }
 
     @Test
@@ -156,7 +156,7 @@ class ImportProdResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(importProd.getId().intValue()))
-            .andExpect(jsonPath("$.arrivaldate").value(DEFAULT_ARRIVALDATE.toString()));
+            .andExpect(jsonPath("$.arrivalDate").value(DEFAULT_ARRIVAL_DATE.toString()));
     }
 
     @Test
@@ -178,7 +178,7 @@ class ImportProdResourceIT {
         ImportProd updatedImportProd = importProdRepository.findById(importProd.getId()).get();
         // Disconnect from session so that the updates on updatedImportProd are not directly saved in db
         em.detach(updatedImportProd);
-        updatedImportProd.arrivaldate(UPDATED_ARRIVALDATE);
+        updatedImportProd.arrivalDate(UPDATED_ARRIVAL_DATE);
 
         restImportProdMockMvc
             .perform(
@@ -192,7 +192,7 @@ class ImportProdResourceIT {
         List<ImportProd> importProdList = importProdRepository.findAll();
         assertThat(importProdList).hasSize(databaseSizeBeforeUpdate);
         ImportProd testImportProd = importProdList.get(importProdList.size() - 1);
-        assertThat(testImportProd.getArrivaldate()).isEqualTo(UPDATED_ARRIVALDATE);
+        assertThat(testImportProd.getArrivalDate()).isEqualTo(UPDATED_ARRIVAL_DATE);
     }
 
     @Test
@@ -275,7 +275,7 @@ class ImportProdResourceIT {
         List<ImportProd> importProdList = importProdRepository.findAll();
         assertThat(importProdList).hasSize(databaseSizeBeforeUpdate);
         ImportProd testImportProd = importProdList.get(importProdList.size() - 1);
-        assertThat(testImportProd.getArrivaldate()).isEqualTo(DEFAULT_ARRIVALDATE);
+        assertThat(testImportProd.getArrivalDate()).isEqualTo(DEFAULT_ARRIVAL_DATE);
     }
 
     @Test
@@ -290,7 +290,7 @@ class ImportProdResourceIT {
         ImportProd partialUpdatedImportProd = new ImportProd();
         partialUpdatedImportProd.setId(importProd.getId());
 
-        partialUpdatedImportProd.arrivaldate(UPDATED_ARRIVALDATE);
+        partialUpdatedImportProd.arrivalDate(UPDATED_ARRIVAL_DATE);
 
         restImportProdMockMvc
             .perform(
@@ -304,7 +304,7 @@ class ImportProdResourceIT {
         List<ImportProd> importProdList = importProdRepository.findAll();
         assertThat(importProdList).hasSize(databaseSizeBeforeUpdate);
         ImportProd testImportProd = importProdList.get(importProdList.size() - 1);
-        assertThat(testImportProd.getArrivaldate()).isEqualTo(UPDATED_ARRIVALDATE);
+        assertThat(testImportProd.getArrivalDate()).isEqualTo(UPDATED_ARRIVAL_DATE);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package by.victory.myapp.web.rest;
 
-import static by.victory.myapp.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -9,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Driver;
 import by.victory.myapp.repository.DriverRepository;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -43,8 +41,8 @@ class DriverResourceIT {
     private static final String DEFAULT_PHONE = "AAAAAAAAAA";
     private static final String UPDATED_PHONE = "BBBBBBBBBB";
 
-    private static final BigDecimal DEFAULT_EXPERIENCE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_EXPERIENCE = new BigDecimal(2);
+    private static final Double DEFAULT_EXPERIENCE = 1D;
+    private static final Double UPDATED_EXPERIENCE = 2D;
 
     private static final String ENTITY_API_URL = "/api/drivers";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -117,7 +115,7 @@ class DriverResourceIT {
         assertThat(testDriver.getPatronymic()).isEqualTo(DEFAULT_PATRONYMIC);
         assertThat(testDriver.getLastname()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(testDriver.getPhone()).isEqualTo(DEFAULT_PHONE);
-        assertThat(testDriver.getExperience()).isEqualByComparingTo(DEFAULT_EXPERIENCE);
+        assertThat(testDriver.getExperience()).isEqualTo(DEFAULT_EXPERIENCE);
     }
 
     @Test
@@ -222,7 +220,7 @@ class DriverResourceIT {
             .andExpect(jsonPath("$.[*].patronymic").value(hasItem(DEFAULT_PATRONYMIC)))
             .andExpect(jsonPath("$.[*].lastname").value(hasItem(DEFAULT_LASTNAME)))
             .andExpect(jsonPath("$.[*].phone").value(hasItem(DEFAULT_PHONE)))
-            .andExpect(jsonPath("$.[*].experience").value(hasItem(sameNumber(DEFAULT_EXPERIENCE))));
+            .andExpect(jsonPath("$.[*].experience").value(hasItem(DEFAULT_EXPERIENCE.doubleValue())));
     }
 
     @Test
@@ -241,7 +239,7 @@ class DriverResourceIT {
             .andExpect(jsonPath("$.patronymic").value(DEFAULT_PATRONYMIC))
             .andExpect(jsonPath("$.lastname").value(DEFAULT_LASTNAME))
             .andExpect(jsonPath("$.phone").value(DEFAULT_PHONE))
-            .andExpect(jsonPath("$.experience").value(sameNumber(DEFAULT_EXPERIENCE)));
+            .andExpect(jsonPath("$.experience").value(DEFAULT_EXPERIENCE.doubleValue()));
     }
 
     @Test
@@ -286,7 +284,7 @@ class DriverResourceIT {
         assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
         assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualByComparingTo(UPDATED_EXPERIENCE);
+        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
     }
 
     @Test
@@ -380,7 +378,7 @@ class DriverResourceIT {
         assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
         assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualByComparingTo(UPDATED_EXPERIENCE);
+        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
     }
 
     @Test
@@ -418,7 +416,7 @@ class DriverResourceIT {
         assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
         assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualByComparingTo(UPDATED_EXPERIENCE);
+        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
     }
 
     @Test

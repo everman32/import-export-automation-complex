@@ -134,11 +134,8 @@ public class ProductResource {
                 if (product.getName() != null) {
                     existingProduct.setName(product.getName());
                 }
-                if (product.getNumber() != null) {
-                    existingProduct.setNumber(product.getNumber());
-                }
-                if (product.getCost() != null) {
-                    existingProduct.setCost(product.getCost());
+                if (product.getCostPerPiece() != null) {
+                    existingProduct.setCostPerPiece(product.getCostPerPiece());
                 }
 
                 return existingProduct;

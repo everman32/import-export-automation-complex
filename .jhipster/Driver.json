@@ -31,8 +31,9 @@
     },
     {
       "fieldName": "experience",
-      "fieldType": "BigDecimal",
-      "fieldValidateRules": ["required"]
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
     }
   ],
   "fluentMethods": true,
@@ -40,6 +41,13 @@
   "name": "Driver",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "driver",
+      "relationshipName": "trip",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "service": "no"
 }

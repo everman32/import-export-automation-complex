@@ -15,6 +15,18 @@
         "importProd": "Импорт",
         "exportProd": "Экспорт",
         "grade": "Оценки",
+        "transport": "Transport",
+        "driver": "Driver",
+        "address": "Address",
+        "product": "Product",
+        "trip": "Trip",
+        "importProd": "Import Prod",
+        "exportProd": "Export Prod",
+        "grade": "Grade",
+        "statement": "Statement",
+        "statementType": "Statement Type",
+        "positioning": "Positioning",
+        "productUnit": "Product Unit",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

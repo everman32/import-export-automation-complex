@@ -4,26 +4,29 @@
       "home": {
         "title": "Trips",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new trip",
-        "createOrEditLabel": "Create or edit a trip",
-        "notFound": "No trips found"
+        "createLabel": "Create a new Trip",
+        "createOrEditLabel": "Create or edit a Trip",
+        "notFound": "No Trips found"
       },
-      "created": "A new trip is created with identifier {{ param }}",
-      "updated": "A trip is updated with identifier {{ param }}",
-      "deleted": "A trip is deleted with identifier {{ param }}",
+      "created": "A new Trip is created with identifier {{ param }}",
+      "updated": "A Trip is updated with identifier {{ param }}",
+      "deleted": "A Trip is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete trip {{ id }}?"
+        "question": "Are you sure you want to delete Trip {{ id }}?"
       },
       "detail": {
         "title": "Trip"
       },
       "id": "ID",
-      "distance": "Distance",
+      "authorizedCapital": "Authorized Capital",
+      "threshold": "Threshold",
+      "statement": "Statement",
+      "user": "User",
+      "importProd": "Import Prod",
+      "exportProd": "Export Prod",
       "transport": "Transport",
       "driver": "Driver",
-      "address": "Address",
-      "product": "Product",
-      "user": "Approved"
+      "hubPositioning": "Hub Positioning"
     }
   }
 }

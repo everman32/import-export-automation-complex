@@ -2,25 +2,26 @@
   "accountingImportExportProductsApp": {
     "transport": {
       "home": {
-        "title": "Транспорт",
+        "title": "Transports",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый транспорт",
-        "createOrEditLabel": "Создать или отредактировать транспорт",
-        "notFound": "Транспорт не найден"
+        "createLabel": "Создать новый Transport",
+        "createOrEditLabel": "Создать или отредактировать Transport",
+        "notFound": "Transports не найдено"
       },
-      "created": "Новый транспорт создан с идентификатором {{ param }}",
-      "updated": "Транспорт обновлен с идентификатором {{ param }}",
-      "deleted": "Транспорт удален с идентификатором {{ param }}",
+      "created": "Новый Transport создан с идентификатором {{ param }}",
+      "updated": "Transport обновлен с идентификатором {{ param }}",
+      "deleted": "Transport удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить транспорт {{ id }}?"
+        "question": "Вы уверены что хотите удалить Transport {{ id }}?"
       },
       "detail": {
-        "title": "Транспорт"
+        "title": "Transport"
       },
       "id": "ID",
-      "brand": "Бренд",
-      "model": "Модель",
-      "vin": "VIN"
+      "brand": "Brand",
+      "model": "Model",
+      "vin": "Vin",
+      "trip": "Trip"
     }
   }
 }

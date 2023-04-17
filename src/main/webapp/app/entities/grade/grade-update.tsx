@@ -90,6 +90,7 @@ export const GradeUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 type="text"
                 validate={{
                   required: { value: true, message: translate('entity.validation.required') },
+                  minLength: { value: 2, message: translate('entity.validation.minlength', { min: 2 }) },
                 }}
               />
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/grade" replace color="info">

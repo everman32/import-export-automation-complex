@@ -56,6 +56,20 @@ public class CacheConfiguration {
             createCache(cm, by.victory.myapp.domain.ImportProd.class.getName());
             createCache(cm, by.victory.myapp.domain.ExportProd.class.getName());
             createCache(cm, by.victory.myapp.domain.Grade.class.getName());
+            createCache(cm, by.victory.myapp.domain.Transport.class.getName() + ".trips");
+            createCache(cm, by.victory.myapp.domain.Driver.class.getName() + ".trips");
+            createCache(cm, by.victory.myapp.domain.Product.class.getName() + ".statements");
+            createCache(cm, by.victory.myapp.domain.Trip.class.getName() + ".statements");
+            createCache(cm, by.victory.myapp.domain.Grade.class.getName() + ".importProds");
+            createCache(cm, by.victory.myapp.domain.Grade.class.getName() + ".exportProds");
+            createCache(cm, by.victory.myapp.domain.Statement.class.getName());
+            createCache(cm, by.victory.myapp.domain.StatementType.class.getName());
+            createCache(cm, by.victory.myapp.domain.StatementType.class.getName() + ".statements");
+            createCache(cm, by.victory.myapp.domain.Positioning.class.getName());
+            createCache(cm, by.victory.myapp.domain.Positioning.class.getName() + ".statements");
+            createCache(cm, by.victory.myapp.domain.Positioning.class.getName() + ".trips");
+            createCache(cm, by.victory.myapp.domain.ProductUnit.class.getName());
+            createCache(cm, by.victory.myapp.domain.ProductUnit.class.getName() + ".products");
             // jhipster-needle-ehcache-add-entry
         };
     }

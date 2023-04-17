@@ -2,25 +2,25 @@
   "accountingImportExportProductsApp": {
     "exportProd": {
       "home": {
-        "title": "Экспорт",
+        "title": "Export Prods",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый экспорт",
-        "createOrEditLabel": "Создать или отредактировать экспорт",
-        "notFound": "Экспорт не найден"
+        "createLabel": "Создать новый Export Prod",
+        "createOrEditLabel": "Создать или отредактировать Export Prod",
+        "notFound": "Export Prods не найдено"
       },
-      "created": "Новый экспорт создан с идентификатором {{ param }}",
-      "updated": "Экспорт обновлен с идентификатором {{ param }}",
-      "deleted": "Экспорт удален с идентификатором {{ param }}",
+      "created": "Новый Export Prod создан с идентификатором {{ param }}",
+      "updated": "Export Prod обновлен с идентификатором {{ param }}",
+      "deleted": "Export Prod удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить экспорт {{ id }}?"
+        "question": "Вы уверены что хотите удалить Export Prod {{ id }}?"
       },
       "detail": {
-        "title": "Экспорт"
+        "title": "Export Prod"
       },
       "id": "ID",
-      "departuredate": "Дата отправления",
-      "trip": "Рейс",
-      "grade": "Оценка"
+      "departureDate": "Departure Date",
+      "trip": "Trip",
+      "grade": "Grade"
     }
   }
 }

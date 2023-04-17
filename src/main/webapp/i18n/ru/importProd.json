@@ -2,25 +2,25 @@
   "accountingImportExportProductsApp": {
     "importProd": {
       "home": {
-        "title": "Импорт",
+        "title": "Import Prods",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый импорт",
-        "createOrEditLabel": "Создать или отредактировать импорт",
-        "notFound": "Импорт не найден"
+        "createLabel": "Создать новый Import Prod",
+        "createOrEditLabel": "Создать или отредактировать Import Prod",
+        "notFound": "Import Prods не найдено"
       },
-      "created": "Новый импорт создан с идентификатором {{ param }}",
-      "updated": "Импорт обновлен с идентификатором {{ param }}",
-      "deleted": "Импорт удален с идентификатором {{ param }}",
+      "created": "Новый Import Prod создан с идентификатором {{ param }}",
+      "updated": "Import Prod обновлен с идентификатором {{ param }}",
+      "deleted": "Import Prod удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить импорт {{ id }}?"
+        "question": "Вы уверены что хотите удалить Import Prod {{ id }}?"
       },
       "detail": {
-        "title": "Импорт"
+        "title": "Import Prod"
       },
       "id": "ID",
-      "arrivaldate": "Дата прибытия",
-      "trip": "Рейс",
-      "grade": "Оценка"
+      "arrivalDate": "Arrival Date",
+      "trip": "Trip",
+      "grade": "Grade"
     }
   }
 }

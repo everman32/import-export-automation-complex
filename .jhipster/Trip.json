@@ -6,9 +6,16 @@
   "entityTableName": "trip",
   "fields": [
     {
-      "fieldName": "distance",
-      "fieldType": "BigDecimal",
-      "fieldValidateRules": ["required"]
+      "fieldName": "authorizedCapital",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "threshold",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "0"
     }
   ],
   "fluentMethods": true,
@@ -17,6 +24,33 @@
   "pagination": "pagination",
   "readOnly": false,
   "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "user",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "importProd",
+      "otherEntityRelationshipName": "trip",
+      "ownerSide": false,
+      "relationshipName": "importProd",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "exportProd",
+      "otherEntityRelationshipName": "trip",
+      "ownerSide": false,
+      "relationshipName": "exportProd",
+      "relationshipType": "one-to-one"
+    },
     {
       "otherEntityName": "transport",
       "otherEntityRelationshipName": "trip",
@@ -30,22 +64,9 @@
       "relationshipType": "many-to-one"
     },
     {
-      "otherEntityName": "address",
+      "otherEntityName": "positioning",
       "otherEntityRelationshipName": "trip",
-      "relationshipName": "address",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "product",
-      "otherEntityRelationshipName": "trip",
-      "relationshipName": "product",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityField": "login",
-      "otherEntityName": "user",
-      "otherEntityRelationshipName": "trip",
-      "relationshipName": "user",
+      "relationshipName": "hubPositioning",
       "relationshipType": "many-to-one"
     }
   ],

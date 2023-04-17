@@ -1,0 +1,29 @@
+{
+  "applications": "*",
+  "changelogDate": "20230417145212",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "statement_type",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "3"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "StatementType",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "statementType",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

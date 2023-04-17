@@ -27,6 +27,14 @@ import importProd from 'app/entities/import-prod/import-prod.reducer';
 import exportProd from 'app/entities/export-prod/export-prod.reducer';
 // prettier-ignore
 import grade from 'app/entities/grade/grade.reducer';
+// prettier-ignore
+import statement from 'app/entities/statement/statement.reducer';
+// prettier-ignore
+import statementType from 'app/entities/statement-type/statement-type.reducer';
+// prettier-ignore
+import positioning from 'app/entities/positioning/positioning.reducer';
+// prettier-ignore
+import productUnit from 'app/entities/product-unit/product-unit.reducer';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const rootReducer = {
@@ -48,6 +56,10 @@ const rootReducer = {
   importProd,
   exportProd,
   grade,
+  statement,
+  statementType,
+  positioning,
+  productUnit,
   /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
   loadingBar,
 };

@@ -16,7 +16,7 @@ describe('ExportProd e2e test', () => {
   const exportProdPageUrlPattern = new RegExp('/export-prod(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const exportProdSample = { departuredate: '2022-04-22T07:09:53.091Z' };
+  const exportProdSample = { departureDate: '2022-04-22T07:09:53.091Z' };
 
   let exportProd: any;
 
@@ -153,7 +153,7 @@ describe('ExportProd e2e test', () => {
     });
 
     it('should create an instance of ExportProd', () => {
-      cy.get(`[data-cy="departuredate"]`).type('2022-04-22T00:40').should('have.value', '2022-04-22T00:40');
+      cy.get(`[data-cy="departureDate"]`).type('2022-04-22T00:40').should('have.value', '2022-04-22T00:40');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

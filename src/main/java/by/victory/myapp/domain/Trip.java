@@ -1,7 +1,9 @@
 package by.victory.myapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -24,23 +26,42 @@ public class Trip implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "distance", precision = 21, scale = 2, nullable = false)
-    private BigDecimal distance;
+    @DecimalMin(value = "1")
+    @Column(name = "authorized_capital", nullable = false)
+    private Double authorizedCapital;
 
-    @ManyToOne
-    private Transport transport;
+    @NotNull
+    @DecimalMin(value = "0")
+    @Column(name = "threshold", nullable = false)
+    private Double threshold;
 
-    @ManyToOne
-    private Driver driver;
-
-    @ManyToOne
-    private Address address;
-
-    @ManyToOne
-    private Product product;
+    @OneToMany(mappedBy = "trip")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
+    private Set<Statement> statements = new HashSet<>();
 
     @ManyToOne
     private User user;
+
+    @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
+    @OneToOne(mappedBy = "trip")
+    private ImportProd importProd;
+
+    @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
+    @OneToOne(mappedBy = "trip")
+    private ExportProd exportProd;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "trips" }, allowSetters = true)
+    private Transport transport;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "trips" }, allowSetters = true)
+    private Driver driver;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "statements", "trips" }, allowSetters = true)
+    private Positioning hubPositioning;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -57,17 +78,112 @@ public class Trip implements Serializable {
         this.id = id;
     }
 
-    public BigDecimal getDistance() {
-        return this.distance;
+    public Double getAuthorizedCapital() {
+        return this.authorizedCapital;
     }
 
-    public Trip distance(BigDecimal distance) {
-        this.setDistance(distance);
+    public Trip authorizedCapital(Double authorizedCapital) {
+        this.setAuthorizedCapital(authorizedCapital);
         return this;
     }
 
-    public void setDistance(BigDecimal distance) {
-        this.distance = distance;
+    public void setAuthorizedCapital(Double authorizedCapital) {
+        this.authorizedCapital = authorizedCapital;
+    }
+
+    public Double getThreshold() {
+        return this.threshold;
+    }
+
+    public Trip threshold(Double threshold) {
+        this.setThreshold(threshold);
+        return this;
+    }
+
+    public void setThreshold(Double threshold) {
+        this.threshold = threshold;
+    }
+
+    public Set<Statement> getStatements() {
+        return this.statements;
+    }
+
+    public void setStatements(Set<Statement> statements) {
+        if (this.statements != null) {
+            this.statements.forEach(i -> i.setTrip(null));
+        }
+        if (statements != null) {
+            statements.forEach(i -> i.setTrip(this));
+        }
+        this.statements = statements;
+    }
+
+    public Trip statements(Set<Statement> statements) {
+        this.setStatements(statements);
+        return this;
+    }
+
+    public Trip addStatement(Statement statement) {
+        this.statements.add(statement);
+        statement.setTrip(this);
+        return this;
+    }
+
+    public Trip removeStatement(Statement statement) {
+        this.statements.remove(statement);
+        statement.setTrip(null);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Trip user(User user) {
+        this.setUser(user);
+        return this;
+    }
+
+    public ImportProd getImportProd() {
+        return this.importProd;
+    }
+
+    public void setImportProd(ImportProd importProd) {
+        if (this.importProd != null) {
+            this.importProd.setTrip(null);
+        }
+        if (importProd != null) {
+            importProd.setTrip(this);
+        }
+        this.importProd = importProd;
+    }
+
+    public Trip importProd(ImportProd importProd) {
+        this.setImportProd(importProd);
+        return this;
+    }
+
+    public ExportProd getExportProd() {
+        return this.exportProd;
+    }
+
+    public void setExportProd(ExportProd exportProd) {
+        if (this.exportProd != null) {
+            this.exportProd.setTrip(null);
+        }
+        if (exportProd != null) {
+            exportProd.setTrip(this);
+        }
+        this.exportProd = exportProd;
+    }
+
+    public Trip exportProd(ExportProd exportProd) {
+        this.setExportProd(exportProd);
+        return this;
     }
 
     public Transport getTransport() {
@@ -96,42 +212,16 @@ public class Trip implements Serializable {
         return this;
     }
 
-    public Address getAddress() {
-        return this.address;
+    public Positioning getHubPositioning() {
+        return this.hubPositioning;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setHubPositioning(Positioning positioning) {
+        this.hubPositioning = positioning;
     }
 
-    public Trip address(Address address) {
-        this.setAddress(address);
-        return this;
-    }
-
-    public Product getProduct() {
-        return this.product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public Trip product(Product product) {
-        this.setProduct(product);
-        return this;
-    }
-
-    public User getUser() {
-        return this.user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Trip user(User user) {
-        this.setUser(user);
+    public Trip hubPositioning(Positioning positioning) {
+        this.setHubPositioning(positioning);
         return this;
     }
 
@@ -159,7 +249,8 @@ public class Trip implements Serializable {
     public String toString() {
         return "Trip{" +
             "id=" + getId() +
-            ", distance=" + getDistance() +
+            ", authorizedCapital=" + getAuthorizedCapital() +
+            ", threshold=" + getThreshold() +
             "}";
     }
 }

@@ -30,12 +30,12 @@ export const ImportProdDetail = (props: RouteComponentProps<{ id: string }>) => 
           </dt>
           <dd>{importProdEntity.id}</dd>
           <dt>
-            <span id="arrivaldate">
-              <Translate contentKey="accountingImportExportProductsApp.importProd.arrivaldate">Arrivaldate</Translate>
+            <span id="arrivalDate">
+              <Translate contentKey="accountingImportExportProductsApp.importProd.arrivalDate">Arrival Date</Translate>
             </span>
           </dt>
           <dd>
-            {importProdEntity.arrivaldate ? <TextFormat value={importProdEntity.arrivaldate} type="date" format={APP_DATE_FORMAT} /> : null}
+            {importProdEntity.arrivalDate ? <TextFormat value={importProdEntity.arrivalDate} type="date" format={APP_DATE_FORMAT} /> : null}
           </dd>
           <dt>
             <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate>

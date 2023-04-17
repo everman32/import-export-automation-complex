@@ -1,7 +1,9 @@
 package by.victory.myapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -43,8 +45,17 @@ public class Driver implements Serializable {
     private String phone;
 
     @NotNull
-    @Column(name = "experience", precision = 21, scale = 2, nullable = false)
-    private BigDecimal experience;
+    @DecimalMin(value = "1")
+    @Column(name = "experience", nullable = false)
+    private Double experience;
+
+    @OneToMany(mappedBy = "driver")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
+        allowSetters = true
+    )
+    private Set<Trip> trips = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -113,17 +124,48 @@ public class Driver implements Serializable {
         this.phone = phone;
     }
 
-    public BigDecimal getExperience() {
+    public Double getExperience() {
         return this.experience;
     }
 
-    public Driver experience(BigDecimal experience) {
+    public Driver experience(Double experience) {
         this.setExperience(experience);
         return this;
     }
 
-    public void setExperience(BigDecimal experience) {
+    public void setExperience(Double experience) {
         this.experience = experience;
+    }
+
+    public Set<Trip> getTrips() {
+        return this.trips;
+    }
+
+    public void setTrips(Set<Trip> trips) {
+        if (this.trips != null) {
+            this.trips.forEach(i -> i.setDriver(null));
+        }
+        if (trips != null) {
+            trips.forEach(i -> i.setDriver(this));
+        }
+        this.trips = trips;
+    }
+
+    public Driver trips(Set<Trip> trips) {
+        this.setTrips(trips);
+        return this;
+    }
+
+    public Driver addTrip(Trip trip) {
+        this.trips.add(trip);
+        trip.setDriver(this);
+        return this;
+    }
+
+    public Driver removeTrip(Trip trip) {
+        this.trips.remove(trip);
+        trip.setDriver(null);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

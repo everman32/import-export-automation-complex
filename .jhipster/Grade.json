@@ -8,7 +8,8 @@
     {
       "fieldName": "description",
       "fieldType": "String",
-      "fieldValidateRules": ["unique", "required"]
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "2"
     }
   ],
   "fluentMethods": true,
@@ -16,6 +17,19 @@
   "name": "Grade",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "importProd",
+      "otherEntityRelationshipName": "grade",
+      "relationshipName": "importProd",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "exportProd",
+      "otherEntityRelationshipName": "grade",
+      "relationshipName": "exportProd",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "service": "no"
 }

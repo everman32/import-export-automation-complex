@@ -15,6 +15,12 @@
         "importProd": "Import",
         "exportProd": "Export",
         "grade": "Grade",
+        "importProd": "Import Prod",
+        "exportProd": "Export Prod",
+        "statement": "Statement",
+        "statementType": "Statement Type",
+        "positioning": "Positioning",
+        "productUnit": "Product Unit",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

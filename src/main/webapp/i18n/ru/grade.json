@@ -2,23 +2,25 @@
   "accountingImportExportProductsApp": {
     "grade": {
       "home": {
-        "title": "Оценки",
+        "title": "Grades",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новую оценку",
-        "createOrEditLabel": "Создать или отредактировать оценку",
-        "notFound": "Оценок не найдено"
+        "createLabel": "Создать новый Grade",
+        "createOrEditLabel": "Создать или отредактировать Grade",
+        "notFound": "Grades не найдено"
       },
-      "created": "Новая оценка создана с идентификатором {{ param }}",
-      "updated": "Оценка обновлена с идентификатором {{ param }}",
-      "deleted": "Оценка удалена с идентификатором {{ param }}",
+      "created": "Новый Grade создан с идентификатором {{ param }}",
+      "updated": "Grade обновлен с идентификатором {{ param }}",
+      "deleted": "Grade удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить оценку {{ id }}?"
+        "question": "Вы уверены что хотите удалить Grade {{ id }}?"
       },
       "detail": {
-        "title": "Оценка"
+        "title": "Grade"
       },
       "id": "ID",
-      "description": "Содержание"
+      "description": "Description",
+      "importProd": "Import Prod",
+      "exportProd": "Export Prod"
     }
   }
 }

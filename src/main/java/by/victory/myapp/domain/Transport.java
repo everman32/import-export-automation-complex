@@ -1,6 +1,9 @@
 package by.victory.myapp.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
@@ -36,6 +39,14 @@ public class Transport implements Serializable {
     @Size(min = 17, max = 17)
     @Column(name = "vin", length = 17, nullable = false, unique = true)
     private String vin;
+
+    @OneToMany(mappedBy = "transport")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(
+        value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
+        allowSetters = true
+    )
+    private Set<Trip> trips = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -89,6 +100,37 @@ public class Transport implements Serializable {
 
     public void setVin(String vin) {
         this.vin = vin;
+    }
+
+    public Set<Trip> getTrips() {
+        return this.trips;
+    }
+
+    public void setTrips(Set<Trip> trips) {
+        if (this.trips != null) {
+            this.trips.forEach(i -> i.setTransport(null));
+        }
+        if (trips != null) {
+            trips.forEach(i -> i.setTransport(this));
+        }
+        this.trips = trips;
+    }
+
+    public Transport trips(Set<Trip> trips) {
+        this.setTrips(trips);
+        return this;
+    }
+
+    public Transport addTrip(Trip trip) {
+        this.trips.add(trip);
+        trip.setTransport(this);
+        return this;
+    }
+
+    public Transport removeTrip(Trip trip) {
+        this.trips.remove(trip);
+        trip.setTransport(null);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -4,6 +4,8 @@ import { Button, Row, Col, FormText } from 'reactstrap';
 import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { IProductUnit } from 'app/shared/model/product-unit.model';
+import { getEntities as getProductUnits } from 'app/entities/product-unit/product-unit.reducer';
 import { getEntity, updateEntity, createEntity, reset } from './product.reducer';
 import { IProduct } from 'app/shared/model/product.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
@@ -15,6 +17,7 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
 
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
+  const productUnits = useAppSelector(state => state.productUnit.entities);
   const productEntity = useAppSelector(state => state.product.entity);
   const loading = useAppSelector(state => state.product.loading);
   const updating = useAppSelector(state => state.product.updating);
@@ -29,6 +32,8 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
     } else {
       dispatch(getEntity(props.match.params.id));
     }
+
+    dispatch(getProductUnits({}));
   }, []);
 
   useEffect(() => {
@@ -41,6 +46,7 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
     const entity = {
       ...productEntity,
       ...values,
+      productUnit: productUnits.find(it => it.id.toString() === values.productUnit.toString()),
     };
 
     if (isNew) {
@@ -55,6 +61,7 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
       ? {}
       : {
           ...productEntity,
+          productUnit: productEntity?.productUnit?.id,
         };
 
   return (
@@ -94,27 +101,33 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 }}
               />
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.product.number')}
-                id="product-number"
-                name="number"
-                data-cy="number"
+                label={translate('accountingImportExportProductsApp.product.costPerPiece')}
+                id="product-costPerPiece"
+                name="costPerPiece"
+                data-cy="costPerPiece"
                 type="text"
                 validate={{
                   required: { value: true, message: translate('entity.validation.required') },
+                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
                   validate: v => isNumber(v) || translate('entity.validation.number'),
                 }}
               />
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.product.cost')}
-                id="product-cost"
-                name="cost"
-                data-cy="cost"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
+                id="product-productUnit"
+                name="productUnit"
+                data-cy="productUnit"
+                label={translate('accountingImportExportProductsApp.product.productUnit')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {productUnits
+                  ? productUnits.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.id}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/product" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

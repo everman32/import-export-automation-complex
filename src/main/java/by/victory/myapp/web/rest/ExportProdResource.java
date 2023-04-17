@@ -131,8 +131,8 @@ public class ExportProdResource {
         Optional<ExportProd> result = exportProdRepository
             .findById(exportProd.getId())
             .map(existingExportProd -> {
-                if (exportProd.getDeparturedate() != null) {
-                    existingExportProd.setDeparturedate(exportProd.getDeparturedate());
+                if (exportProd.getDepartureDate() != null) {
+                    existingExportProd.setDepartureDate(exportProd.getDepartureDate());
                 }
 
                 return existingExportProd;

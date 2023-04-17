@@ -31,8 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class ExportProdResourceIT {
 
-    private static final Instant DEFAULT_DEPARTUREDATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_DEPARTUREDATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Instant DEFAULT_DEPARTURE_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DEPARTURE_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/export-prods";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -58,7 +58,7 @@ class ExportProdResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ExportProd createEntity(EntityManager em) {
-        ExportProd exportProd = new ExportProd().departuredate(DEFAULT_DEPARTUREDATE);
+        ExportProd exportProd = new ExportProd().departureDate(DEFAULT_DEPARTURE_DATE);
         return exportProd;
     }
 
@@ -69,7 +69,7 @@ class ExportProdResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static ExportProd createUpdatedEntity(EntityManager em) {
-        ExportProd exportProd = new ExportProd().departuredate(UPDATED_DEPARTUREDATE);
+        ExportProd exportProd = new ExportProd().departureDate(UPDATED_DEPARTURE_DATE);
         return exportProd;
     }
 
@@ -91,7 +91,7 @@ class ExportProdResourceIT {
         List<ExportProd> exportProdList = exportProdRepository.findAll();
         assertThat(exportProdList).hasSize(databaseSizeBeforeCreate + 1);
         ExportProd testExportProd = exportProdList.get(exportProdList.size() - 1);
-        assertThat(testExportProd.getDeparturedate()).isEqualTo(DEFAULT_DEPARTUREDATE);
+        assertThat(testExportProd.getDepartureDate()).isEqualTo(DEFAULT_DEPARTURE_DATE);
     }
 
     @Test
@@ -114,10 +114,10 @@ class ExportProdResourceIT {
 
     @Test
     @Transactional
-    void checkDeparturedateIsRequired() throws Exception {
+    void checkDepartureDateIsRequired() throws Exception {
         int databaseSizeBeforeTest = exportProdRepository.findAll().size();
         // set the field null
-        exportProd.setDeparturedate(null);
+        exportProd.setDepartureDate(null);
 
         // Create the ExportProd, which fails.
 
@@ -141,7 +141,7 @@ class ExportProdResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(exportProd.getId().intValue())))
-            .andExpect(jsonPath("$.[*].departuredate").value(hasItem(DEFAULT_DEPARTUREDATE.toString())));
+            .andExpect(jsonPath("$.[*].departureDate").value(hasItem(DEFAULT_DEPARTURE_DATE.toString())));
     }
 
     @Test
@@ -156,7 +156,7 @@ class ExportProdResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(exportProd.getId().intValue()))
-            .andExpect(jsonPath("$.departuredate").value(DEFAULT_DEPARTUREDATE.toString()));
+            .andExpect(jsonPath("$.departureDate").value(DEFAULT_DEPARTURE_DATE.toString()));
     }
 
     @Test
@@ -178,7 +178,7 @@ class ExportProdResourceIT {
         ExportProd updatedExportProd = exportProdRepository.findById(exportProd.getId()).get();
         // Disconnect from session so that the updates on updatedExportProd are not directly saved in db
         em.detach(updatedExportProd);
-        updatedExportProd.departuredate(UPDATED_DEPARTUREDATE);
+        updatedExportProd.departureDate(UPDATED_DEPARTURE_DATE);
 
         restExportProdMockMvc
             .perform(
@@ -192,7 +192,7 @@ class ExportProdResourceIT {
         List<ExportProd> exportProdList = exportProdRepository.findAll();
         assertThat(exportProdList).hasSize(databaseSizeBeforeUpdate);
         ExportProd testExportProd = exportProdList.get(exportProdList.size() - 1);
-        assertThat(testExportProd.getDeparturedate()).isEqualTo(UPDATED_DEPARTUREDATE);
+        assertThat(testExportProd.getDepartureDate()).isEqualTo(UPDATED_DEPARTURE_DATE);
     }
 
     @Test
@@ -275,7 +275,7 @@ class ExportProdResourceIT {
         List<ExportProd> exportProdList = exportProdRepository.findAll();
         assertThat(exportProdList).hasSize(databaseSizeBeforeUpdate);
         ExportProd testExportProd = exportProdList.get(exportProdList.size() - 1);
-        assertThat(testExportProd.getDeparturedate()).isEqualTo(DEFAULT_DEPARTUREDATE);
+        assertThat(testExportProd.getDepartureDate()).isEqualTo(DEFAULT_DEPARTURE_DATE);
     }
 
     @Test
@@ -290,7 +290,7 @@ class ExportProdResourceIT {
         ExportProd partialUpdatedExportProd = new ExportProd();
         partialUpdatedExportProd.setId(exportProd.getId());
 
-        partialUpdatedExportProd.departuredate(UPDATED_DEPARTUREDATE);
+        partialUpdatedExportProd.departureDate(UPDATED_DEPARTURE_DATE);
 
         restExportProdMockMvc
             .perform(
@@ -304,7 +304,7 @@ class ExportProdResourceIT {
         List<ExportProd> exportProdList = exportProdRepository.findAll();
         assertThat(exportProdList).hasSize(databaseSizeBeforeUpdate);
         ExportProd testExportProd = exportProdList.get(exportProdList.size() - 1);
-        assertThat(testExportProd.getDeparturedate()).isEqualTo(UPDATED_DEPARTUREDATE);
+        assertThat(testExportProd.getDepartureDate()).isEqualTo(UPDATED_DEPARTURE_DATE);
     }
 
     @Test

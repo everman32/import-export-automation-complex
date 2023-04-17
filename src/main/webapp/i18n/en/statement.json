@@ -1,0 +1,30 @@
+{
+  "accountingImportExportProductsApp": {
+    "statement": {
+      "home": {
+        "title": "Statements",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Statement",
+        "createOrEditLabel": "Create or edit a Statement",
+        "notFound": "No Statements found"
+      },
+      "created": "A new Statement is created with identifier {{ param }}",
+      "updated": "A Statement is updated with identifier {{ param }}",
+      "deleted": "A Statement is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Statement {{ id }}?"
+      },
+      "detail": {
+        "title": "Statement"
+      },
+      "id": "ID",
+      "name": "Name",
+      "transportTariff": "Transport Tariff",
+      "deliveryScope": "Delivery Scope",
+      "statementType": "Statement Type",
+      "product": "Product",
+      "positioning": "Positioning",
+      "trip": "Trip"
+    }
+  }
+}

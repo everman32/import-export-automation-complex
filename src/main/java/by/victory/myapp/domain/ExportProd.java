@@ -25,15 +25,19 @@ public class ExportProd implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "departuredate", nullable = false)
-    private Instant departuredate;
+    @Column(name = "departure_date", nullable = false)
+    private Instant departureDate;
 
-    @JsonIgnoreProperties(value = { "transport", "driver", "address", "product", "user" }, allowSetters = true)
+    @JsonIgnoreProperties(
+        value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
+        allowSetters = true
+    )
     @OneToOne
     @JoinColumn(unique = true)
     private Trip trip;
 
     @ManyToOne
+    @JsonIgnoreProperties(value = { "importProds", "exportProds" }, allowSetters = true)
     private Grade grade;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -51,17 +55,17 @@ public class ExportProd implements Serializable {
         this.id = id;
     }
 
-    public Instant getDeparturedate() {
-        return this.departuredate;
+    public Instant getDepartureDate() {
+        return this.departureDate;
     }
 
-    public ExportProd departuredate(Instant departuredate) {
-        this.setDeparturedate(departuredate);
+    public ExportProd departureDate(Instant departureDate) {
+        this.setDepartureDate(departureDate);
         return this;
     }
 
-    public void setDeparturedate(Instant departuredate) {
-        this.departuredate = departuredate;
+    public void setDepartureDate(Instant departureDate) {
+        this.departureDate = departureDate;
     }
 
     public Trip getTrip() {
@@ -114,7 +118,7 @@ public class ExportProd implements Serializable {
     public String toString() {
         return "ExportProd{" +
             "id=" + getId() +
-            ", departuredate='" + getDeparturedate() + "'" +
+            ", departureDate='" + getDepartureDate() + "'" +
             "}";
     }
 }

@@ -16,7 +16,7 @@ describe('ImportProd e2e test', () => {
   const importProdPageUrlPattern = new RegExp('/import-prod(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const importProdSample = { arrivaldate: '2022-04-21T23:51:47.336Z' };
+  const importProdSample = { arrivalDate: '2022-04-21T23:51:47.336Z' };
 
   let importProd: any;
 
@@ -153,7 +153,7 @@ describe('ImportProd e2e test', () => {
     });
 
     it('should create an instance of ImportProd', () => {
-      cy.get(`[data-cy="arrivaldate"]`).type('2022-04-22T20:50').should('have.value', '2022-04-22T20:50');
+      cy.get(`[data-cy="arrivalDate"]`).type('2022-04-22T20:50').should('have.value', '2022-04-22T20:50');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

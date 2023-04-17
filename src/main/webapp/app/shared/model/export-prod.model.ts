@@ -4,7 +4,7 @@ import { IGrade } from 'app/shared/model/grade.model';
 
 export interface IExportProd {
   id?: number;
-  departuredate?: string;
+  departureDate?: string;
   trip?: ITrip | null;
   grade?: IGrade | null;
 }

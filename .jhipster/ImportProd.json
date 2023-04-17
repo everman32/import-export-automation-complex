@@ -6,7 +6,7 @@
   "entityTableName": "import_prod",
   "fields": [
     {
-      "fieldName": "arrivaldate",
+      "fieldName": "arrivalDate",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     }

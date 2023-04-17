@@ -16,7 +16,7 @@ describe('Driver e2e test', () => {
   const driverPageUrlPattern = new RegExp('/driver(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const driverSample = { firstname: 'Fantastic', lastname: 'sexy Virginia', phone: '(737) 672-7324', experience: 33608 };
+  const driverSample = { firstname: 'Fantastic', lastname: 'sexy Virginia', phone: '(737) 672-7324', experience: 33609 };
 
   let driver: any;
 

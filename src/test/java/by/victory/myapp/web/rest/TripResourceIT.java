@@ -1,6 +1,5 @@
 package by.victory.myapp.web.rest;
 
-import static by.victory.myapp.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -9,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Trip;
 import by.victory.myapp.repository.TripRepository;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,8 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class TripResourceIT {
 
-    private static final BigDecimal DEFAULT_DISTANCE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_DISTANCE = new BigDecimal(2);
+    private static final Double DEFAULT_AUTHORIZED_CAPITAL = 1D;
+    private static final Double UPDATED_AUTHORIZED_CAPITAL = 2D;
+
+    private static final Double DEFAULT_THRESHOLD = 0D;
+    private static final Double UPDATED_THRESHOLD = 1D;
 
     private static final String ENTITY_API_URL = "/api/trips";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -58,7 +59,7 @@ class TripResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Trip createEntity(EntityManager em) {
-        Trip trip = new Trip().distance(DEFAULT_DISTANCE);
+        Trip trip = new Trip().authorizedCapital(DEFAULT_AUTHORIZED_CAPITAL).threshold(DEFAULT_THRESHOLD);
         return trip;
     }
 
@@ -69,7 +70,7 @@ class TripResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Trip createUpdatedEntity(EntityManager em) {
-        Trip trip = new Trip().distance(UPDATED_DISTANCE);
+        Trip trip = new Trip().authorizedCapital(UPDATED_AUTHORIZED_CAPITAL).threshold(UPDATED_THRESHOLD);
         return trip;
     }
 
@@ -91,7 +92,8 @@ class TripResourceIT {
         List<Trip> tripList = tripRepository.findAll();
         assertThat(tripList).hasSize(databaseSizeBeforeCreate + 1);
         Trip testTrip = tripList.get(tripList.size() - 1);
-        assertThat(testTrip.getDistance()).isEqualByComparingTo(DEFAULT_DISTANCE);
+        assertThat(testTrip.getAuthorizedCapital()).isEqualTo(DEFAULT_AUTHORIZED_CAPITAL);
+        assertThat(testTrip.getThreshold()).isEqualTo(DEFAULT_THRESHOLD);
     }
 
     @Test
@@ -114,10 +116,27 @@ class TripResourceIT {
 
     @Test
     @Transactional
-    void checkDistanceIsRequired() throws Exception {
+    void checkAuthorizedCapitalIsRequired() throws Exception {
         int databaseSizeBeforeTest = tripRepository.findAll().size();
         // set the field null
-        trip.setDistance(null);
+        trip.setAuthorizedCapital(null);
+
+        // Create the Trip, which fails.
+
+        restTripMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(trip)))
+            .andExpect(status().isBadRequest());
+
+        List<Trip> tripList = tripRepository.findAll();
+        assertThat(tripList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkThresholdIsRequired() throws Exception {
+        int databaseSizeBeforeTest = tripRepository.findAll().size();
+        // set the field null
+        trip.setThreshold(null);
 
         // Create the Trip, which fails.
 
@@ -141,7 +160,8 @@ class TripResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(trip.getId().intValue())))
-            .andExpect(jsonPath("$.[*].distance").value(hasItem(sameNumber(DEFAULT_DISTANCE))));
+            .andExpect(jsonPath("$.[*].authorizedCapital").value(hasItem(DEFAULT_AUTHORIZED_CAPITAL.doubleValue())))
+            .andExpect(jsonPath("$.[*].threshold").value(hasItem(DEFAULT_THRESHOLD.doubleValue())));
     }
 
     @Test
@@ -156,7 +176,8 @@ class TripResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(trip.getId().intValue()))
-            .andExpect(jsonPath("$.distance").value(sameNumber(DEFAULT_DISTANCE)));
+            .andExpect(jsonPath("$.authorizedCapital").value(DEFAULT_AUTHORIZED_CAPITAL.doubleValue()))
+            .andExpect(jsonPath("$.threshold").value(DEFAULT_THRESHOLD.doubleValue()));
     }
 
     @Test
@@ -178,7 +199,7 @@ class TripResourceIT {
         Trip updatedTrip = tripRepository.findById(trip.getId()).get();
         // Disconnect from session so that the updates on updatedTrip are not directly saved in db
         em.detach(updatedTrip);
-        updatedTrip.distance(UPDATED_DISTANCE);
+        updatedTrip.authorizedCapital(UPDATED_AUTHORIZED_CAPITAL).threshold(UPDATED_THRESHOLD);
 
         restTripMockMvc
             .perform(
@@ -192,7 +213,8 @@ class TripResourceIT {
         List<Trip> tripList = tripRepository.findAll();
         assertThat(tripList).hasSize(databaseSizeBeforeUpdate);
         Trip testTrip = tripList.get(tripList.size() - 1);
-        assertThat(testTrip.getDistance()).isEqualByComparingTo(UPDATED_DISTANCE);
+        assertThat(testTrip.getAuthorizedCapital()).isEqualTo(UPDATED_AUTHORIZED_CAPITAL);
+        assertThat(testTrip.getThreshold()).isEqualTo(UPDATED_THRESHOLD);
     }
 
     @Test
@@ -263,7 +285,7 @@ class TripResourceIT {
         Trip partialUpdatedTrip = new Trip();
         partialUpdatedTrip.setId(trip.getId());
 
-        partialUpdatedTrip.distance(UPDATED_DISTANCE);
+        partialUpdatedTrip.authorizedCapital(UPDATED_AUTHORIZED_CAPITAL);
 
         restTripMockMvc
             .perform(
@@ -277,7 +299,8 @@ class TripResourceIT {
         List<Trip> tripList = tripRepository.findAll();
         assertThat(tripList).hasSize(databaseSizeBeforeUpdate);
         Trip testTrip = tripList.get(tripList.size() - 1);
-        assertThat(testTrip.getDistance()).isEqualByComparingTo(UPDATED_DISTANCE);
+        assertThat(testTrip.getAuthorizedCapital()).isEqualTo(UPDATED_AUTHORIZED_CAPITAL);
+        assertThat(testTrip.getThreshold()).isEqualTo(DEFAULT_THRESHOLD);
     }
 
     @Test
@@ -292,7 +315,7 @@ class TripResourceIT {
         Trip partialUpdatedTrip = new Trip();
         partialUpdatedTrip.setId(trip.getId());
 
-        partialUpdatedTrip.distance(UPDATED_DISTANCE);
+        partialUpdatedTrip.authorizedCapital(UPDATED_AUTHORIZED_CAPITAL).threshold(UPDATED_THRESHOLD);
 
         restTripMockMvc
             .perform(
@@ -306,7 +329,8 @@ class TripResourceIT {
         List<Trip> tripList = tripRepository.findAll();
         assertThat(tripList).hasSize(databaseSizeBeforeUpdate);
         Trip testTrip = tripList.get(tripList.size() - 1);
-        assertThat(testTrip.getDistance()).isEqualByComparingTo(UPDATED_DISTANCE);
+        assertThat(testTrip.getAuthorizedCapital()).isEqualTo(UPDATED_AUTHORIZED_CAPITAL);
+        assertThat(testTrip.getThreshold()).isEqualTo(UPDATED_THRESHOLD);
     }
 
     @Test

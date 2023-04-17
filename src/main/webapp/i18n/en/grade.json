@@ -4,21 +4,23 @@
       "home": {
         "title": "Grades",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new grade",
-        "createOrEditLabel": "Create or edit a grade",
-        "notFound": "No grades found"
+        "createLabel": "Create a new Grade",
+        "createOrEditLabel": "Create or edit a Grade",
+        "notFound": "No Grades found"
       },
-      "created": "A new grade is created with identifier {{ param }}",
-      "updated": "A grade is updated with identifier {{ param }}",
-      "deleted": "A grade is deleted with identifier {{ param }}",
+      "created": "A new Grade is created with identifier {{ param }}",
+      "updated": "A Grade is updated with identifier {{ param }}",
+      "deleted": "A Grade is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete grade {{ id }}?"
+        "question": "Are you sure you want to delete Grade {{ id }}?"
       },
       "detail": {
         "title": "Grade"
       },
       "id": "ID",
-      "description": "Description"
+      "description": "Description",
+      "importProd": "Import Prod",
+      "exportProd": "Export Prod"
     }
   }
 }

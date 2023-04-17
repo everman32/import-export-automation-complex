@@ -26,7 +26,7 @@
             <column name="phone" type="varchar(255)">
                 <constraints nullable="false" unique="true" uniqueConstraintName="ux_driver__phone" />
             </column>
-            <column name="experience" type="decimal(21,2)">
+            <column name="experience" type="double">
                 <constraints nullable="false" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->

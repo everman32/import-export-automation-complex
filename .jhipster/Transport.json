@@ -30,6 +30,13 @@
   "name": "Transport",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "transport",
+      "relationshipName": "trip",
+      "relationshipType": "one-to-many"
+    }
+  ],
   "service": "no"
 }

@@ -23,10 +23,16 @@
     <include file="config/liquibase/changelog/20220422224638_added_entity_ImportProd.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224639_added_entity_ExportProd.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224640_added_entity_Grade.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20230417145211_added_entity_Statement.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20230417145212_added_entity_StatementType.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20230417145213_added_entity_Positioning.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20230417145214_added_entity_ProductUnit.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20220422224637_added_entity_constraints_Trip.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224638_added_entity_constraints_ImportProd.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224639_added_entity_constraints_ExportProd.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20220422224636_added_entity_constraints_Product.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20230417145211_added_entity_constraints_Statement.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

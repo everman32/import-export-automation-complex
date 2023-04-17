@@ -12,14 +12,10 @@
       "fieldValidateRulesMinlength": "2"
     },
     {
-      "fieldName": "number",
-      "fieldType": "Long",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "cost",
-      "fieldType": "BigDecimal",
-      "fieldValidateRules": ["required"]
+      "fieldName": "costPerPiece",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
     }
   ],
   "fluentMethods": true,
@@ -27,6 +23,19 @@
   "name": "Product",
   "pagination": "pagination",
   "readOnly": false,
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "productUnit",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "productUnit",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "service": "no"
 }

@@ -30,11 +30,21 @@ export const TripDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{tripEntity.id}</dd>
           <dt>
-            <span id="distance">
-              <Translate contentKey="accountingImportExportProductsApp.trip.distance">Distance</Translate>
+            <span id="authorizedCapital">
+              <Translate contentKey="accountingImportExportProductsApp.trip.authorizedCapital">Authorized Capital</Translate>
             </span>
           </dt>
-          <dd>{tripEntity.distance}</dd>
+          <dd>{tripEntity.authorizedCapital}</dd>
+          <dt>
+            <span id="threshold">
+              <Translate contentKey="accountingImportExportProductsApp.trip.threshold">Threshold</Translate>
+            </span>
+          </dt>
+          <dd>{tripEntity.threshold}</dd>
+          <dt>
+            <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate>
+          </dt>
+          <dd>{tripEntity.user ? tripEntity.user.login : ''}</dd>
           <dt>
             <Translate contentKey="accountingImportExportProductsApp.trip.transport">Transport</Translate>
           </dt>
@@ -44,17 +54,9 @@ export const TripDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{tripEntity.driver ? tripEntity.driver.id : ''}</dd>
           <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.address">Address</Translate>
+            <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>
           </dt>
-          <dd>{tripEntity.address ? tripEntity.address.id : ''}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.product">Product</Translate>
-          </dt>
-          <dd>{tripEntity.product ? tripEntity.product.id : ''}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate>
-          </dt>
-          <dd>{tripEntity.user ? tripEntity.user.login : ''}</dd>
+          <dd>{tripEntity.hubPositioning ? tripEntity.hubPositioning.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/trip" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

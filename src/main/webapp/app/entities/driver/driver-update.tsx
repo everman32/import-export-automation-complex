@@ -133,6 +133,7 @@ export const DriverUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 type="text"
                 validate={{
                   required: { value: true, message: translate('entity.validation.required') },
+                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
                   validate: v => isNumber(v) || translate('entity.validation.number'),
                 }}
               />
