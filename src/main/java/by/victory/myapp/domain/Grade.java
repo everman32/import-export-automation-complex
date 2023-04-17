@@ -14,7 +14,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "grade")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.NONE)
 public class Grade implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,12 +31,12 @@ public class Grade implements Serializable {
     private String description;
 
     @OneToMany(mappedBy = "grade")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ImportProd> importProds = new HashSet<>();
 
     @OneToMany(mappedBy = "grade")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ExportProd> exportProds = new HashSet<>();
 

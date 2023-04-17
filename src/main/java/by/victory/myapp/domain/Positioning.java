@@ -14,7 +14,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "positioning")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.NONE)
 public class Positioning implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -38,12 +38,12 @@ public class Positioning implements Serializable {
     private Double longitude;
 
     @OneToMany(mappedBy = "positioning")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();
 
     @OneToMany(mappedBy = "hubPositioning")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.NONE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
