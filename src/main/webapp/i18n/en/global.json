@@ -9,7 +9,7 @@
         "main": "Accounting",
         "transport": "Transport",
         "driver": "Drivers",
-        "product": "Product",
+        "product": "Products",
         "trip": "Trip",
         "importProd": "Import",
         "exportProd": "Export",
