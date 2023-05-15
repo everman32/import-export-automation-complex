@@ -1,7 +1,11 @@
 package by.victory.myapp.web.rest;
 
+import by.victory.myapp.domain.Positioning;
+import by.victory.myapp.domain.Statement;
 import by.victory.myapp.domain.Trip;
 import by.victory.myapp.repository.TripRepository;
+import by.victory.myapp.service.PositioningAPIService;
+import by.victory.myapp.service.StatementService;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,8 +50,14 @@ public class TripResource {
 
     private final TripRepository tripRepository;
 
-    public TripResource(TripRepository tripRepository) {
+    private final StatementService statementService;
+
+    private final PositioningAPIService positioningService;
+
+    public TripResource(TripRepository tripRepository, StatementService statementService, PositioningAPIService positioningService) {
         this.tripRepository = tripRepository;
+        this.statementService = statementService;
+        this.positioningService = positioningService;
     }
 
     /**
@@ -61,7 +73,15 @@ public class TripResource {
         if (trip.getId() != null) {
             throw new BadRequestAlertException("A new trip cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         Trip result = tripRepository.save(trip);
+
+        List<Statement> statements = statementService.setTripForAllStatement(trip);
+        JSONObject positioningJsonObject = positioningService.buildPositioningJsonObject(trip, statements);
+
+        Positioning positioning = positioningService.getPositioningFromAPI(positioningJsonObject);
+        trip.setHubPositioning(positioning);
+
         return ResponseEntity
             .created(new URI("/api/trips/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -77,10 +97,11 @@ public class TripResource {
      * or with status {@code 400 (Bad Request)} if the trip is not valid,
      * or with status {@code 500 (Internal Server Error)} if the trip couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @throws JSONException
      */
     @PutMapping("/trips/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Trip trip)
-        throws URISyntaxException {
+        throws URISyntaxException, JSONException {
         log.debug("REST request to update Trip : {}, {}", id, trip);
         if (trip.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -92,6 +113,12 @@ public class TripResource {
         if (!tripRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+
+        List<Statement> statements = statementService.setTripForAllStatement(trip);
+        JSONObject positioningJsonObject = positioningService.buildPositioningJsonObject(trip, statements);
+
+        Positioning positioning = positioningService.getPositioningFromAPI(positioningJsonObject);
+        trip.setHubPositioning(positioning);
 
         Trip result = tripRepository.save(trip);
         return ResponseEntity
@@ -216,7 +243,11 @@ public class TripResource {
     @DeleteMapping("/trips/{id}")
     public ResponseEntity<Void> deleteTrip(@PathVariable Long id) {
         log.debug("REST request to delete Trip : {}", id);
+
+        Trip trip = tripRepository.getById(id);
+        statementService.setTripToNullByIdForAllStatement(trip);
         tripRepository.deleteById(id);
+
         return ResponseEntity
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

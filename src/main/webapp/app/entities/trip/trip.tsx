@@ -125,6 +125,10 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                   <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
                 </th>
+                <th>
+                  <Translate contentKey="accountingImportExportProductsApp.trip.statement">Statement</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
+                </th>
                 <th />
               </tr>
             </thead>
@@ -142,6 +146,16 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                   <td>{trip.transport ? <Link to={`transport/${trip.transport.id}`}>{trip.transport.id}</Link> : ''}</td>
                   <td>{trip.driver ? <Link to={`driver/${trip.driver.id}`}>{trip.driver.id}</Link> : ''}</td>
                   <td>{trip.hubPositioning ? <Link to={`positioning/${trip.hubPositioning.id}`}>{trip.hubPositioning.id}</Link> : ''}</td>
+                  <td>
+                    {trip.statements
+                      ? trip.statements.map((statement, j) => (
+                          <Link key={statement.id} to={`statement/${statement.id}`}>
+                            {j ? ', ' : ''}
+                            {statement.name}
+                          </Link>
+                        ))
+                      : ''}
+                  </td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${trip.id}`} color="info" size="sm" data-cy="entityDetailsButton">

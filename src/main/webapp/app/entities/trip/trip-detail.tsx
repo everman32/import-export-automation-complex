@@ -57,6 +57,10 @@ export const TripDetail = (props: RouteComponentProps<{ id: string }>) => {
             <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>
           </dt>
           <dd>{tripEntity.hubPositioning ? tripEntity.hubPositioning.id : ''}</dd>
+          <dt>
+            <Translate contentKey="accountingImportExportProductsApp.trip.statement">Statement</Translate>
+          </dt>
+          <dd>{tripEntity.statements ? tripEntity.statements.map((statement, j) => (j ? ', ' : '') + statement.name) : ''}</dd>
         </dl>
         <Button tag={Link} to="/trip" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

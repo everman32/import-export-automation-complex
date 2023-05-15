@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IUser } from 'app/shared/model/user.model';
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
 import { IImportProd } from 'app/shared/model/import-prod.model';
+import { getEntities as getStatements } from 'app/entities/statement/statement.reducer';
 import { getEntities as getImportProds } from 'app/entities/import-prod/import-prod.reducer';
 import { IExportProd } from 'app/shared/model/export-prod.model';
 import { getEntities as getExportProds } from 'app/entities/export-prod/export-prod.reducer';
@@ -27,6 +28,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
 
   const [isNew] = useState(!props.match.params || !props.match.params.id);
 
+  const statements = useAppSelector(state => state.statement.entities);
   const users = useAppSelector(state => state.userManagement.users);
   const importProds = useAppSelector(state => state.importProd.entities);
   const exportProds = useAppSelector(state => state.exportProd.entities);
@@ -48,6 +50,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
       dispatch(getEntity(props.match.params.id));
     }
 
+    dispatch(getStatements({}));
     dispatch(getUsers({}));
     dispatch(getImportProds({}));
     dispatch(getExportProds({}));
@@ -63,12 +66,14 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    const statementValidate = values.statements.trim().split(/,\s*/).map(Number);
     const entity = {
       ...tripEntity,
       ...values,
       user: users.find(it => it.id.toString() === values.user.toString()),
       transport: transports.find(it => it.id.toString() === values.transport.toString()),
       driver: drivers.find(it => it.id.toString() === values.driver.toString()),
+      statements: statements.filter(statement => statementValidate.indexOf(statement.id) !== -1),
       hubPositioning: positionings.find(it => it.id.toString() === values.hubPositioning.toString()),
     };
 
@@ -87,6 +92,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
           user: tripEntity?.user?.id,
           transport: tripEntity?.transport?.id,
           driver: tripEntity?.driver?.id,
+          statements: tripEntity.statements?.map(statement => statement.id),
           hubPositioning: tripEntity?.hubPositioning?.id,
         };
 
@@ -187,6 +193,13 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
                     ))
                   : null}
               </ValidatedField>
+              <ValidatedField
+                label={translate('accountingImportExportProductsApp.trip.statement')}
+                id="trip-statements"
+                name="statements"
+                data-cy="statements"
+                type="text"
+              />
               <ValidatedField
                 id="trip-hubPositioning"
                 name="hubPositioning"
