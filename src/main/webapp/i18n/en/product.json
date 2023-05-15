@@ -19,7 +19,7 @@
       },
       "id": "ID",
       "name": "Name",
-      "costPerPiece": "Cost per piece (c.u)",
+      "costPerPiece": "Cost per piece (c.u.)",
       "statement": "Statement",
       "productUnit": "Product units"
     }
