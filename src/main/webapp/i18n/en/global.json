@@ -8,8 +8,7 @@
       "entities": {
         "main": "Accounting",
         "transport": "Transport",
-        "driver": "Driver",
-        "address": "Address",
+        "driver": "Drivers",
         "product": "Product",
         "trip": "Trip",
         "importProd": "Import",

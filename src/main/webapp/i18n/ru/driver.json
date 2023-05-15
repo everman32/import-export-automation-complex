@@ -2,27 +2,27 @@
   "accountingImportExportProductsApp": {
     "driver": {
       "home": {
-        "title": "Drivers",
+        "title": "Водители",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Driver",
-        "createOrEditLabel": "Создать или отредактировать Driver",
-        "notFound": "Drivers не найдено"
+        "createLabel": "Создать нового водителя",
+        "createOrEditLabel": "Создать или отредактировать водителя",
+        "notFound": "Водителей не найдено"
       },
-      "created": "Новый Driver создан с идентификатором {{ param }}",
-      "updated": "Driver обновлен с идентификатором {{ param }}",
-      "deleted": "Driver удален с идентификатором {{ param }}",
+      "created": "Новый водитель создан с идентификатором {{ param }}",
+      "updated": "Водитель обновлен с идентификатором {{ param }}",
+      "deleted": "Водитель удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Driver {{ id }}?"
+        "question": "Вы уверены что хотите удалить водителя {{ id }}?"
       },
       "detail": {
-        "title": "Driver"
+        "title": "Водитель"
       },
       "id": "ID",
-      "firstname": "Firstname",
-      "patronymic": "Patronymic",
-      "lastname": "Lastname",
-      "phone": "Phone",
-      "experience": "Experience",
+      "firstname": "Имя",
+      "patronymic": "Отчество",
+      "lastname": "Фамилия",
+      "phone": "Моб.телефон",
+      "experience": "Опыт(лет)",
       "trip": "Trip"
     }
   }
