@@ -22,7 +22,7 @@
         "statement": "Statement",
         "statementType": "Statement Type",
         "positioning": "Positioning",
-        "productUnit": "Product Unit",
+        "productUnit": "Единицы продукции",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

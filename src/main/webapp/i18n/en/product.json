@@ -21,7 +21,7 @@
       "name": "Name",
       "costPerPiece": "Cost per piece (c.u)",
       "statement": "Statement",
-      "productUnit": "Product unit"
+      "productUnit": "Product units"
     }
   }
 }

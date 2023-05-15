@@ -2,24 +2,24 @@
   "accountingImportExportProductsApp": {
     "productUnit": {
       "home": {
-        "title": "Product Units",
+        "title": "Единицы продукции",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Product Unit",
-        "createOrEditLabel": "Создать или отредактировать Product Unit",
-        "notFound": "Product Units не найдено"
+        "createLabel": "Создать новые единицы продукции",
+        "createOrEditLabel": "Создать или отредактировать единицы продукции",
+        "notFound": "Единицы продукции не найдены"
       },
-      "created": "Новый Product Unit создан с идентификатором {{ param }}",
-      "updated": "Product Unit обновлен с идентификатором {{ param }}",
-      "deleted": "Product Unit удален с идентификатором {{ param }}",
+      "created": "Новые единицы продукции созданы с идентификатором {{ param }}",
+      "updated": "Единицы продукции обновлены с идентификатором {{ param }}",
+      "deleted": "Единицы продукции удалены с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Product Unit {{ id }}?"
+        "question": "Вы уверены что хотите удалить единицы продукции {{ id }}?"
       },
       "detail": {
-        "title": "Product Unit"
+        "title": "Единицы продукции"
       },
       "id": "ID",
-      "name": "Name",
-      "description": "Description",
+      "name": "Наименование",
+      "description": "Описание",
       "product": "Product"
     }
   }
