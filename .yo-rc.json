@@ -22,7 +22,6 @@
     "entities": [
       "Transport",
       "Driver",
-      "Address",
       "Product",
       "Trip",
       "ImportProd",

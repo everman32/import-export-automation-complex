@@ -6,7 +6,6 @@ import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
 
 import Transport from './transport';
 import Driver from './driver';
-import Address from './address';
 import Product from './product';
 import Trip from './trip';
 import ImportProd from './import-prod';
@@ -24,7 +23,6 @@ const Routes = ({ match }) => (
       {/* prettier-ignore */}
       <ErrorBoundaryRoute path={`${match.url}transport`} component={Transport} />
       <ErrorBoundaryRoute path={`${match.url}driver`} component={Driver} />
-      <ErrorBoundaryRoute path={`${match.url}address`} component={Address} />
       <ErrorBoundaryRoute path={`${match.url}product`} component={Product} />
       <ErrorBoundaryRoute path={`${match.url}trip`} component={Trip} />
       <ErrorBoundaryRoute path={`${match.url}import-prod`} component={ImportProd} />

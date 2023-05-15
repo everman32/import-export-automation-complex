@@ -17,7 +17,6 @@
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224633_added_entity_Transport.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224634_added_entity_Driver.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20220422224635_added_entity_Address.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224636_added_entity_Product.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224637_added_entity_Trip.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20220422224638_added_entity_ImportProd.xml" relativeToChangelogFile="false"/>

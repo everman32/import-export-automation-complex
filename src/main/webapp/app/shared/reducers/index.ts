@@ -16,8 +16,6 @@ import transport from 'app/entities/transport/transport.reducer';
 // prettier-ignore
 import driver from 'app/entities/driver/driver.reducer';
 // prettier-ignore
-import address from 'app/entities/address/address.reducer';
-// prettier-ignore
 import product from 'app/entities/product/product.reducer';
 // prettier-ignore
 import trip from 'app/entities/trip/trip.reducer';
@@ -50,7 +48,6 @@ const rootReducer = {
   settings,
   transport,
   driver,
-  address,
   product,
   trip,
   importProd,
