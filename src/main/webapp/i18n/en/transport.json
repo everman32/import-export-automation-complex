@@ -2,17 +2,17 @@
   "accountingImportExportProductsApp": {
     "transport": {
       "home": {
-        "title": "Transports",
+        "title": "Transport",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Transport",
-        "createOrEditLabel": "Create or edit a Transport",
-        "notFound": "No Transports found"
+        "createLabel": "Create a new transport",
+        "createOrEditLabel": "Create or edit a transport",
+        "notFound": "No transport found"
       },
-      "created": "A new Transport is created with identifier {{ param }}",
-      "updated": "A Transport is updated with identifier {{ param }}",
-      "deleted": "A Transport is deleted with identifier {{ param }}",
+      "created": "A new transport is created with identifier {{ param }}",
+      "updated": "A transport is updated with identifier {{ param }}",
+      "deleted": "A transport is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Transport {{ id }}?"
+        "question": "Are you sure you want to delete transport {{ id }}?"
       },
       "detail": {
         "title": "Transport"
@@ -20,7 +20,7 @@
       "id": "ID",
       "brand": "Brand",
       "model": "Model",
-      "vin": "Vin",
+      "vin": "VIN",
       "trip": "Trip"
     }
   }
