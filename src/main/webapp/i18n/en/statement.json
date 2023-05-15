@@ -4,24 +4,24 @@
       "home": {
         "title": "Statements",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Statement",
-        "createOrEditLabel": "Create or edit a Statement",
-        "notFound": "No Statements found"
+        "createLabel": "Create a new statement",
+        "createOrEditLabel": "Create or edit a statement",
+        "notFound": "No statements found"
       },
-      "created": "A new Statement is created with identifier {{ param }}",
-      "updated": "A Statement is updated with identifier {{ param }}",
-      "deleted": "A Statement is deleted with identifier {{ param }}",
+      "created": "A new statement is created with identifier {{ param }}",
+      "updated": "A statement is updated with identifier {{ param }}",
+      "deleted": "A statement is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Statement {{ id }}?"
+        "question": "Are you sure you want to delete statement {{ id }}?"
       },
       "detail": {
         "title": "Statement"
       },
       "id": "ID",
       "name": "Name",
-      "transportTariff": "Transport Tariff",
-      "deliveryScope": "Delivery Scope",
-      "statementType": "Statement Type",
+      "transportTariff": "Transport tariff (c.u.)",
+      "deliveryScope": "Delivery scope",
+      "statementType": "Statement type",
       "product": "Product",
       "positioning": "Positioning",
       "trip": "Trip"

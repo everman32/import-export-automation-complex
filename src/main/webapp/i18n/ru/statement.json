@@ -2,28 +2,28 @@
   "accountingImportExportProductsApp": {
     "statement": {
       "home": {
-        "title": "Statements",
+        "title": "Заявки",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Statement",
-        "createOrEditLabel": "Создать или отредактировать Statement",
-        "notFound": "Statements не найдено"
+        "createLabel": "Создать новую заявку",
+        "createOrEditLabel": "Создать или отредактировать заявку",
+        "notFound": "Заявок не найдено"
       },
-      "created": "Новый Statement создан с идентификатором {{ param }}",
-      "updated": "Statement обновлен с идентификатором {{ param }}",
-      "deleted": "Statement удален с идентификатором {{ param }}",
+      "created": "Новая заявка создана с идентификатором {{ param }}",
+      "updated": "Заявка обновлена с идентификатором {{ param }}",
+      "deleted": "Заявка удалена с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Statement {{ id }}?"
+        "question": "Вы уверены что хотите удалить заявку {{ id }}?"
       },
       "detail": {
-        "title": "Statement"
+        "title": "Заявка"
       },
       "id": "ID",
-      "name": "Name",
-      "transportTariff": "Transport Tariff",
-      "deliveryScope": "Delivery Scope",
-      "statementType": "Statement Type",
-      "product": "Product",
-      "positioning": "Positioning",
+      "name": "Наименование компании",
+      "transportTariff": "Транспортный тариф (у.е.)",
+      "deliveryScope": "Объем поставки",
+      "statementType": "Тип заявки",
+      "product": "Продукция",
+      "positioning": "Расположение",
       "trip": "Trip"
     }
   }
