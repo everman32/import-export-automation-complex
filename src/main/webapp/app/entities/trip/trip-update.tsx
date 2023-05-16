@@ -122,6 +122,13 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 />
               ) : null}
               <ValidatedField
+                label={translate('accountingImportExportProductsApp.trip.statement')}
+                id="trip-statements"
+                name="statements"
+                data-cy="statements"
+                type="text"
+              />
+              <ValidatedField
                 label={translate('accountingImportExportProductsApp.trip.authorizedCapital')}
                 id="trip-authorizedCapital"
                 name="authorizedCapital"
@@ -146,22 +153,6 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 }}
               />
               <ValidatedField
-                id="trip-user"
-                name="user"
-                data-cy="user"
-                label={translate('accountingImportExportProductsApp.trip.user')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {users
-                  ? users.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.login}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <ValidatedField
                 id="trip-transport"
                 name="transport"
                 data-cy="transport"
@@ -172,7 +163,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 {transports
                   ? transports.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.brand}, {otherEntity.model}, {otherEntity.vin}
                       </option>
                     ))
                   : null}
@@ -188,30 +179,23 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 {drivers
                   ? drivers.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.firstname}, {otherEntity.patronymic}, {otherEntity.lastname}, {otherEntity.phone}
                       </option>
                     ))
                   : null}
               </ValidatedField>
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.trip.statement')}
-                id="trip-statements"
-                name="statements"
-                data-cy="statements"
-                type="text"
-              />
-              <ValidatedField
-                id="trip-hubPositioning"
-                name="hubPositioning"
-                data-cy="hubPositioning"
-                label={translate('accountingImportExportProductsApp.trip.hubPositioning')}
+                id="trip-user"
+                name="user"
+                data-cy="user"
+                label={translate('accountingImportExportProductsApp.trip.user')}
                 type="select"
               >
                 <option value="" key="0" />
-                {positionings
-                  ? positionings.map(otherEntity => (
+                {users
+                  ? users.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.login}
                       </option>
                     ))
                   : null}

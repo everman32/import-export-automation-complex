@@ -30,11 +30,19 @@ export const TripDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{tripEntity.id}</dd>
           <dt>
+            <Translate contentKey="accountingImportExportProductsApp.trip.statement">Statement</Translate>
+          </dt>
+          <dd>{tripEntity.statements ? tripEntity.statements.map((statement, j) => (j ? ', ' : '') + statement.name) : ''}</dd>
+          <dt>
             <span id="authorizedCapital">
               <Translate contentKey="accountingImportExportProductsApp.trip.authorizedCapital">Authorized Capital</Translate>
             </span>
           </dt>
           <dd>{tripEntity.authorizedCapital}</dd>
+          <dt>
+            <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>
+          </dt>
+          <dd>{tripEntity.hubPositioning ? tripEntity.hubPositioning.latitude + ', ' + tripEntity.hubPositioning.longitude : ''}</dd>
           <dt>
             <span id="threshold">
               <Translate contentKey="accountingImportExportProductsApp.trip.threshold">Threshold</Translate>
@@ -42,25 +50,29 @@ export const TripDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{tripEntity.threshold}</dd>
           <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate>
-          </dt>
-          <dd>{tripEntity.user ? tripEntity.user.login : ''}</dd>
-          <dt>
             <Translate contentKey="accountingImportExportProductsApp.trip.transport">Transport</Translate>
           </dt>
-          <dd>{tripEntity.transport ? tripEntity.transport.id : ''}</dd>
+          <dd>
+            {tripEntity.transport ? tripEntity.transport.brand + ' ' + tripEntity.transport.model + ', ' + tripEntity.transport.vin : ''}
+          </dd>
           <dt>
             <Translate contentKey="accountingImportExportProductsApp.trip.driver">Driver</Translate>
           </dt>
-          <dd>{tripEntity.driver ? tripEntity.driver.id : ''}</dd>
+          <dd>
+            {tripEntity.driver
+              ? tripEntity.driver.firstname +
+                ' ' +
+                tripEntity.driver.patronymic +
+                ' ' +
+                tripEntity.driver.lastname +
+                ', ' +
+                tripEntity.driver.phone
+              : ''}
+          </dd>
           <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>
+            <Translate contentKey="accountingImportExportProductsApp.trip.user">User</Translate>
           </dt>
-          <dd>{tripEntity.hubPositioning ? tripEntity.hubPositioning.id : ''}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.trip.statement">Statement</Translate>
-          </dt>
-          <dd>{tripEntity.statements ? tripEntity.statements.map((statement, j) => (j ? ', ' : '') + statement.name) : ''}</dd>
+          <dd>{tripEntity.user ? tripEntity.user.login : ''}</dd>
         </dl>
         <Button tag={Link} to="/trip" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}
