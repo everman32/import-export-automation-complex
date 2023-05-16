@@ -2,23 +2,23 @@
   "accountingImportExportProductsApp": {
     "exportProd": {
       "home": {
-        "title": "Export Prods",
+        "title": "Export",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Export Prod",
-        "createOrEditLabel": "Create or edit a Export Prod",
-        "notFound": "No Export Prods found"
+        "createLabel": "Create a new export",
+        "createOrEditLabel": "Create or edit a export",
+        "notFound": "No export found"
       },
-      "created": "A new Export Prod is created with identifier {{ param }}",
-      "updated": "A Export Prod is updated with identifier {{ param }}",
-      "deleted": "A Export Prod is deleted with identifier {{ param }}",
+      "created": "A new export is created with identifier {{ param }}",
+      "updated": "A export is updated with identifier {{ param }}",
+      "deleted": "A export is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Export Prod {{ id }}?"
+        "question": "Are you sure you want to delete export {{ id }}?"
       },
       "detail": {
-        "title": "Export Prod"
+        "title": "Export"
       },
       "id": "ID",
-      "departureDate": "Departure Date",
+      "departureDate": "Departure date",
       "trip": "Trip",
       "grade": "Grade"
     }
