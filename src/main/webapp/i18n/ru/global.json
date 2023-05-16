@@ -21,7 +21,7 @@
         "grade": "Grade",
         "statement": "Заявки",
         "statementType": "Типы заявок",
-        "positioning": "Positioning",
+        "positioning": "Расположения",
         "productUnit": "Единицы продукции",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },

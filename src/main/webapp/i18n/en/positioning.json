@@ -4,15 +4,15 @@
       "home": {
         "title": "Positionings",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Positioning",
-        "createOrEditLabel": "Create or edit a Positioning",
-        "notFound": "No Positionings found"
+        "createLabel": "Create a new positioning",
+        "createOrEditLabel": "Create or edit a positioning",
+        "notFound": "No positionings found"
       },
-      "created": "A new Positioning is created with identifier {{ param }}",
-      "updated": "A Positioning is updated with identifier {{ param }}",
-      "deleted": "A Positioning is deleted with identifier {{ param }}",
+      "created": "A new positioning is created with identifier {{ param }}",
+      "updated": "A positioning is updated with identifier {{ param }}",
+      "deleted": "A positioning is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Positioning {{ id }}?"
+        "question": "Are you sure you want to delete positioning {{ id }}?"
       },
       "detail": {
         "title": "Positioning"

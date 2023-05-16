@@ -2,24 +2,24 @@
   "accountingImportExportProductsApp": {
     "positioning": {
       "home": {
-        "title": "Positionings",
+        "title": "Расположения",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Positioning",
-        "createOrEditLabel": "Создать или отредактировать Positioning",
-        "notFound": "Positionings не найдено"
+        "createLabel": "Создать новое расположение",
+        "createOrEditLabel": "Создать или отредактировать расположение",
+        "notFound": "Расположения не найдены"
       },
-      "created": "Новый Positioning создан с идентификатором {{ param }}",
-      "updated": "Positioning обновлен с идентификатором {{ param }}",
-      "deleted": "Positioning удален с идентификатором {{ param }}",
+      "created": "Новое расположение создано с идентификатором {{ param }}",
+      "updated": "Расположение обновлено с идентификатором {{ param }}",
+      "deleted": "Расположение удалено с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Positioning {{ id }}?"
+        "question": "Вы уверены что хотите удалить расположение {{ id }}?"
       },
       "detail": {
-        "title": "Positioning"
+        "title": "Расположение"
       },
       "id": "ID",
-      "latitude": "Latitude",
-      "longitude": "Longitude",
+      "latitude": "Широта",
+      "longitude": "Долгота",
       "statement": "Statement",
       "trip": "Trip"
     }
