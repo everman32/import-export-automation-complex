@@ -46,7 +46,7 @@ export const ExportProdDetail = (props: RouteComponentProps<{ id: string }>) => 
           <dt>
             <Translate contentKey="accountingImportExportProductsApp.exportProd.grade">Grade</Translate>
           </dt>
-          <dd>{exportProdEntity.grade ? exportProdEntity.grade.id : ''}</dd>
+          <dd>{exportProdEntity.grade ? exportProdEntity.grade.description : ''}</dd>
         </dl>
         <Button tag={Link} to="/export-prod" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

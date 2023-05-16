@@ -103,17 +103,6 @@ export const ExportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
                 />
               ) : null}
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.exportProd.departureDate')}
-                id="export-prod-departureDate"
-                name="departureDate"
-                data-cy="departureDate"
-                type="datetime-local"
-                placeholder="YYYY-MM-DD HH:mm"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                }}
-              />
-              <ValidatedField
                 id="export-prod-trip"
                 name="trip"
                 data-cy="trip"
@@ -130,6 +119,17 @@ export const ExportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
                   : null}
               </ValidatedField>
               <ValidatedField
+                label={translate('accountingImportExportProductsApp.exportProd.departureDate')}
+                id="export-prod-departureDate"
+                name="departureDate"
+                data-cy="departureDate"
+                type="datetime-local"
+                placeholder="YYYY-MM-DD HH:mm"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                }}
+              />
+              <ValidatedField
                 id="export-prod-grade"
                 name="grade"
                 data-cy="grade"
@@ -140,7 +140,7 @@ export const ExportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
                 {grades
                   ? grades.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.description}
                       </option>
                     ))
                   : null}
