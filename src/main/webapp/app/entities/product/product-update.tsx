@@ -101,6 +101,22 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 }}
               />
               <ValidatedField
+                id="product-productUnit"
+                name="productUnit"
+                data-cy="productUnit"
+                label={translate('accountingImportExportProductsApp.product.productUnit')}
+                type="select"
+              >
+                <option value="" key="0" />
+                {productUnits
+                  ? productUnits.map(otherEntity => (
+                      <option value={otherEntity.id} key={otherEntity.id}>
+                        {otherEntity.name}
+                      </option>
+                    ))
+                  : null}
+              </ValidatedField>
+              <ValidatedField
                 label={translate('accountingImportExportProductsApp.product.costPerPiece')}
                 id="product-costPerPiece"
                 name="costPerPiece"
@@ -112,22 +128,6 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
                   validate: v => isNumber(v) || translate('entity.validation.number'),
                 }}
               />
-              <ValidatedField
-                id="product-productUnit"
-                name="productUnit"
-                data-cy="productUnit"
-                label={translate('accountingImportExportProductsApp.product.productUnit')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {productUnits
-                  ? productUnits.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
               <Button tag={Link} id="cancel-save" data-cy="entityCreateCancelButton" to="/product" replace color="info">
                 <FontAwesomeIcon icon="arrow-left" />
                 &nbsp;

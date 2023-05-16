@@ -36,15 +36,15 @@ export const ProductDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{productEntity.name}</dd>
           <dt>
+            <Translate contentKey="accountingImportExportProductsApp.product.productUnit">Product Unit</Translate>
+          </dt>
+          <dd>{productEntity.productUnit ? productEntity.productUnit.name : ''}</dd>
+          <dt>
             <span id="costPerPiece">
               <Translate contentKey="accountingImportExportProductsApp.product.costPerPiece">Cost Per Piece</Translate>
             </span>
           </dt>
           <dd>{productEntity.costPerPiece}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.product.productUnit">Product Unit</Translate>
-          </dt>
-          <dd>{productEntity.productUnit ? productEntity.productUnit.id : ''}</dd>
         </dl>
         <Button tag={Link} to="/product" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

@@ -106,12 +106,12 @@ export const Product = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('name')}>
                   <Translate contentKey="accountingImportExportProductsApp.product.name">Name</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
-                <th className="hand" onClick={sort('costPerPiece')}>
-                  <Translate contentKey="accountingImportExportProductsApp.product.costPerPiece">Cost Per Piece</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
-                </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.product.productUnit">Product Unit</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
+                </th>
+                <th className="hand" onClick={sort('costPerPiece')}>
+                  <Translate contentKey="accountingImportExportProductsApp.product.costPerPiece">Cost Per Piece</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
@@ -126,8 +126,10 @@ export const Product = (props: RouteComponentProps<{ url: string }>) => {
                     </Button>
                   </td>
                   <td>{product.name}</td>
+                  <td>
+                    {product.productUnit ? <Link to={`product-unit/${product.productUnit.id}`}>{product.productUnit.name}</Link> : ''}
+                  </td>
                   <td>{product.costPerPiece}</td>
-                  <td>{product.productUnit ? <Link to={`product-unit/${product.productUnit.id}`}>{product.productUnit.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${product.id}`} color="info" size="sm" data-cy="entityDetailsButton">
