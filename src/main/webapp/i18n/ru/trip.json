@@ -2,31 +2,31 @@
   "accountingImportExportProductsApp": {
     "trip": {
       "home": {
-        "title": "Trips",
+        "title": "Рейсы",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Trip",
-        "createOrEditLabel": "Создать или отредактировать Trip",
-        "notFound": "Trips не найдено"
+        "createLabel": "Создать новый рейс",
+        "createOrEditLabel": "Создать или отредактировать рейс",
+        "notFound": "Рейсы не найдены"
       },
-      "created": "Новый Trip создан с идентификатором {{ param }}",
-      "updated": "Trip обновлен с идентификатором {{ param }}",
-      "deleted": "Trip удален с идентификатором {{ param }}",
+      "created": "Новый рейс создан с идентификатором {{ param }}",
+      "updated": "Рейс обновлен с идентификатором {{ param }}",
+      "deleted": "Рейс удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Trip {{ id }}?"
+        "question": "Вы уверены что хотите удалить рейс {{ id }}?"
       },
       "detail": {
-        "title": "Trip"
+        "title": "Рейс"
       },
       "id": "ID",
-      "authorizedCapital": "Authorized Capital",
-      "threshold": "Threshold",
-      "statement": "Statement",
-      "user": "User",
+      "authorizedCapital": "Уставной фонд (у.е.)",
+      "threshold": "Уровень значимости (у.е.)",
+      "statement": "Заявки",
+      "user": "Ответственный",
       "importProd": "Import Prod",
       "exportProd": "Export Prod",
-      "transport": "Transport",
-      "driver": "Driver",
-      "hubPositioning": "Hub Positioning"
+      "transport": "Транспорт",
+      "driver": "Водитель",
+      "hubPositioning": "Расположение распределительного центра"
     }
   }
 }

@@ -10,7 +10,7 @@
         "transport": "Transport",
         "driver": "Drivers",
         "product": "Products",
-        "trip": "Trip",
+        "trip": "Trips",
         "importProd": "Import",
         "exportProd": "Export",
         "grade": "Grade",
