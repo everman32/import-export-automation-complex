@@ -121,30 +121,6 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 }}
               />
               <ValidatedField
-                label={translate('accountingImportExportProductsApp.statement.transportTariff')}
-                id="statement-transportTariff"
-                name="transportTariff"
-                data-cy="transportTariff"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
-              <ValidatedField
-                label={translate('accountingImportExportProductsApp.statement.deliveryScope')}
-                id="statement-deliveryScope"
-                name="deliveryScope"
-                data-cy="deliveryScope"
-                type="text"
-                validate={{
-                  required: { value: true, message: translate('entity.validation.required') },
-                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
-                  validate: v => isNumber(v) || translate('entity.validation.number'),
-                }}
-              />
-              <ValidatedField
                 id="statement-statementType"
                 name="statementType"
                 data-cy="statementType"
@@ -155,7 +131,7 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 {statementTypes
                   ? statementTypes.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.name}
                       </option>
                     ))
                   : null}
@@ -171,11 +147,35 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 {products
                   ? products.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.name}
                       </option>
                     ))
                   : null}
               </ValidatedField>
+              <ValidatedField
+                label={translate('accountingImportExportProductsApp.statement.deliveryScope')}
+                id="statement-deliveryScope"
+                name="deliveryScope"
+                data-cy="deliveryScope"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
+                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                }}
+              />
+              <ValidatedField
+                label={translate('accountingImportExportProductsApp.statement.transportTariff')}
+                id="statement-transportTariff"
+                name="transportTariff"
+                data-cy="transportTariff"
+                type="text"
+                validate={{
+                  required: { value: true, message: translate('entity.validation.required') },
+                  min: { value: 1, message: translate('entity.validation.min', { min: 1 }) },
+                  validate: v => isNumber(v) || translate('entity.validation.number'),
+                }}
+              />
               <ValidatedField
                 id="statement-positioning"
                 name="positioning"
@@ -188,26 +188,7 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
                 {positionings
                   ? positionings.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
-                      </option>
-                    ))
-                  : null}
-              </ValidatedField>
-              <FormText>
-                <Translate contentKey="entity.validation.required">This field is required.</Translate>
-              </FormText>
-              <ValidatedField
-                id="statement-trip"
-                name="trip"
-                data-cy="trip"
-                label={translate('accountingImportExportProductsApp.statement.trip')}
-                type="select"
-              >
-                <option value="" key="0" />
-                {trips
-                  ? trips.map(otherEntity => (
-                      <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.latitude}, {otherEntity.longitude}
                       </option>
                     ))
                   : null}

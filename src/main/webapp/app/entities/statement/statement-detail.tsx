@@ -36,11 +36,13 @@ export const StatementDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{statementEntity.name}</dd>
           <dt>
-            <span id="transportTariff">
-              <Translate contentKey="accountingImportExportProductsApp.statement.transportTariff">Transport Tariff</Translate>
-            </span>
+            <Translate contentKey="accountingImportExportProductsApp.statement.statementType">Statement Type</Translate>
           </dt>
-          <dd>{statementEntity.transportTariff}</dd>
+          <dd>{statementEntity.statementType ? statementEntity.statementType.name : ''}</dd>
+          <dt>
+            <Translate contentKey="accountingImportExportProductsApp.statement.product">Product</Translate>
+          </dt>
+          <dd>{statementEntity.product ? statementEntity.product.name : ''}</dd>
           <dt>
             <span id="deliveryScope">
               <Translate contentKey="accountingImportExportProductsApp.statement.deliveryScope">Delivery Scope</Translate>
@@ -48,21 +50,15 @@ export const StatementDetail = (props: RouteComponentProps<{ id: string }>) => {
           </dt>
           <dd>{statementEntity.deliveryScope}</dd>
           <dt>
-            <Translate contentKey="accountingImportExportProductsApp.statement.statementType">Statement Type</Translate>
+            <span id="transportTariff">
+              <Translate contentKey="accountingImportExportProductsApp.statement.transportTariff">Transport Tariff</Translate>
+            </span>
           </dt>
-          <dd>{statementEntity.statementType ? statementEntity.statementType.id : ''}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.statement.product">Product</Translate>
-          </dt>
-          <dd>{statementEntity.product ? statementEntity.product.id : ''}</dd>
+          <dd>{statementEntity.transportTariff}</dd>
           <dt>
             <Translate contentKey="accountingImportExportProductsApp.statement.positioning">Positioning</Translate>
           </dt>
-          <dd>{statementEntity.positioning ? statementEntity.positioning.id : ''}</dd>
-          <dt>
-            <Translate contentKey="accountingImportExportProductsApp.statement.trip">Trip</Translate>
-          </dt>
-          <dd>{statementEntity.trip ? statementEntity.trip.id : ''}</dd>
+          <dd>{statementEntity.positioning ? statementEntity.positioning.latitude + ', ' + statementEntity.positioning.longitude : ''}</dd>
         </dl>
         <Button tag={Link} to="/statement" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

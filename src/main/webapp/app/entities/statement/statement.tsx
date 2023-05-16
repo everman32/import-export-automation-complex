@@ -106,14 +106,6 @@ export const Statement = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('name')}>
                   <Translate contentKey="accountingImportExportProductsApp.statement.name">Name</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
-                <th className="hand" onClick={sort('transportTariff')}>
-                  <Translate contentKey="accountingImportExportProductsApp.statement.transportTariff">Transport Tariff</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
-                </th>
-                <th className="hand" onClick={sort('deliveryScope')}>
-                  <Translate contentKey="accountingImportExportProductsApp.statement.deliveryScope">Delivery Scope</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
-                </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.statement.statementType">Statement Type</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
@@ -122,12 +114,17 @@ export const Statement = (props: RouteComponentProps<{ url: string }>) => {
                   <Translate contentKey="accountingImportExportProductsApp.statement.product">Product</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
                 </th>
-                <th>
-                  <Translate contentKey="accountingImportExportProductsApp.statement.positioning">Positioning</Translate>{' '}
+                <th className="hand" onClick={sort('deliveryScope')}>
+                  <Translate contentKey="accountingImportExportProductsApp.statement.deliveryScope">Delivery Scope</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
+                </th>
+                <th className="hand" onClick={sort('transportTariff')}>
+                  <Translate contentKey="accountingImportExportProductsApp.statement.transportTariff">Transport Tariff</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
-                  <Translate contentKey="accountingImportExportProductsApp.statement.trip">Trip</Translate> <FontAwesomeIcon icon="sort" />
+                  <Translate contentKey="accountingImportExportProductsApp.statement.positioning">Positioning</Translate>{' '}
+                  <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -141,20 +138,25 @@ export const Statement = (props: RouteComponentProps<{ url: string }>) => {
                     </Button>
                   </td>
                   <td>{statement.name}</td>
-                  <td>{statement.transportTariff}</td>
-                  <td>{statement.deliveryScope}</td>
                   <td>
                     {statement.statementType ? (
-                      <Link to={`statement-type/${statement.statementType.id}`}>{statement.statementType.id}</Link>
+                      <Link to={`statement-type/${statement.statementType.id}`}>{statement.statementType.name}</Link>
                     ) : (
                       ''
                     )}
                   </td>
-                  <td>{statement.product ? <Link to={`product/${statement.product.id}`}>{statement.product.id}</Link> : ''}</td>
+                  <td>{statement.product ? <Link to={`product/${statement.product.id}`}>{statement.product.name}</Link> : ''}</td>
+                  <td>{statement.deliveryScope}</td>
+                  <td>{statement.transportTariff}</td>
                   <td>
-                    {statement.positioning ? <Link to={`positioning/${statement.positioning.id}`}>{statement.positioning.id}</Link> : ''}
+                    {statement.positioning ? (
+                      <Link to={`positioning/${statement.positioning.id}`}>
+                        {statement.positioning.latitude}, {statement.positioning.longitude}
+                      </Link>
+                    ) : (
+                      ''
+                    )}
                   </td>
-                  <td>{statement.trip ? <Link to={`trip/${statement.trip.id}`}>{statement.trip.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button tag={Link} to={`${match.url}/${statement.id}`} color="info" size="sm" data-cy="entityDetailsButton">
