@@ -20,7 +20,7 @@
         "exportProd": "Export Prod",
         "grade": "Grade",
         "statement": "Заявки",
-        "statementType": "Statement Type",
+        "statementType": "Типы заявок",
         "positioning": "Positioning",
         "productUnit": "Единицы продукции",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"

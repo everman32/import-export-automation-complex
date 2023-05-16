@@ -2,23 +2,23 @@
   "accountingImportExportProductsApp": {
     "statementType": {
       "home": {
-        "title": "Statement Types",
+        "title": "Типы заявок",
         "refreshListLabel": "Обновить список",
-        "createLabel": "Создать новый Statement Type",
-        "createOrEditLabel": "Создать или отредактировать Statement Type",
-        "notFound": "Statement Types не найдено"
+        "createLabel": "Создать новый тип заявки",
+        "createOrEditLabel": "Создать или отредактировать тип заявки",
+        "notFound": "Типы заявок не найдены"
       },
-      "created": "Новый Statement Type создан с идентификатором {{ param }}",
-      "updated": "Statement Type обновлен с идентификатором {{ param }}",
-      "deleted": "Statement Type удален с идентификатором {{ param }}",
+      "created": "Тип заявки создан с идентификатором {{ param }}",
+      "updated": "Тип заявки обновлен с идентификатором {{ param }}",
+      "deleted": "Тип заявки удален с идентификатором {{ param }}",
       "delete": {
-        "question": "Вы уверены что хотите удалить Statement Type {{ id }}?"
+        "question": "Вы уверены что хотите удалить тип заявки {{ id }}?"
       },
       "detail": {
-        "title": "Statement Type"
+        "title": "Тип заявки"
       },
       "id": "ID",
-      "name": "Name",
+      "name": "Наименование",
       "statement": "Statement"
     }
   }

@@ -17,7 +17,7 @@
         "importProd": "Import Prod",
         "exportProd": "Export Prod",
         "statement": "Statements",
-        "statementType": "Statement Type",
+        "statementType": "Statement types",
         "positioning": "Positioning",
         "productUnit": "Product units",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"

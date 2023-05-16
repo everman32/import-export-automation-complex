@@ -2,20 +2,20 @@
   "accountingImportExportProductsApp": {
     "statementType": {
       "home": {
-        "title": "Statement Types",
+        "title": "Statement types",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Statement Type",
-        "createOrEditLabel": "Create or edit a Statement Type",
-        "notFound": "No Statement Types found"
+        "createLabel": "Create a new statement type",
+        "createOrEditLabel": "Create or edit a statement type",
+        "notFound": "No statement types found"
       },
-      "created": "A new Statement Type is created with identifier {{ param }}",
-      "updated": "A Statement Type is updated with identifier {{ param }}",
-      "deleted": "A Statement Type is deleted with identifier {{ param }}",
+      "created": "A new statement type is created with identifier {{ param }}",
+      "updated": "A statement type is updated with identifier {{ param }}",
+      "deleted": "A statement type is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Statement Type {{ id }}?"
+        "question": "Are you sure you want to delete statement type {{ id }}?"
       },
       "detail": {
-        "title": "Statement Type"
+        "title": "Statement type"
       },
       "id": "ID",
       "name": "Name",
