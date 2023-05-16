@@ -30,6 +30,10 @@ export const ImportProdDetail = (props: RouteComponentProps<{ id: string }>) => 
           </dt>
           <dd>{importProdEntity.id}</dd>
           <dt>
+            <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate>
+          </dt>
+          <dd>{importProdEntity.trip ? importProdEntity.trip.id : ''}</dd>
+          <dt>
             <span id="arrivalDate">
               <Translate contentKey="accountingImportExportProductsApp.importProd.arrivalDate">Arrival Date</Translate>
             </span>
@@ -38,13 +42,9 @@ export const ImportProdDetail = (props: RouteComponentProps<{ id: string }>) => 
             {importProdEntity.arrivalDate ? <TextFormat value={importProdEntity.arrivalDate} type="date" format={APP_DATE_FORMAT} /> : null}
           </dd>
           <dt>
-            <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate>
-          </dt>
-          <dd>{importProdEntity.trip ? importProdEntity.trip.id : ''}</dd>
-          <dt>
             <Translate contentKey="accountingImportExportProductsApp.importProd.grade">Grade</Translate>
           </dt>
-          <dd>{importProdEntity.grade ? importProdEntity.grade.id : ''}</dd>
+          <dd>{importProdEntity.grade ? importProdEntity.grade.description : ''}</dd>
         </dl>
         <Button tag={Link} to="/import-prod" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

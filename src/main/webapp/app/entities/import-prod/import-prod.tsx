@@ -103,12 +103,12 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('id')}>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.id">ID</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
+                <th>
+                  <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate> <FontAwesomeIcon icon="sort" />
+                </th>
                 <th className="hand" onClick={sort('arrivalDate')}>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.arrivalDate">Arrival Date</Translate>{' '}
                   <FontAwesomeIcon icon="sort" />
-                </th>
-                <th>
-                  <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.grade">Grade</Translate>{' '}
@@ -125,10 +125,10 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                       {importProd.id}
                     </Button>
                   </td>
+                  <td>{importProd.trip ? <Link to={`trip/${importProd.trip.id}`}>{importProd.trip.id}</Link> : ''}</td>
                   <td>
                     {importProd.arrivalDate ? <TextFormat type="date" value={importProd.arrivalDate} format={APP_DATE_FORMAT} /> : null}
                   </td>
-                  <td>{importProd.trip ? <Link to={`trip/${importProd.trip.id}`}>{importProd.trip.id}</Link> : ''}</td>
                   <td>{importProd.grade ? <Link to={`grade/${importProd.grade.id}`}>{importProd.grade.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
