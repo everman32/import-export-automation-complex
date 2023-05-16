@@ -2,23 +2,23 @@
   "accountingImportExportProductsApp": {
     "importProd": {
       "home": {
-        "title": "Import Prods",
+        "title": "Import",
         "refreshListLabel": "Refresh list",
-        "createLabel": "Create a new Import Prod",
-        "createOrEditLabel": "Create or edit a Import Prod",
-        "notFound": "No Import Prods found"
+        "createLabel": "Create a new import",
+        "createOrEditLabel": "Create or edit a import",
+        "notFound": "No import found"
       },
-      "created": "A new Import Prod is created with identifier {{ param }}",
-      "updated": "A Import Prod is updated with identifier {{ param }}",
-      "deleted": "A Import Prod is deleted with identifier {{ param }}",
+      "created": "A new import is created with identifier {{ param }}",
+      "updated": "A import is updated with identifier {{ param }}",
+      "deleted": "A import is deleted with identifier {{ param }}",
       "delete": {
-        "question": "Are you sure you want to delete Import Prod {{ id }}?"
+        "question": "Are you sure you want to delete import {{ id }}?"
       },
       "detail": {
-        "title": "Import Prod"
+        "title": "Import"
       },
       "id": "ID",
-      "arrivalDate": "Arrival Date",
+      "arrivalDate": "Arrival date",
       "trip": "Trip",
       "grade": "Grade"
     }
