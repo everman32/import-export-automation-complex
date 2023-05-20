@@ -74,7 +74,7 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
       transport: transports.find(it => it.id.toString() === values.transport.toString()),
       driver: drivers.find(it => it.id.toString() === values.driver.toString()),
       statements: statements.filter(statement => statementValidate.indexOf(statement.id) !== -1),
-      hubPositioning: positionings.find(it => it.id.toString() === values.hubPositioning.toString()),
+      hubPositioning: positionings.find(it => it.id.toString() === values.hubPositioning?.toString()),
     };
 
     if (isNew) {
