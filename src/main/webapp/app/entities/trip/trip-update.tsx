@@ -66,7 +66,9 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
-    const statementValidate = values.statements.trim().split(/,\s*/).map(Number);
+    const statementValidate = Array.isArray(values.statements)
+      ? values.statements.toString()
+      : values.statements.trim().split(/,\s*/).map(Number);
     const entity = {
       ...tripEntity,
       ...values,
