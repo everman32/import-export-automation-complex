@@ -1,0 +1,43 @@
+{
+  "applications": "*",
+  "changelogDate": "20230417145213",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "positioning",
+  "fields": [
+    {
+      "fieldName": "latitude",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "max", "required"],
+      "fieldValidateRulesMax": "90",
+      "fieldValidateRulesMin": "-90"
+    },
+    {
+      "fieldName": "longitude",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "max", "required"],
+      "fieldValidateRulesMax": "180",
+      "fieldValidateRulesMin": "-180"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Positioning",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "positioning",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "hubPositioning",
+      "relationshipName": "trip",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

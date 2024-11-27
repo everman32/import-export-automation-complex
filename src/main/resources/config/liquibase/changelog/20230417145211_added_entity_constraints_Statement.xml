@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    <!--
+        Added the constraints for entity Statement.
+    -->
+    <changeSet id="20230417145211-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="statement_type_id"
+                                 baseTableName="statement"
+                                 constraintName="fk_statement__statement_type_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="statement_type"/>
+
+        <addForeignKeyConstraint baseColumnNames="product_id"
+                                 baseTableName="statement"
+                                 constraintName="fk_statement__product_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="product"/>
+
+        <addForeignKeyConstraint baseColumnNames="positioning_id"
+                                 baseTableName="statement"
+                                 constraintName="fk_statement__positioning_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="positioning"/>
+
+        <addForeignKeyConstraint baseColumnNames="trip_id"
+                                 baseTableName="statement"
+                                 constraintName="fk_statement__trip_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="trip"/>
+    </changeSet>
+</databaseChangeLog>

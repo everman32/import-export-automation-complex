@@ -1,0 +1,32 @@
+{
+  "accountingImportExportProductsApp": {
+    "trip": {
+      "home": {
+        "title": "Trips",
+        "refreshListLabel": "Обновить список",
+        "createLabel": "Создать новый Trip",
+        "createOrEditLabel": "Создать или отредактировать Trip",
+        "notFound": "Trips не найдено"
+      },
+      "created": "Новый Trip создан с идентификатором {{ param }}",
+      "updated": "Trip обновлен с идентификатором {{ param }}",
+      "deleted": "Trip удален с идентификатором {{ param }}",
+      "delete": {
+        "question": "Вы уверены что хотите удалить Trip {{ id }}?"
+      },
+      "detail": {
+        "title": "Trip"
+      },
+      "id": "ID",
+      "authorizedCapital": "Authorized Capital",
+      "threshold": "Threshold",
+      "statement": "Statement",
+      "user": "User",
+      "importProd": "Import Prod",
+      "exportProd": "Export Prod",
+      "transport": "Transport",
+      "driver": "Driver",
+      "hubPositioning": "Hub Positioning"
+    }
+  }
+}

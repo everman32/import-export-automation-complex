@@ -1,0 +1,41 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224636",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "product",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "costPerPiece",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Product",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "productUnit",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "productUnit",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

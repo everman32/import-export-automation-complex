@@ -1,0 +1,53 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224634",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "driver",
+  "fields": [
+    {
+      "fieldName": "firstname",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "patronymic",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "lastname",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "phone",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "3"
+    },
+    {
+      "fieldName": "experience",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Driver",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "driver",
+      "relationshipName": "trip",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

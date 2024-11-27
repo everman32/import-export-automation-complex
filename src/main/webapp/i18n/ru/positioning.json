@@ -1,0 +1,27 @@
+{
+  "accountingImportExportProductsApp": {
+    "positioning": {
+      "home": {
+        "title": "Positionings",
+        "refreshListLabel": "Обновить список",
+        "createLabel": "Создать новый Positioning",
+        "createOrEditLabel": "Создать или отредактировать Positioning",
+        "notFound": "Positionings не найдено"
+      },
+      "created": "Новый Positioning создан с идентификатором {{ param }}",
+      "updated": "Positioning обновлен с идентификатором {{ param }}",
+      "deleted": "Positioning удален с идентификатором {{ param }}",
+      "delete": {
+        "question": "Вы уверены что хотите удалить Positioning {{ id }}?"
+      },
+      "detail": {
+        "title": "Positioning"
+      },
+      "id": "ID",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "statement": "Statement",
+      "trip": "Trip"
+    }
+  }
+}

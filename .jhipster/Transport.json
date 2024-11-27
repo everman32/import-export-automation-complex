@@ -1,0 +1,42 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224633",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "transport",
+  "fields": [
+    {
+      "fieldName": "brand",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "model",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "vin",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "maxlength", "unique", "required"],
+      "fieldValidateRulesMaxlength": "17",
+      "fieldValidateRulesMinlength": "17"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Transport",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "transport",
+      "relationshipName": "trip",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

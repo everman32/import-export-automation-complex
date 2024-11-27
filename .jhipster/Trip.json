@@ -1,0 +1,74 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224637",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "trip",
+  "fields": [
+    {
+      "fieldName": "authorizedCapital",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "threshold",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "0"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Trip",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "statement",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "statement",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "user",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "importProd",
+      "otherEntityRelationshipName": "trip",
+      "ownerSide": false,
+      "relationshipName": "importProd",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "exportProd",
+      "otherEntityRelationshipName": "trip",
+      "ownerSide": false,
+      "relationshipName": "exportProd",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "transport",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "transport",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "driver",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "driver",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "positioning",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "hubPositioning",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}

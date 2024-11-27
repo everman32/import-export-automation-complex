@@ -1,0 +1,35 @@
+{
+  "applications": "*",
+  "changelogDate": "20220422224640",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "grade",
+  "fields": [
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "2"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Grade",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "importProd",
+      "otherEntityRelationshipName": "grade",
+      "relationshipName": "importProd",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "exportProd",
+      "otherEntityRelationshipName": "grade",
+      "relationshipName": "exportProd",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

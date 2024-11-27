@@ -1,0 +1,26 @@
+{
+  "accountingImportExportProductsApp": {
+    "productUnit": {
+      "home": {
+        "title": "Product Units",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Product Unit",
+        "createOrEditLabel": "Create or edit a Product Unit",
+        "notFound": "No Product Units found"
+      },
+      "created": "A new Product Unit is created with identifier {{ param }}",
+      "updated": "A Product Unit is updated with identifier {{ param }}",
+      "deleted": "A Product Unit is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Product Unit {{ id }}?"
+      },
+      "detail": {
+        "title": "Product Unit"
+      },
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "product": "Product"
+    }
+  }
+}

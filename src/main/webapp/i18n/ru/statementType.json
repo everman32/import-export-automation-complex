@@ -1,0 +1,25 @@
+{
+  "accountingImportExportProductsApp": {
+    "statementType": {
+      "home": {
+        "title": "Statement Types",
+        "refreshListLabel": "Обновить список",
+        "createLabel": "Создать новый Statement Type",
+        "createOrEditLabel": "Создать или отредактировать Statement Type",
+        "notFound": "Statement Types не найдено"
+      },
+      "created": "Новый Statement Type создан с идентификатором {{ param }}",
+      "updated": "Statement Type обновлен с идентификатором {{ param }}",
+      "deleted": "Statement Type удален с идентификатором {{ param }}",
+      "delete": {
+        "question": "Вы уверены что хотите удалить Statement Type {{ id }}?"
+      },
+      "detail": {
+        "title": "Statement Type"
+      },
+      "id": "ID",
+      "name": "Name",
+      "statement": "Statement"
+    }
+  }
+}

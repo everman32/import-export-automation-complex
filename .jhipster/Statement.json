@@ -1,0 +1,60 @@
+{
+  "applications": "*",
+  "changelogDate": "20230417145211",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "statement",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["minlength", "unique", "required"],
+      "fieldValidateRulesMinlength": "2"
+    },
+    {
+      "fieldName": "transportTariff",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "deliveryScope",
+      "fieldType": "Double",
+      "fieldValidateRules": ["min", "required"],
+      "fieldValidateRulesMin": "1"
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Statement",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "statementType",
+      "otherEntityRelationshipName": "statement",
+      "relationshipName": "statementType",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "statement",
+      "relationshipName": "product",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "positioning",
+      "otherEntityRelationshipName": "statement",
+      "relationshipName": "positioning",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityName": "trip",
+      "otherEntityRelationshipName": "statement",
+      "relationshipName": "trip",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "service": "no"
+}
