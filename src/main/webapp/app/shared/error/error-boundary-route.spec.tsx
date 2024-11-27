@@ -26,7 +26,7 @@ describe('error-boundary-route component', () => {
     const { container } = render(
       <Router history={history}>
         <ErrorBoundaryRoute component={ErrorComp} path="/" />
-      </Router>
+      </Router>,
     );
     expect(container.innerHTML).toEqual('<div><h2 class="error">An unexpected error has occurred.</h2></div>');
   });

@@ -15,7 +15,7 @@ export const RegisterPage = () => {
     () => () => {
       dispatch(reset());
     },
-    []
+    [],
   );
 
   const currentLocale = useAppSelector(state => state.locale.currentLocale);

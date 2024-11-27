@@ -31,7 +31,7 @@ const render = Component =>
         </div>
       </Provider>
     </ErrorBoundary>,
-    rootEl
+    rootEl,
   );
 
 render(AppComponent);

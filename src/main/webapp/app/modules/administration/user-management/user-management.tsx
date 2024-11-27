@@ -14,7 +14,7 @@ export const UserManagement = (props: RouteComponentProps<any>) => {
   const dispatch = useAppDispatch();
 
   const [pagination, setPagination] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search)
+    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
   );
 
   const getUsersFromProps = () => {
@@ -23,7 +23,7 @@ export const UserManagement = (props: RouteComponentProps<any>) => {
         page: pagination.activePage - 1,
         size: pagination.itemsPerPage,
         sort: `${pagination.sort},${pagination.order}`,
-      })
+      }),
     );
     const endURL = `?page=${pagination.activePage}&sort=${pagination.sort},${pagination.order}`;
     if (props.location.search !== endURL) {
@@ -72,7 +72,7 @@ export const UserManagement = (props: RouteComponentProps<any>) => {
       updateUser({
         ...user,
         activated: !user.activated,
-      })
+      }),
     );
 
   const { match } = props;

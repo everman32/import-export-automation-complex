@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { createAsyncThunk, isFulfilled, isPending, isRejected } from '@reduxjs/toolkit';
+import { createAsyncThunk, isFulfilled, isPending } from '@reduxjs/toolkit';
 
 import { cleanEntity } from 'app/shared/util/entity-utils';
-import { IQueryParams, createEntitySlice, EntityState, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
+import { EntityState, IQueryParams, createEntitySlice, serializeAxiosError } from 'app/shared/reducers/reducer.utils';
 import { IStatementType, defaultValue } from 'app/shared/model/statement-type.model';
 
 const initialState: EntityState<IStatementType> = {
@@ -30,7 +30,7 @@ export const getEntity = createAsyncThunk(
     const requestUrl = `${apiUrl}/${id}`;
     return axios.get<IStatementType>(requestUrl);
   },
-  { serializeError: serializeAxiosError }
+  { serializeError: serializeAxiosError },
 );
 
 export const createEntity = createAsyncThunk(
@@ -40,7 +40,7 @@ export const createEntity = createAsyncThunk(
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
-  { serializeError: serializeAxiosError }
+  { serializeError: serializeAxiosError },
 );
 
 export const updateEntity = createAsyncThunk(
@@ -50,7 +50,7 @@ export const updateEntity = createAsyncThunk(
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
-  { serializeError: serializeAxiosError }
+  { serializeError: serializeAxiosError },
 );
 
 export const partialUpdateEntity = createAsyncThunk(
@@ -60,7 +60,7 @@ export const partialUpdateEntity = createAsyncThunk(
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
-  { serializeError: serializeAxiosError }
+  { serializeError: serializeAxiosError },
 );
 
 export const deleteEntity = createAsyncThunk(
@@ -71,7 +71,7 @@ export const deleteEntity = createAsyncThunk(
     thunkAPI.dispatch(getEntities({}));
     return result;
   },
-  { serializeError: serializeAxiosError }
+  { serializeError: serializeAxiosError },
 );
 
 // slice

@@ -1,8 +1,5 @@
 import { loadingBarReducer as loadingBar } from 'react-redux-loading-bar';
 
-import locale from './locale';
-import authentication from './authentication';
-import applicationProfile from './application-profile';
 
 import administration from 'app/modules/administration/administration.reducer';
 import userManagement from 'app/modules/administration/user-management/user-management.reducer';
@@ -33,6 +30,9 @@ import statementType from 'app/entities/statement-type/statement-type.reducer';
 import positioning from 'app/entities/positioning/positioning.reducer';
 // prettier-ignore
 import productUnit from 'app/entities/product-unit/product-unit.reducer';
+import applicationProfile from './application-profile';
+import authentication from './authentication';
+import locale from './locale';
 /* jhipster-needle-add-reducer-import - JHipster will add reducer here */
 
 const rootReducer = {

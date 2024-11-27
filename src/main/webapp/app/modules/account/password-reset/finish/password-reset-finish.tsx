@@ -17,7 +17,7 @@ export const PasswordResetFinishPage = (props: RouteComponentProps<{ key: string
     () => () => {
       dispatch(reset());
     },
-    []
+    [],
   );
 
   const handleValidSubmit = ({ newPassword }) => dispatch(handlePasswordResetFinish({ key, newPassword }));

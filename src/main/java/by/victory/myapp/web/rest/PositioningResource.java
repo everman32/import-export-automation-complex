@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +59,7 @@ public class PositioningResource {
             throw new BadRequestAlertException("A new positioning cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Positioning result = positioningRepository.save(positioning);
-        return ResponseEntity
-            .created(new URI("/api/positionings/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/positionings/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -94,8 +92,7 @@ public class PositioningResource {
         }
 
         Positioning result = positioningRepository.save(positioning);
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, positioning.getId().toString()))
             .body(result);
     }
@@ -185,8 +182,7 @@ public class PositioningResource {
     public ResponseEntity<Void> deletePositioning(@PathVariable Long id) {
         log.debug("REST request to delete Positioning : {}", id);
         positioningRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }

@@ -4,13 +4,13 @@ import thunk from 'redux-thunk';
 import sinon from 'sinon';
 
 import administration, {
-  getSystemHealth,
-  getSystemMetrics,
-  getSystemThreadDump,
-  getLoggers,
   changeLogLevel,
   getConfigurations,
   getEnv,
+  getLoggers,
+  getSystemHealth,
+  getSystemMetrics,
+  getSystemThreadDump,
   setLoggers,
 } from './administration.reducer';
 
@@ -61,7 +61,7 @@ describe('Administration reducer tests', () => {
             errorMessage: null,
             loading: true,
           });
-        }
+        },
       );
     });
   });
@@ -86,7 +86,7 @@ describe('Administration reducer tests', () => {
         },
         {
           message: 'error',
-        }
+        },
       );
     });
   });

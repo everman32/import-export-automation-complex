@@ -5,17 +5,17 @@ import { Storage } from 'react-jhipster';
 import configureStore from 'redux-mock-store';
 
 import authentication, {
-  getSession,
-  getAccount,
+  authError,
   authenticate,
-  login,
+  clearAuth,
+  clearAuthToken,
   clearAuthentication,
+  getAccount,
+  getSession,
+  initialState,
+  login,
   logout,
   logoutSession,
-  clearAuthToken,
-  authError,
-  clearAuth,
-  initialState,
 } from 'app/shared/reducers/authentication';
 import { updateLocale } from 'app/shared/reducers/locale';
 

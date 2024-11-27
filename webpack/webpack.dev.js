@@ -93,7 +93,7 @@ module.exports = async options =>
         },
         {
           reload: false,
-        }
+        },
       ),
       new webpack.HotModuleReplacementPlugin(),
       new WebpackNotifierPlugin({

@@ -78,7 +78,7 @@ export const HealthPage = () => {
                       ) : null}
                     </td>
                   </tr>
-                ) : null
+                ) : null,
               )}
             </tbody>
           </Table>

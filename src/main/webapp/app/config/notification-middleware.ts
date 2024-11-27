@@ -60,7 +60,7 @@ export default () => next => action => {
                 }
               });
             if (errorHeader) {
-              const entityName = translate('global.menu.entities.' + entityKey);
+              const entityName = translate(`global.menu.entities.${  entityKey}`);
               addErrorAlert(errorHeader, errorHeader, { entityName });
             } else if (data?.fieldErrors) {
               const fieldErrors = data.fieldErrors;

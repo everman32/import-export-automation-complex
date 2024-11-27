@@ -1,14 +1,13 @@
-import { entityItemSelector } from '../../support/commands';
 import {
-  entityTableSelector,
-  entityDetailsButtonSelector,
-  entityDetailsBackButtonSelector,
-  entityCreateButtonSelector,
-  entityCreateSaveButtonSelector,
-  entityCreateCancelButtonSelector,
-  entityEditButtonSelector,
-  entityDeleteButtonSelector,
   entityConfirmDeleteButtonSelector,
+  entityCreateButtonSelector,
+  entityCreateCancelButtonSelector,
+  entityCreateSaveButtonSelector,
+  entityDeleteButtonSelector,
+  entityDetailsBackButtonSelector,
+  entityDetailsButtonSelector,
+  entityEditButtonSelector,
+  entityTableSelector,
 } from '../../support/entity';
 
 describe('Statement e2e test', () => {
@@ -128,7 +127,7 @@ describe('Statement e2e test', () => {
           url: '/api/statements',
           body: {
             ...statementSample,
-            positioning: positioning,
+            positioning,
           },
         }).then(({ body }) => {
           statement = body;
@@ -145,7 +144,7 @@ describe('Statement e2e test', () => {
                 link: '<http://localhost/api/statements?page=0&size=20>; rel="last",<http://localhost/api/statements?page=0&size=20>; rel="first"',
               },
               body: [statement],
-            }
+            },
           ).as('entitiesRequestInternal');
         });
 

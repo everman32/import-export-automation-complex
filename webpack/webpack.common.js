@@ -148,7 +148,7 @@ module.exports = async options => {
           },
         }),
       ],
-    }
+    },
     // jhipster-needle-add-webpack-config - JHipster will add custom config
   );
 };

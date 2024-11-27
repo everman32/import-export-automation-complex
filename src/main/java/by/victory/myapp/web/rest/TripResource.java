@@ -62,8 +62,7 @@ public class TripResource {
             throw new BadRequestAlertException("A new trip cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Trip result = tripRepository.save(trip);
-        return ResponseEntity
-            .created(new URI("/api/trips/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/trips/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -94,8 +93,7 @@ public class TripResource {
         }
 
         Trip result = tripRepository.save(trip);
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, trip.getId().toString()))
             .body(result);
     }
@@ -165,8 +163,7 @@ public class TripResource {
         if ("importprod-is-null".equals(filter)) {
             log.debug("REST request to get all Trips where importProd is null");
             return new ResponseEntity<>(
-                StreamSupport
-                    .stream(tripRepository.findAll().spliterator(), false)
+                StreamSupport.stream(tripRepository.findAll().spliterator(), false)
                     .filter(trip -> trip.getImportProd() == null)
                     .collect(Collectors.toList()),
                 HttpStatus.OK
@@ -176,8 +173,7 @@ public class TripResource {
         if ("exportprod-is-null".equals(filter)) {
             log.debug("REST request to get all Trips where exportProd is null");
             return new ResponseEntity<>(
-                StreamSupport
-                    .stream(tripRepository.findAll().spliterator(), false)
+                StreamSupport.stream(tripRepository.findAll().spliterator(), false)
                     .filter(trip -> trip.getExportProd() == null)
                     .collect(Collectors.toList()),
                 HttpStatus.OK
@@ -217,8 +213,7 @@ public class TripResource {
     public ResponseEntity<Void> deleteTrip(@PathVariable Long id) {
         log.debug("REST request to delete Trip : {}", id);
         tripRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }

@@ -3,18 +3,18 @@ import axios from 'axios';
 import thunk from 'redux-thunk';
 import sinon from 'sinon';
 
-import userManagement, {
-  getUsers,
-  getUsersAsAdmin,
-  getRoles,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  reset,
-} from './user-management.reducer';
 import { defaultValue } from 'app/shared/model/user.model';
 import { AUTHORITIES } from 'app/config/constants';
+import userManagement, {
+  createUser,
+  deleteUser,
+  getRoles,
+  getUser,
+  getUsers,
+  getUsersAsAdmin,
+  reset,
+  updateUser,
+} from './user-management.reducer';
 
 describe('User management reducer tests', () => {
   const username = process.env.E2E_USERNAME ?? 'admin';
@@ -22,9 +22,9 @@ describe('User management reducer tests', () => {
   function isEmpty(element): boolean {
     if (element instanceof Array) {
       return element.length === 0;
-    } else {
+    } 
       return Object.keys(element).length === 0;
-    }
+    
   }
 
   function testInitialState(state) {
@@ -99,14 +99,14 @@ describe('User management reducer tests', () => {
             errorMessage: 'error happened',
           });
         },
-        { message: 'error happened' }
+        { message: 'error happened' },
       );
     });
   });
 
   describe('Success', () => {
     it('should update state according to a successful fetch users request', () => {
-      const headers = { ['x-total-count']: 42 };
+      const headers = { 'x-total-count': 42 };
       const payload = { data: 'some handsome users', headers };
       const toTest = userManagement(undefined, { type: getUsers.fulfilled.type, payload });
 

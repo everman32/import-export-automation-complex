@@ -1,14 +1,13 @@
-import { entityItemSelector } from '../../support/commands';
 import {
-  entityTableSelector,
-  entityDetailsButtonSelector,
-  entityDetailsBackButtonSelector,
-  entityCreateButtonSelector,
-  entityCreateSaveButtonSelector,
-  entityCreateCancelButtonSelector,
-  entityEditButtonSelector,
-  entityDeleteButtonSelector,
   entityConfirmDeleteButtonSelector,
+  entityCreateButtonSelector,
+  entityCreateCancelButtonSelector,
+  entityCreateSaveButtonSelector,
+  entityDeleteButtonSelector,
+  entityDetailsBackButtonSelector,
+  entityDetailsButtonSelector,
+  entityEditButtonSelector,
+  entityTableSelector,
 } from '../../support/entity';
 
 describe('ImportProd e2e test', () => {
@@ -96,7 +95,7 @@ describe('ImportProd e2e test', () => {
                 link: '<http://localhost/api/import-prods?page=0&size=20>; rel="last",<http://localhost/api/import-prods?page=0&size=20>; rel="first"',
               },
               body: [importProd],
-            }
+            },
           ).as('entitiesRequestInternal');
         });
 
