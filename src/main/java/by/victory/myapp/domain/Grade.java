@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -15,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "grade")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Grade implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,12 +31,12 @@ public class Grade implements Serializable {
     @Column(name = "description", nullable = false, unique = true)
     private String description;
 
-    @OneToMany(mappedBy = "grade")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "grade")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ImportProd> importProds = new HashSet<>();
 
-    @OneToMany(mappedBy = "grade")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "grade")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
     private Set<ExportProd> exportProds = new HashSet<>();
@@ -140,7 +141,7 @@ public class Grade implements Serializable {
         if (!(o instanceof Grade)) {
             return false;
         }
-        return id != null && id.equals(((Grade) o).id);
+        return getId() != null && getId().equals(((Grade) o).getId());
     }
 
     @Override

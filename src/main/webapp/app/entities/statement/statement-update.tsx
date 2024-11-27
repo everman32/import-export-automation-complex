@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, FormText, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IStatementType } from 'app/shared/model/statement-type.model';
-import { getEntities as getStatementTypes } from 'app/entities/statement-type/statement-type.reducer';
-import { IProduct } from 'app/shared/model/product.model';
-import { getEntities as getProducts } from 'app/entities/product/product.reducer';
-import { IPositioning } from 'app/shared/model/positioning.model';
-import { getEntities as getPositionings } from 'app/entities/positioning/positioning.reducer';
-import { ITrip } from 'app/shared/model/trip.model';
-import { getEntities as getTrips } from 'app/entities/trip/trip.reducer';
-import { getEntity, updateEntity, createEntity, reset } from './statement.reducer';
-import { IStatement } from 'app/shared/model/statement.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { getEntities as getStatementTypes } from 'app/entities/statement-type/statement-type.reducer';
+import { getEntities as getProducts } from 'app/entities/product/product.reducer';
+import { getEntities as getPositionings } from 'app/entities/positioning/positioning.reducer';
+import { getEntities as getTrips } from 'app/entities/trip/trip.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './statement.reducer';
+
+export const StatementUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const statementTypes = useAppSelector(state => state.statementType.entities);
   const products = useAppSelector(state => state.product.entities);
@@ -31,15 +28,16 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const loading = useAppSelector(state => state.statement.loading);
   const updating = useAppSelector(state => state.statement.updating);
   const updateSuccess = useAppSelector(state => state.statement.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/statement' + props.location.search);
+    navigate(`/statement${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
 
     dispatch(getStatementTypes({}));
@@ -55,13 +53,23 @@ export const StatementUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+    if (values.transportTariff !== undefined && typeof values.transportTariff !== 'number') {
+      values.transportTariff = Number(values.transportTariff);
+    }
+    if (values.deliveryScope !== undefined && typeof values.deliveryScope !== 'number') {
+      values.deliveryScope = Number(values.deliveryScope);
+    }
+
     const entity = {
       ...statementEntity,
       ...values,
-      statementType: statementTypes.find(it => it.id.toString() === values.statementType.toString()),
-      product: products.find(it => it.id.toString() === values.product.toString()),
-      positioning: positionings.find(it => it.id.toString() === values.positioning.toString()),
-      trip: trips.find(it => it.id.toString() === values.trip.toString()),
+      statementType: statementTypes.find(it => it.id.toString() === values.statementType?.toString()),
+      product: products.find(it => it.id.toString() === values.product?.toString()),
+      positioning: positionings.find(it => it.id.toString() === values.positioning?.toString()),
+      trip: trips.find(it => it.id.toString() === values.trip?.toString()),
     };
 
     if (isNew) {

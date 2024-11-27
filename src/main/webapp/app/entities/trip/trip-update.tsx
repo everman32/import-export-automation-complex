@@ -1,35 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IUser } from 'app/shared/model/user.model';
-import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
-import { IImportProd } from 'app/shared/model/import-prod.model';
-import { getEntities as getImportProds } from 'app/entities/import-prod/import-prod.reducer';
-import { IExportProd } from 'app/shared/model/export-prod.model';
-import { getEntities as getExportProds } from 'app/entities/export-prod/export-prod.reducer';
-import { ITransport } from 'app/shared/model/transport.model';
-import { getEntities as getTransports } from 'app/entities/transport/transport.reducer';
-import { IDriver } from 'app/shared/model/driver.model';
-import { getEntities as getDrivers } from 'app/entities/driver/driver.reducer';
-import { IPositioning } from 'app/shared/model/positioning.model';
-import { getEntities as getPositionings } from 'app/entities/positioning/positioning.reducer';
-import { getEntity, updateEntity, createEntity, reset } from './trip.reducer';
-import { ITrip } from 'app/shared/model/trip.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
+import { getEntities as getTransports } from 'app/entities/transport/transport.reducer';
+import { getEntities as getDrivers } from 'app/entities/driver/driver.reducer';
+import { getEntities as getPositionings } from 'app/entities/positioning/positioning.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './trip.reducer';
+
+export const TripUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const users = useAppSelector(state => state.userManagement.users);
-  const importProds = useAppSelector(state => state.importProd.entities);
-  const exportProds = useAppSelector(state => state.exportProd.entities);
   const transports = useAppSelector(state => state.transport.entities);
   const drivers = useAppSelector(state => state.driver.entities);
   const positionings = useAppSelector(state => state.positioning.entities);
@@ -37,20 +28,19 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
   const loading = useAppSelector(state => state.trip.loading);
   const updating = useAppSelector(state => state.trip.updating);
   const updateSuccess = useAppSelector(state => state.trip.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/trip' + props.location.search);
+    navigate(`/trip${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
 
     dispatch(getUsers({}));
-    dispatch(getImportProds({}));
-    dispatch(getExportProds({}));
     dispatch(getTransports({}));
     dispatch(getDrivers({}));
     dispatch(getPositionings({}));
@@ -63,13 +53,23 @@ export const TripUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+    if (values.authorizedCapital !== undefined && typeof values.authorizedCapital !== 'number') {
+      values.authorizedCapital = Number(values.authorizedCapital);
+    }
+    if (values.threshold !== undefined && typeof values.threshold !== 'number') {
+      values.threshold = Number(values.threshold);
+    }
+
     const entity = {
       ...tripEntity,
       ...values,
-      user: users.find(it => it.id.toString() === values.user.toString()),
-      transport: transports.find(it => it.id.toString() === values.transport.toString()),
-      driver: drivers.find(it => it.id.toString() === values.driver.toString()),
-      hubPositioning: positionings.find(it => it.id.toString() === values.hubPositioning.toString()),
+      user: users.find(it => it.id.toString() === values.user?.toString()),
+      transport: transports.find(it => it.id.toString() === values.transport?.toString()),
+      driver: drivers.find(it => it.id.toString() === values.driver?.toString()),
+      hubPositioning: positionings.find(it => it.id.toString() === values.hubPositioning?.toString()),
     };
 
     if (isNew) {

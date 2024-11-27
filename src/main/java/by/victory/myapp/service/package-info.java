@@ -1,4 +1,4 @@
 /**
- * Service layer beans.
+ * Service layer.
  */
 package by.victory.myapp.service;

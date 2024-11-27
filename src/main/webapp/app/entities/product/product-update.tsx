@@ -1,36 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { IProductUnit } from 'app/shared/model/product-unit.model';
-import { getEntities as getProductUnits } from 'app/entities/product-unit/product-unit.reducer';
-import { getEntity, updateEntity, createEntity, reset } from './product.reducer';
-import { IProduct } from 'app/shared/model/product.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { getEntities as getProductUnits } from 'app/entities/product-unit/product-unit.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './product.reducer';
+
+export const ProductUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const productUnits = useAppSelector(state => state.productUnit.entities);
   const productEntity = useAppSelector(state => state.product.entity);
   const loading = useAppSelector(state => state.product.loading);
   const updating = useAppSelector(state => state.product.updating);
   const updateSuccess = useAppSelector(state => state.product.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/product' + props.location.search);
+    navigate(`/product${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
 
     dispatch(getProductUnits({}));
@@ -43,10 +44,17 @@ export const ProductUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+    if (values.costPerPiece !== undefined && typeof values.costPerPiece !== 'number') {
+      values.costPerPiece = Number(values.costPerPiece);
+    }
+
     const entity = {
       ...productEntity,
       ...values,
-      productUnit: productUnits.find(it => it.id.toString() === values.productUnit.toString()),
+      productUnit: productUnits.find(it => it.id.toString() === values.productUnit?.toString()),
     };
 
     if (isNew) {

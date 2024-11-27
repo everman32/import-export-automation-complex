@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { Storage } from 'react-jhipster';
 
 const TIMEOUT = 1 * 60 * 1000;
@@ -14,9 +14,9 @@ const setupAxiosInterceptors = onUnauthenticated => {
     return config;
   };
   const onResponseSuccess = response => response;
-  const onResponseError = err => {
+  const onResponseError = (err: AxiosError) => {
     const status = err.status || (err.response ? err.response.status : 0);
-    if (status === 403 || status === 401) {
+    if (status === 401) {
       onUnauthenticated();
     }
     return Promise.reject(err);

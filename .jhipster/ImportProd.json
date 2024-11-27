@@ -1,4 +1,7 @@
 {
+  "annotations": {
+    "changelogDate": "20220422224638"
+  },
   "applications": "*",
   "changelogDate": "20220422224638",
   "dto": "no",
@@ -22,14 +25,17 @@
       "otherEntityRelationshipName": "importProd",
       "ownerSide": true,
       "relationshipName": "trip",
+      "relationshipSide": "left",
       "relationshipType": "one-to-one"
     },
     {
       "otherEntityName": "grade",
       "otherEntityRelationshipName": "importProd",
       "relationshipName": "grade",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": "no",
   "service": "no"
 }

@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.GradeAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Grade;
 import by.victory.myapp.repository.GradeRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,10 @@ class GradeResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private GradeRepository gradeRepository;
@@ -49,15 +55,16 @@ class GradeResourceIT {
 
     private Grade grade;
 
+    private Grade insertedGrade;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Grade createEntity(EntityManager em) {
-        Grade grade = new Grade().description(DEFAULT_DESCRIPTION);
-        return grade;
+    public static Grade createEntity() {
+        return new Grade().description(DEFAULT_DESCRIPTION);
     }
 
     /**
@@ -66,30 +73,43 @@ class GradeResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Grade createUpdatedEntity(EntityManager em) {
-        Grade grade = new Grade().description(UPDATED_DESCRIPTION);
-        return grade;
+    public static Grade createUpdatedEntity() {
+        return new Grade().description(UPDATED_DESCRIPTION);
     }
 
     @BeforeEach
     public void initTest() {
-        grade = createEntity(em);
+        grade = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedGrade != null) {
+            gradeRepository.delete(insertedGrade);
+            insertedGrade = null;
+        }
     }
 
     @Test
     @Transactional
     void createGrade() throws Exception {
-        int databaseSizeBeforeCreate = gradeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Grade
-        restGradeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(grade)))
-            .andExpect(status().isCreated());
+        var returnedGrade = om.readValue(
+            restGradeMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(grade)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Grade.class
+        );
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeCreate + 1);
-        Grade testGrade = gradeList.get(gradeList.size() - 1);
-        assertThat(testGrade.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertGradeUpdatableFieldsEquals(returnedGrade, getPersistedGrade(returnedGrade));
+
+        insertedGrade = returnedGrade;
     }
 
     @Test
@@ -98,40 +118,38 @@ class GradeResourceIT {
         // Create the Grade with an existing ID
         grade.setId(1L);
 
-        int databaseSizeBeforeCreate = gradeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restGradeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(grade)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(grade)))
             .andExpect(status().isBadRequest());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkDescriptionIsRequired() throws Exception {
-        int databaseSizeBeforeTest = gradeRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         grade.setDescription(null);
 
         // Create the Grade, which fails.
 
         restGradeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(grade)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(grade)))
             .andExpect(status().isBadRequest());
 
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllGrades() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
         // Get all the gradeList
         restGradeMockMvc
@@ -146,7 +164,7 @@ class GradeResourceIT {
     @Transactional
     void getGrade() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
         // Get the grade
         restGradeMockMvc
@@ -166,14 +184,14 @@ class GradeResourceIT {
 
     @Test
     @Transactional
-    void putNewGrade() throws Exception {
+    void putExistingGrade() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the grade
-        Grade updatedGrade = gradeRepository.findById(grade.getId()).get();
+        Grade updatedGrade = gradeRepository.findById(grade.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedGrade are not directly saved in db
         em.detach(updatedGrade);
         updatedGrade.description(UPDATED_DESCRIPTION);
@@ -182,109 +200,97 @@ class GradeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedGrade.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedGrade))
+                    .content(om.writeValueAsBytes(updatedGrade))
             )
             .andExpect(status().isOk());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
-        Grade testGrade = gradeList.get(gradeList.size() - 1);
-        assertThat(testGrade.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedGradeToMatchAllProperties(updatedGrade);
     }
 
     @Test
     @Transactional
     void putNonExistingGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGradeMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, grade.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(grade))
-            )
+            .perform(put(ENTITY_API_URL_ID, grade.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(grade)))
             .andExpect(status().isBadRequest());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restGradeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(grade))
+                    .content(om.writeValueAsBytes(grade))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restGradeMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(grade)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(grade)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateGradeWithPatch() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the grade using partial update
         Grade partialUpdatedGrade = new Grade();
         partialUpdatedGrade.setId(grade.getId());
 
-        partialUpdatedGrade.description(UPDATED_DESCRIPTION);
-
         restGradeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedGrade.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedGrade))
+                    .content(om.writeValueAsBytes(partialUpdatedGrade))
             )
             .andExpect(status().isOk());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
-        Grade testGrade = gradeList.get(gradeList.size() - 1);
-        assertThat(testGrade.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertGradeUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedGrade, grade), getPersistedGrade(grade));
     }
 
     @Test
     @Transactional
     void fullUpdateGradeWithPatch() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the grade using partial update
         Grade partialUpdatedGrade = new Grade();
@@ -296,80 +302,74 @@ class GradeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedGrade.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedGrade))
+                    .content(om.writeValueAsBytes(partialUpdatedGrade))
             )
             .andExpect(status().isOk());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
-        Grade testGrade = gradeList.get(gradeList.size() - 1);
-        assertThat(testGrade.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertGradeUpdatableFieldsEquals(partialUpdatedGrade, getPersistedGrade(partialUpdatedGrade));
     }
 
     @Test
     @Transactional
     void patchNonExistingGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restGradeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, grade.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(grade))
+                patch(ENTITY_API_URL_ID, grade.getId()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(grade))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restGradeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(grade))
+                    .content(om.writeValueAsBytes(grade))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamGrade() throws Exception {
-        int databaseSizeBeforeUpdate = gradeRepository.findAll().size();
-        grade.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        grade.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restGradeMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(grade)))
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(grade)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Grade in the database
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteGrade() throws Exception {
         // Initialize the database
-        gradeRepository.saveAndFlush(grade);
+        insertedGrade = gradeRepository.saveAndFlush(grade);
 
-        int databaseSizeBeforeDelete = gradeRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the grade
         restGradeMockMvc
@@ -377,7 +377,34 @@ class GradeResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Grade> gradeList = gradeRepository.findAll();
-        assertThat(gradeList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return gradeRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Grade getPersistedGrade(Grade grade) {
+        return gradeRepository.findById(grade.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedGradeToMatchAllProperties(Grade expectedGrade) {
+        assertGradeAllPropertiesEquals(expectedGrade, getPersistedGrade(expectedGrade));
+    }
+
+    protected void assertPersistedGradeToMatchUpdatableProperties(Grade expectedGrade) {
+        assertGradeAllUpdatablePropertiesEquals(expectedGrade, getPersistedGrade(expectedGrade));
     }
 }

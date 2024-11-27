@@ -3,13 +3,13 @@ package by.victory.myapp.web.rest;
 import by.victory.myapp.domain.Statement;
 import by.victory.myapp.repository.StatementRepository;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.Statement}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/statements")
 @Transactional
 public class StatementResource {
 
-    private final Logger log = LoggerFactory.getLogger(StatementResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StatementResource.class);
 
     private static final String ENTITY_NAME = "statement";
 
@@ -52,16 +52,16 @@ public class StatementResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new statement, or with status {@code 400 (Bad Request)} if the statement has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/statements")
+    @PostMapping("")
     public ResponseEntity<Statement> createStatement(@Valid @RequestBody Statement statement) throws URISyntaxException {
-        log.debug("REST request to save Statement : {}", statement);
+        LOG.debug("REST request to save Statement : {}", statement);
         if (statement.getId() != null) {
             throw new BadRequestAlertException("A new statement cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Statement result = statementRepository.save(statement);
-        return ResponseEntity.created(new URI("/api/statements/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        statement = statementRepository.save(statement);
+        return ResponseEntity.created(new URI("/api/statements/" + statement.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, statement.getId().toString()))
+            .body(statement);
     }
 
     /**
@@ -74,12 +74,12 @@ public class StatementResource {
      * or with status {@code 500 (Internal Server Error)} if the statement couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/statements/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Statement> updateStatement(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Statement statement
     ) throws URISyntaxException {
-        log.debug("REST request to update Statement : {}, {}", id, statement);
+        LOG.debug("REST request to update Statement : {}, {}", id, statement);
         if (statement.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -91,10 +91,10 @@ public class StatementResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Statement result = statementRepository.save(statement);
+        statement = statementRepository.save(statement);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, statement.getId().toString()))
-            .body(result);
+            .body(statement);
     }
 
     /**
@@ -108,12 +108,12 @@ public class StatementResource {
      * or with status {@code 500 (Internal Server Error)} if the statement couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/statements/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Statement> partialUpdateStatement(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Statement statement
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Statement partially : {}, {}", id, statement);
+        LOG.debug("REST request to partial update Statement partially : {}, {}", id, statement);
         if (statement.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -154,9 +154,9 @@ public class StatementResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of statements in body.
      */
-    @GetMapping("/statements")
-    public ResponseEntity<List<Statement>> getAllStatements(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Statements");
+    @GetMapping("")
+    public ResponseEntity<List<Statement>> getAllStatements(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of Statements");
         Page<Statement> page = statementRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -168,9 +168,9 @@ public class StatementResource {
      * @param id the id of the statement to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the statement, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/statements/{id}")
-    public ResponseEntity<Statement> getStatement(@PathVariable Long id) {
-        log.debug("REST request to get Statement : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Statement> getStatement(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Statement : {}", id);
         Optional<Statement> statement = statementRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(statement);
     }
@@ -181,9 +181,9 @@ public class StatementResource {
      * @param id the id of the statement to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/statements/{id}")
-    public ResponseEntity<Void> deleteStatement(@PathVariable Long id) {
-        log.debug("REST request to delete Statement : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStatement(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete Statement : {}", id);
         statementRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

@@ -1,4 +1,3 @@
-const webpack = require('webpack');
 const webpackMerge = require('webpack-merge').merge;
 const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const SimpleProgressWebpackPlugin = require('simple-progress-webpack-plugin');
@@ -18,8 +17,8 @@ module.exports = async options =>
     entry: ['./src/main/webapp/app/index'],
     output: {
       path: utils.root('target/classes/static/'),
-      filename: 'app/[name].bundle.js',
-      chunkFilename: 'app/[id].chunk.js',
+      filename: '[name].[contenthash:8].js',
+      chunkFilename: '[name].[chunkhash:8].chunk.js',
     },
     optimization: {
       moduleIds: 'named',
@@ -30,7 +29,10 @@ module.exports = async options =>
           test: /\.(sa|sc|c)ss$/,
           use: [
             'style-loader',
-            'css-loader',
+            {
+              loader: 'css-loader',
+              options: { url: false },
+            },
             {
               loader: 'postcss-loader',
             },
@@ -50,13 +52,12 @@ module.exports = async options =>
       port: 9060,
       proxy: [
         {
-          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console', '/auth'],
+          context: ['/api', '/services', '/management', '/v3/api-docs', '/h2-console'],
           target: `http${options.tls ? 's' : ''}://localhost:8080`,
           secure: false,
           changeOrigin: options.tls,
         },
       ],
-      https: options.tls,
       historyApiFallback: true,
     },
     stats: process.env.JHI_DISABLE_WEBPACK_LOGS ? 'none' : options.stats,
@@ -72,7 +73,7 @@ module.exports = async options =>
           host: 'localhost',
           port: 9000,
           proxy: {
-            target: `http${options.tls ? 's' : ''}://localhost:9060`,
+            target: `http${options.tls ? 's' : ''}://localhost:${options.watch ? '8080' : '9060'}`,
             ws: true,
             proxyOptions: {
               changeOrigin: false, //pass the Host header to the backend unchanged  https://github.com/Browsersync/browser-sync/issues/430
@@ -95,7 +96,6 @@ module.exports = async options =>
           reload: false,
         },
       ),
-      new webpack.HotModuleReplacementPlugin(),
       new WebpackNotifierPlugin({
         title: 'Accounting Import Export Products App',
         contentImage: path.join(__dirname, 'logo-jhipster.png'),

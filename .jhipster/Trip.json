@@ -1,4 +1,7 @@
 {
+  "annotations": {
+    "changelogDate": "20220422224637"
+  },
   "applications": "*",
   "changelogDate": "20220422224637",
   "dto": "no",
@@ -28,6 +31,7 @@
       "otherEntityName": "statement",
       "otherEntityRelationshipName": "trip",
       "relationshipName": "statement",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
@@ -35,6 +39,7 @@
       "otherEntityName": "user",
       "otherEntityRelationshipName": "trip",
       "relationshipName": "user",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
@@ -42,6 +47,7 @@
       "otherEntityRelationshipName": "trip",
       "ownerSide": false,
       "relationshipName": "importProd",
+      "relationshipSide": "right",
       "relationshipType": "one-to-one"
     },
     {
@@ -49,26 +55,31 @@
       "otherEntityRelationshipName": "trip",
       "ownerSide": false,
       "relationshipName": "exportProd",
+      "relationshipSide": "right",
       "relationshipType": "one-to-one"
     },
     {
       "otherEntityName": "transport",
       "otherEntityRelationshipName": "trip",
       "relationshipName": "transport",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "driver",
       "otherEntityRelationshipName": "trip",
       "relationshipName": "driver",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "positioning",
       "otherEntityRelationshipName": "trip",
       "relationshipName": "hubPositioning",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": "no",
   "service": "no"
 }

@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { getEntity, updateEntity, createEntity, reset } from './driver.reducer';
-import { IDriver } from 'app/shared/model/driver.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const DriverUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { createEntity, getEntity, reset, updateEntity } from './driver.reducer';
+
+export const DriverUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const driverEntity = useAppSelector(state => state.driver.entity);
   const loading = useAppSelector(state => state.driver.loading);
   const updating = useAppSelector(state => state.driver.updating);
   const updateSuccess = useAppSelector(state => state.driver.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/driver' + props.location.search);
+    navigate(`/driver${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
   }, []);
 
@@ -38,6 +40,13 @@ export const DriverUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+    if (values.experience !== undefined && typeof values.experience !== 'number') {
+      values.experience = Number(values.experience);
+    }
+
     const entity = {
       ...driverEntity,
       ...values,

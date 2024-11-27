@@ -1,8 +1,8 @@
 import React from 'react';
-import { Translate, translate, ValidatedField } from 'react-jhipster';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Alert, Row, Col, Form } from 'reactstrap';
+import { Translate, ValidatedField, translate } from 'react-jhipster';
+import { Alert, Button, Col, Form, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { type FieldError, useForm } from 'react-hook-form';
 
 export interface ILoginModalProps {
   showModal: boolean;
@@ -24,9 +24,13 @@ const LoginModal = (props: ILoginModalProps) => {
 
   const { loginError, handleClose } = props;
 
+  const handleLoginSubmit = e => {
+    handleSubmit(login)(e);
+  };
+
   return (
     <Modal isOpen={props.showModal} toggle={handleClose} backdrop="static" id="login-page" autoFocus={false}>
-      <Form onSubmit={handleSubmit(login)}>
+      <Form onSubmit={handleLoginSubmit}>
         <ModalHeader id="login-title" data-cy="loginTitle" toggle={handleClose}>
           <Translate contentKey="login.title">Sign in</Translate>
         </ModalHeader>
@@ -51,7 +55,7 @@ const LoginModal = (props: ILoginModalProps) => {
                 data-cy="username"
                 validate={{ required: 'Username cannot be empty!' }}
                 register={register}
-                error={errors.username}
+                error={errors.username as FieldError}
                 isTouched={touchedFields.username}
               />
               <ValidatedField
@@ -63,7 +67,7 @@ const LoginModal = (props: ILoginModalProps) => {
                 data-cy="password"
                 validate={{ required: 'Password cannot be empty!' }}
                 register={register}
-                error={errors.password}
+                error={errors.password as FieldError}
                 isTouched={touchedFields.password}
               />
               <ValidatedField

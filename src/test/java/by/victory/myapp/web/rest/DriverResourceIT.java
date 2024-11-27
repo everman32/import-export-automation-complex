@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.DriverAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Driver;
 import by.victory.myapp.repository.DriverRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +51,10 @@ class DriverResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private DriverRepository driverRepository;
@@ -61,20 +67,21 @@ class DriverResourceIT {
 
     private Driver driver;
 
+    private Driver insertedDriver;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Driver createEntity(EntityManager em) {
-        Driver driver = new Driver()
+    public static Driver createEntity() {
+        return new Driver()
             .firstname(DEFAULT_FIRSTNAME)
             .patronymic(DEFAULT_PATRONYMIC)
             .lastname(DEFAULT_LASTNAME)
             .phone(DEFAULT_PHONE)
             .experience(DEFAULT_EXPERIENCE);
-        return driver;
     }
 
     /**
@@ -83,39 +90,48 @@ class DriverResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Driver createUpdatedEntity(EntityManager em) {
-        Driver driver = new Driver()
+    public static Driver createUpdatedEntity() {
+        return new Driver()
             .firstname(UPDATED_FIRSTNAME)
             .patronymic(UPDATED_PATRONYMIC)
             .lastname(UPDATED_LASTNAME)
             .phone(UPDATED_PHONE)
             .experience(UPDATED_EXPERIENCE);
-        return driver;
     }
 
     @BeforeEach
     public void initTest() {
-        driver = createEntity(em);
+        driver = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedDriver != null) {
+            driverRepository.delete(insertedDriver);
+            insertedDriver = null;
+        }
     }
 
     @Test
     @Transactional
     void createDriver() throws Exception {
-        int databaseSizeBeforeCreate = driverRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Driver
-        restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
-            .andExpect(status().isCreated());
+        var returnedDriver = om.readValue(
+            restDriverMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Driver.class
+        );
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeCreate + 1);
-        Driver testDriver = driverList.get(driverList.size() - 1);
-        assertThat(testDriver.getFirstname()).isEqualTo(DEFAULT_FIRSTNAME);
-        assertThat(testDriver.getPatronymic()).isEqualTo(DEFAULT_PATRONYMIC);
-        assertThat(testDriver.getLastname()).isEqualTo(DEFAULT_LASTNAME);
-        assertThat(testDriver.getPhone()).isEqualTo(DEFAULT_PHONE);
-        assertThat(testDriver.getExperience()).isEqualTo(DEFAULT_EXPERIENCE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertDriverUpdatableFieldsEquals(returnedDriver, getPersistedDriver(returnedDriver));
+
+        insertedDriver = returnedDriver;
     }
 
     @Test
@@ -124,91 +140,86 @@ class DriverResourceIT {
         // Create the Driver with an existing ID
         driver.setId(1L);
 
-        int databaseSizeBeforeCreate = driverRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkFirstnameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = driverRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         driver.setFirstname(null);
 
         // Create the Driver, which fails.
 
         restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkLastnameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = driverRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         driver.setLastname(null);
 
         // Create the Driver, which fails.
 
         restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkPhoneIsRequired() throws Exception {
-        int databaseSizeBeforeTest = driverRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         driver.setPhone(null);
 
         // Create the Driver, which fails.
 
         restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkExperienceIsRequired() throws Exception {
-        int databaseSizeBeforeTest = driverRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         driver.setExperience(null);
 
         // Create the Driver, which fails.
 
         restDriverMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllDrivers() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
         // Get all the driverList
         restDriverMockMvc
@@ -227,7 +238,7 @@ class DriverResourceIT {
     @Transactional
     void getDriver() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
         // Get the driver
         restDriverMockMvc
@@ -251,14 +262,14 @@ class DriverResourceIT {
 
     @Test
     @Transactional
-    void putNewDriver() throws Exception {
+    void putExistingDriver() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the driver
-        Driver updatedDriver = driverRepository.findById(driver.getId()).get();
+        Driver updatedDriver = driverRepository.findById(driver.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedDriver are not directly saved in db
         em.detach(updatedDriver);
         updatedDriver
@@ -272,122 +283,99 @@ class DriverResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedDriver.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedDriver))
+                    .content(om.writeValueAsBytes(updatedDriver))
             )
             .andExpect(status().isOk());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
-        Driver testDriver = driverList.get(driverList.size() - 1);
-        assertThat(testDriver.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
-        assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
-        assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
-        assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedDriverToMatchAllProperties(updatedDriver);
     }
 
     @Test
     @Transactional
     void putNonExistingDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDriverMockMvc
-            .perform(
-                put(ENTITY_API_URL_ID, driver.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(driver))
-            )
+            .perform(put(ENTITY_API_URL_ID, driver.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isBadRequest());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDriverMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(driver))
+                    .content(om.writeValueAsBytes(driver))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDriverMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(driver)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateDriverWithPatch() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the driver using partial update
         Driver partialUpdatedDriver = new Driver();
         partialUpdatedDriver.setId(driver.getId());
 
-        partialUpdatedDriver
-            .firstname(UPDATED_FIRSTNAME)
-            .patronymic(UPDATED_PATRONYMIC)
-            .lastname(UPDATED_LASTNAME)
-            .phone(UPDATED_PHONE)
-            .experience(UPDATED_EXPERIENCE);
+        partialUpdatedDriver.firstname(UPDATED_FIRSTNAME).phone(UPDATED_PHONE);
 
         restDriverMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDriver.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDriver))
+                    .content(om.writeValueAsBytes(partialUpdatedDriver))
             )
             .andExpect(status().isOk());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
-        Driver testDriver = driverList.get(driverList.size() - 1);
-        assertThat(testDriver.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
-        assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
-        assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
-        assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDriverUpdatableFieldsEquals(createUpdateProxyForBean(partialUpdatedDriver, driver), getPersistedDriver(driver));
     }
 
     @Test
     @Transactional
     void fullUpdateDriverWithPatch() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the driver using partial update
         Driver partialUpdatedDriver = new Driver();
@@ -404,84 +392,74 @@ class DriverResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedDriver.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedDriver))
+                    .content(om.writeValueAsBytes(partialUpdatedDriver))
             )
             .andExpect(status().isOk());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
-        Driver testDriver = driverList.get(driverList.size() - 1);
-        assertThat(testDriver.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
-        assertThat(testDriver.getPatronymic()).isEqualTo(UPDATED_PATRONYMIC);
-        assertThat(testDriver.getLastname()).isEqualTo(UPDATED_LASTNAME);
-        assertThat(testDriver.getPhone()).isEqualTo(UPDATED_PHONE);
-        assertThat(testDriver.getExperience()).isEqualTo(UPDATED_EXPERIENCE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertDriverUpdatableFieldsEquals(partialUpdatedDriver, getPersistedDriver(partialUpdatedDriver));
     }
 
     @Test
     @Transactional
     void patchNonExistingDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDriverMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, driver.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(driver))
+                patch(ENTITY_API_URL_ID, driver.getId()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(driver))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDriverMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(driver))
+                    .content(om.writeValueAsBytes(driver))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamDriver() throws Exception {
-        int databaseSizeBeforeUpdate = driverRepository.findAll().size();
-        driver.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        driver.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDriverMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(driver)))
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(driver)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Driver in the database
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteDriver() throws Exception {
         // Initialize the database
-        driverRepository.saveAndFlush(driver);
+        insertedDriver = driverRepository.saveAndFlush(driver);
 
-        int databaseSizeBeforeDelete = driverRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the driver
         restDriverMockMvc
@@ -489,7 +467,34 @@ class DriverResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Driver> driverList = driverRepository.findAll();
-        assertThat(driverList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return driverRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Driver getPersistedDriver(Driver driver) {
+        return driverRepository.findById(driver.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedDriverToMatchAllProperties(Driver expectedDriver) {
+        assertDriverAllPropertiesEquals(expectedDriver, getPersistedDriver(expectedDriver));
+    }
+
+    protected void assertPersistedDriverToMatchUpdatableProperties(Driver expectedDriver) {
+        assertDriverAllUpdatablePropertiesEquals(expectedDriver, getPersistedDriver(expectedDriver));
     }
 }

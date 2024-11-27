@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.PositioningAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Positioning;
 import by.victory.myapp.repository.PositioningRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +42,10 @@ class PositioningResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private PositioningRepository positioningRepository;
@@ -52,15 +58,16 @@ class PositioningResourceIT {
 
     private Positioning positioning;
 
+    private Positioning insertedPositioning;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Positioning createEntity(EntityManager em) {
-        Positioning positioning = new Positioning().latitude(DEFAULT_LATITUDE).longitude(DEFAULT_LONGITUDE);
-        return positioning;
+    public static Positioning createEntity() {
+        return new Positioning().latitude(DEFAULT_LATITUDE).longitude(DEFAULT_LONGITUDE);
     }
 
     /**
@@ -69,31 +76,43 @@ class PositioningResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Positioning createUpdatedEntity(EntityManager em) {
-        Positioning positioning = new Positioning().latitude(UPDATED_LATITUDE).longitude(UPDATED_LONGITUDE);
-        return positioning;
+    public static Positioning createUpdatedEntity() {
+        return new Positioning().latitude(UPDATED_LATITUDE).longitude(UPDATED_LONGITUDE);
     }
 
     @BeforeEach
     public void initTest() {
-        positioning = createEntity(em);
+        positioning = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedPositioning != null) {
+            positioningRepository.delete(insertedPositioning);
+            insertedPositioning = null;
+        }
     }
 
     @Test
     @Transactional
     void createPositioning() throws Exception {
-        int databaseSizeBeforeCreate = positioningRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Positioning
-        restPositioningMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positioning)))
-            .andExpect(status().isCreated());
+        var returnedPositioning = om.readValue(
+            restPositioningMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positioning)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Positioning.class
+        );
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeCreate + 1);
-        Positioning testPositioning = positioningList.get(positioningList.size() - 1);
-        assertThat(testPositioning.getLatitude()).isEqualTo(DEFAULT_LATITUDE);
-        assertThat(testPositioning.getLongitude()).isEqualTo(DEFAULT_LONGITUDE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertPositioningUpdatableFieldsEquals(returnedPositioning, getPersistedPositioning(returnedPositioning));
+
+        insertedPositioning = returnedPositioning;
     }
 
     @Test
@@ -102,57 +121,54 @@ class PositioningResourceIT {
         // Create the Positioning with an existing ID
         positioning.setId(1L);
 
-        int databaseSizeBeforeCreate = positioningRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPositioningMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positioning)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positioning)))
             .andExpect(status().isBadRequest());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkLatitudeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = positioningRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         positioning.setLatitude(null);
 
         // Create the Positioning, which fails.
 
         restPositioningMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positioning)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positioning)))
             .andExpect(status().isBadRequest());
 
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkLongitudeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = positioningRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         positioning.setLongitude(null);
 
         // Create the Positioning, which fails.
 
         restPositioningMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positioning)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positioning)))
             .andExpect(status().isBadRequest());
 
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllPositionings() throws Exception {
         // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
 
         // Get all the positioningList
         restPositioningMockMvc
@@ -168,7 +184,7 @@ class PositioningResourceIT {
     @Transactional
     void getPositioning() throws Exception {
         // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
 
         // Get the positioning
         restPositioningMockMvc
@@ -189,14 +205,14 @@ class PositioningResourceIT {
 
     @Test
     @Transactional
-    void putNewPositioning() throws Exception {
+    void putExistingPositioning() throws Exception {
         // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
 
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the positioning
-        Positioning updatedPositioning = positioningRepository.findById(positioning.getId()).get();
+        Positioning updatedPositioning = positioningRepository.findById(positioning.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedPositioning are not directly saved in db
         em.detach(updatedPositioning);
         updatedPositioning.latitude(UPDATED_LATITUDE).longitude(UPDATED_LONGITUDE);
@@ -205,109 +221,75 @@ class PositioningResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedPositioning.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedPositioning))
+                    .content(om.writeValueAsBytes(updatedPositioning))
             )
             .andExpect(status().isOk());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
-        Positioning testPositioning = positioningList.get(positioningList.size() - 1);
-        assertThat(testPositioning.getLatitude()).isEqualTo(UPDATED_LATITUDE);
-        assertThat(testPositioning.getLongitude()).isEqualTo(UPDATED_LONGITUDE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedPositioningToMatchAllProperties(updatedPositioning);
     }
 
     @Test
     @Transactional
     void putNonExistingPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPositioningMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, positioning.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(positioning))
+                    .content(om.writeValueAsBytes(positioning))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositioningMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(positioning))
+                    .content(om.writeValueAsBytes(positioning))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositioningMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(positioning)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(positioning)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdatePositioningWithPatch() throws Exception {
         // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
 
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-
-        // Update the positioning using partial update
-        Positioning partialUpdatedPositioning = new Positioning();
-        partialUpdatedPositioning.setId(positioning.getId());
-
-        restPositioningMockMvc
-            .perform(
-                patch(ENTITY_API_URL_ID, partialUpdatedPositioning.getId())
-                    .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPositioning))
-            )
-            .andExpect(status().isOk());
-
-        // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
-        Positioning testPositioning = positioningList.get(positioningList.size() - 1);
-        assertThat(testPositioning.getLatitude()).isEqualTo(DEFAULT_LATITUDE);
-        assertThat(testPositioning.getLongitude()).isEqualTo(DEFAULT_LONGITUDE);
-    }
-
-    @Test
-    @Transactional
-    void fullUpdatePositioningWithPatch() throws Exception {
-        // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
-
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the positioning using partial update
         Positioning partialUpdatedPositioning = new Positioning();
@@ -319,83 +301,107 @@ class PositioningResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedPositioning.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedPositioning))
+                    .content(om.writeValueAsBytes(partialUpdatedPositioning))
             )
             .andExpect(status().isOk());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
-        Positioning testPositioning = positioningList.get(positioningList.size() - 1);
-        assertThat(testPositioning.getLatitude()).isEqualTo(UPDATED_LATITUDE);
-        assertThat(testPositioning.getLongitude()).isEqualTo(UPDATED_LONGITUDE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPositioningUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedPositioning, positioning),
+            getPersistedPositioning(positioning)
+        );
+    }
+
+    @Test
+    @Transactional
+    void fullUpdatePositioningWithPatch() throws Exception {
+        // Initialize the database
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
+
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+
+        // Update the positioning using partial update
+        Positioning partialUpdatedPositioning = new Positioning();
+        partialUpdatedPositioning.setId(positioning.getId());
+
+        partialUpdatedPositioning.latitude(UPDATED_LATITUDE).longitude(UPDATED_LONGITUDE);
+
+        restPositioningMockMvc
+            .perform(
+                patch(ENTITY_API_URL_ID, partialUpdatedPositioning.getId())
+                    .contentType("application/merge-patch+json")
+                    .content(om.writeValueAsBytes(partialUpdatedPositioning))
+            )
+            .andExpect(status().isOk());
+
+        // Validate the Positioning in the database
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPositioningUpdatableFieldsEquals(partialUpdatedPositioning, getPersistedPositioning(partialUpdatedPositioning));
     }
 
     @Test
     @Transactional
     void patchNonExistingPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPositioningMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, positioning.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(positioning))
+                    .content(om.writeValueAsBytes(positioning))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositioningMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(positioning))
+                    .content(om.writeValueAsBytes(positioning))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamPositioning() throws Exception {
-        int databaseSizeBeforeUpdate = positioningRepository.findAll().size();
-        positioning.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        positioning.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restPositioningMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(positioning))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(positioning)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Positioning in the database
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deletePositioning() throws Exception {
         // Initialize the database
-        positioningRepository.saveAndFlush(positioning);
+        insertedPositioning = positioningRepository.saveAndFlush(positioning);
 
-        int databaseSizeBeforeDelete = positioningRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the positioning
         restPositioningMockMvc
@@ -403,7 +409,34 @@ class PositioningResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Positioning> positioningList = positioningRepository.findAll();
-        assertThat(positioningList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return positioningRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Positioning getPersistedPositioning(Positioning positioning) {
+        return positioningRepository.findById(positioning.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedPositioningToMatchAllProperties(Positioning expectedPositioning) {
+        assertPositioningAllPropertiesEquals(expectedPositioning, getPersistedPositioning(expectedPositioning));
+    }
+
+    protected void assertPersistedPositioningToMatchUpdatableProperties(Positioning expectedPositioning) {
+        assertPositioningAllUpdatablePropertiesEquals(expectedPositioning, getPersistedPositioning(expectedPositioning));
     }
 }

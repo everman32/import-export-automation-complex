@@ -10,11 +10,11 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data SQL repository for the Trip entity.
+ * Spring Data JPA repository for the Trip entity.
  */
 @Repository
 public interface TripRepository extends JpaRepository<Trip, Long> {
-    @Query("select trip from Trip trip where trip.user.login = ?#{principal.username}")
+    @Query("select trip from Trip trip where trip.user.login = ?#{authentication.name}")
     List<Trip> findByUserIsCurrentUser();
 
     default Optional<Trip> findOneWithEagerRelationships(Long id) {
@@ -29,13 +29,10 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
         return this.findAllWithToOneRelationships(pageable);
     }
 
-    @Query(
-        value = "select distinct trip from Trip trip left join fetch trip.user",
-        countQuery = "select count(distinct trip) from Trip trip"
-    )
+    @Query(value = "select trip from Trip trip left join fetch trip.user", countQuery = "select count(trip) from Trip trip")
     Page<Trip> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select distinct trip from Trip trip left join fetch trip.user")
+    @Query("select trip from Trip trip left join fetch trip.user")
     List<Trip> findAllWithToOneRelationships();
 
     @Query("select trip from Trip trip left join fetch trip.user where trip.id =:id")

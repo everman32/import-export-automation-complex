@@ -10,7 +10,7 @@ const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin');
 const utils = require('./utils.js');
 const environment = require('./environment');
 
-const getTsLoaderRule = env => {
+const getTsLoaderRule = () => {
   const rules = [
     {
       loader: 'thread-loader',
@@ -77,7 +77,7 @@ module.exports = async options => {
           /*
        ,
        Disabled due to https://github.com/jhipster/generator-jhipster/issues/16116
-       Can be enabled with @reduxjs/toolkit@>1.6.1 
+       Can be enabled with @reduxjs/toolkit@>1.6.1
       {
         enforce: 'pre',
         test: /\.jsx?$/,
@@ -88,17 +88,6 @@ module.exports = async options => {
       },
       stats: {
         children: false,
-      },
-      optimization: {
-        splitChunks: {
-          cacheGroups: {
-            commons: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              chunks: 'all',
-            },
-          },
-        },
       },
       plugins: [
         new webpack.EnvironmentPlugin({
@@ -112,18 +101,23 @@ module.exports = async options => {
           SERVER_API_URL: JSON.stringify(environment.SERVER_API_URL),
         }),
         new ESLintPlugin({
-          extensions: ['js', 'ts', 'jsx', 'tsx'],
+          configType: 'flat',
+          extensions: ['ts', 'tsx'],
         }),
         new ForkTsCheckerWebpackPlugin(),
         new CopyWebpackPlugin({
           patterns: [
             {
-              context: './node_modules/swagger-ui-dist/',
+              // https://github.com/swagger-api/swagger-ui/blob/v4.6.1/swagger-ui-dist-package/README.md
+              context: require('swagger-ui-dist').getAbsoluteFSPath(),
               from: '*.{js,css,html,png}',
               to: 'swagger-ui/',
               globOptions: { ignore: ['**/index.html'] },
             },
-            { from: './node_modules/axios/dist/axios.min.js', to: 'swagger-ui/' },
+            {
+              from: path.join(path.dirname(require.resolve('axios/package.json')), 'dist/axios.min.js'),
+              to: 'swagger-ui/',
+            },
             { from: './src/main/webapp/swagger-ui/', to: 'swagger-ui/' },
             { from: './src/main/webapp/content/', to: 'content/' },
             { from: './src/main/webapp/favicon.ico', to: 'favicon.ico' },

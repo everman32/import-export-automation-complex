@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 /**
- * Spring Data SQL repository for the Positioning entity.
+ * Spring Data JPA repository for the Positioning entity.
  */
 @SuppressWarnings("unused")
 @Repository

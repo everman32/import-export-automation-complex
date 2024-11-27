@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -15,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "statement_type")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class StatementType implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +31,7 @@ public class StatementType implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "statementType")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "statementType")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();
@@ -104,7 +105,7 @@ public class StatementType implements Serializable {
         if (!(o instanceof StatementType)) {
             return false;
         }
-        return id != null && id.equals(((StatementType) o).id);
+        return getId() != null && getId().equals(((StatementType) o).getId());
     }
 
     @Override

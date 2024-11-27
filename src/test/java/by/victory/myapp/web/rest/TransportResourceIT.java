@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.TransportAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Transport;
 import by.victory.myapp.repository.TransportRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,10 @@ class TransportResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private TransportRepository transportRepository;
@@ -55,15 +61,16 @@ class TransportResourceIT {
 
     private Transport transport;
 
+    private Transport insertedTransport;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Transport createEntity(EntityManager em) {
-        Transport transport = new Transport().brand(DEFAULT_BRAND).model(DEFAULT_MODEL).vin(DEFAULT_VIN);
-        return transport;
+    public static Transport createEntity() {
+        return new Transport().brand(DEFAULT_BRAND).model(DEFAULT_MODEL).vin(DEFAULT_VIN);
     }
 
     /**
@@ -72,32 +79,43 @@ class TransportResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Transport createUpdatedEntity(EntityManager em) {
-        Transport transport = new Transport().brand(UPDATED_BRAND).model(UPDATED_MODEL).vin(UPDATED_VIN);
-        return transport;
+    public static Transport createUpdatedEntity() {
+        return new Transport().brand(UPDATED_BRAND).model(UPDATED_MODEL).vin(UPDATED_VIN);
     }
 
     @BeforeEach
     public void initTest() {
-        transport = createEntity(em);
+        transport = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedTransport != null) {
+            transportRepository.delete(insertedTransport);
+            insertedTransport = null;
+        }
     }
 
     @Test
     @Transactional
     void createTransport() throws Exception {
-        int databaseSizeBeforeCreate = transportRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Transport
-        restTransportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
-            .andExpect(status().isCreated());
+        var returnedTransport = om.readValue(
+            restTransportMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Transport.class
+        );
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeCreate + 1);
-        Transport testTransport = transportList.get(transportList.size() - 1);
-        assertThat(testTransport.getBrand()).isEqualTo(DEFAULT_BRAND);
-        assertThat(testTransport.getModel()).isEqualTo(DEFAULT_MODEL);
-        assertThat(testTransport.getVin()).isEqualTo(DEFAULT_VIN);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertTransportUpdatableFieldsEquals(returnedTransport, getPersistedTransport(returnedTransport));
+
+        insertedTransport = returnedTransport;
     }
 
     @Test
@@ -106,74 +124,70 @@ class TransportResourceIT {
         // Create the Transport with an existing ID
         transport.setId(1L);
 
-        int databaseSizeBeforeCreate = transportRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restTransportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
             .andExpect(status().isBadRequest());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkBrandIsRequired() throws Exception {
-        int databaseSizeBeforeTest = transportRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         transport.setBrand(null);
 
         // Create the Transport, which fails.
 
         restTransportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
             .andExpect(status().isBadRequest());
 
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkModelIsRequired() throws Exception {
-        int databaseSizeBeforeTest = transportRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         transport.setModel(null);
 
         // Create the Transport, which fails.
 
         restTransportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
             .andExpect(status().isBadRequest());
 
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkVinIsRequired() throws Exception {
-        int databaseSizeBeforeTest = transportRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         transport.setVin(null);
 
         // Create the Transport, which fails.
 
         restTransportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
             .andExpect(status().isBadRequest());
 
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllTransports() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
         // Get all the transportList
         restTransportMockMvc
@@ -190,7 +204,7 @@ class TransportResourceIT {
     @Transactional
     void getTransport() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
         // Get the transport
         restTransportMockMvc
@@ -212,14 +226,14 @@ class TransportResourceIT {
 
     @Test
     @Transactional
-    void putNewTransport() throws Exception {
+    void putExistingTransport() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the transport
-        Transport updatedTransport = transportRepository.findById(transport.getId()).get();
+        Transport updatedTransport = transportRepository.findById(transport.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedTransport are not directly saved in db
         em.detach(updatedTransport);
         updatedTransport.brand(UPDATED_BRAND).model(UPDATED_MODEL).vin(UPDATED_VIN);
@@ -228,82 +242,73 @@ class TransportResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedTransport.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedTransport))
+                    .content(om.writeValueAsBytes(updatedTransport))
             )
             .andExpect(status().isOk());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
-        Transport testTransport = transportList.get(transportList.size() - 1);
-        assertThat(testTransport.getBrand()).isEqualTo(UPDATED_BRAND);
-        assertThat(testTransport.getModel()).isEqualTo(UPDATED_MODEL);
-        assertThat(testTransport.getVin()).isEqualTo(UPDATED_VIN);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedTransportToMatchAllProperties(updatedTransport);
     }
 
     @Test
     @Transactional
     void putNonExistingTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTransportMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, transport.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(transport))
+                put(ENTITY_API_URL_ID, transport.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTransportMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(transport))
+                    .content(om.writeValueAsBytes(transport))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTransportMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(transport)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(transport)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateTransportWithPatch() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the transport using partial update
         Transport partialUpdatedTransport = new Transport();
@@ -315,26 +320,26 @@ class TransportResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTransport.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTransport))
+                    .content(om.writeValueAsBytes(partialUpdatedTransport))
             )
             .andExpect(status().isOk());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
-        Transport testTransport = transportList.get(transportList.size() - 1);
-        assertThat(testTransport.getBrand()).isEqualTo(DEFAULT_BRAND);
-        assertThat(testTransport.getModel()).isEqualTo(DEFAULT_MODEL);
-        assertThat(testTransport.getVin()).isEqualTo(UPDATED_VIN);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertTransportUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedTransport, transport),
+            getPersistedTransport(transport)
+        );
     }
 
     @Test
     @Transactional
     void fullUpdateTransportWithPatch() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the transport using partial update
         Transport partialUpdatedTransport = new Transport();
@@ -346,84 +351,76 @@ class TransportResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTransport.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedTransport))
+                    .content(om.writeValueAsBytes(partialUpdatedTransport))
             )
             .andExpect(status().isOk());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
-        Transport testTransport = transportList.get(transportList.size() - 1);
-        assertThat(testTransport.getBrand()).isEqualTo(UPDATED_BRAND);
-        assertThat(testTransport.getModel()).isEqualTo(UPDATED_MODEL);
-        assertThat(testTransport.getVin()).isEqualTo(UPDATED_VIN);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertTransportUpdatableFieldsEquals(partialUpdatedTransport, getPersistedTransport(partialUpdatedTransport));
     }
 
     @Test
     @Transactional
     void patchNonExistingTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTransportMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, transport.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(transport))
+                    .content(om.writeValueAsBytes(transport))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTransportMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(transport))
+                    .content(om.writeValueAsBytes(transport))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamTransport() throws Exception {
-        int databaseSizeBeforeUpdate = transportRepository.findAll().size();
-        transport.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        transport.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTransportMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(transport))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(transport)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Transport in the database
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteTransport() throws Exception {
         // Initialize the database
-        transportRepository.saveAndFlush(transport);
+        insertedTransport = transportRepository.saveAndFlush(transport);
 
-        int databaseSizeBeforeDelete = transportRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the transport
         restTransportMockMvc
@@ -431,7 +428,34 @@ class TransportResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Transport> transportList = transportRepository.findAll();
-        assertThat(transportList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return transportRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Transport getPersistedTransport(Transport transport) {
+        return transportRepository.findById(transport.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedTransportToMatchAllProperties(Transport expectedTransport) {
+        assertTransportAllPropertiesEquals(expectedTransport, getPersistedTransport(expectedTransport));
+    }
+
+    protected void assertPersistedTransportToMatchUpdatableProperties(Transport expectedTransport) {
+        assertTransportAllUpdatablePropertiesEquals(expectedTransport, getPersistedTransport(expectedTransport));
     }
 }

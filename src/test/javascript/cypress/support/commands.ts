@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-// eslint-disable-next-line spaced-comment
-/// <reference types="cypress" />
 
 // ***********************************************
 // This commands.ts shows you how to
@@ -78,14 +75,18 @@ export const classInvalid = 'is-invalid';
 
 export const classValid = 'is-valid';
 
-Cypress.Commands.add('authenticatedRequest', (data: any) => {
-  const bearerToken = JSON.parse(sessionStorage.getItem(Cypress.env('jwtStorageName')));
-  return cy.request({
-    ...data,
-    auth: {
-      bearer: bearerToken,
-    },
-  });
+Cypress.Commands.add('authenticatedRequest', data => {
+  const jwtToken = sessionStorage.getItem(Cypress.env('jwtStorageName'));
+  const bearerToken = jwtToken && JSON.parse(jwtToken);
+  if (bearerToken) {
+    return cy.request({
+      ...data,
+      auth: {
+        bearer: bearerToken,
+      },
+    });
+  }
+  return cy.request(data);
 });
 
 Cypress.Commands.add('login', (username: string, password: string) => {
@@ -116,8 +117,8 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 declare global {
   namespace Cypress {
     interface Chainable {
+      authenticatedRequest(data): Cypress.Chainable;
       login(username: string, password: string): Cypress.Chainable;
-      authenticatedRequest(data: any): Cypress.Chainable;
     }
   }
 }

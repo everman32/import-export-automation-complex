@@ -6,11 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.User;
 import by.victory.myapp.repository.UserRepository;
+import by.victory.myapp.service.UserService;
 import java.util.Locale;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,39 +36,60 @@ class DomainUserDetailsServiceIT {
     private UserRepository userRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    @Qualifier("userDetailsService")
     private UserDetailsService domainUserDetailsService;
 
-    @BeforeEach
-    public void init() {
+    public User getUserOne() {
         User userOne = new User();
         userOne.setLogin(USER_ONE_LOGIN);
-        userOne.setPassword(RandomStringUtils.random(60));
+        userOne.setPassword(RandomStringUtils.randomAlphanumeric(60));
         userOne.setActivated(true);
         userOne.setEmail(USER_ONE_EMAIL);
         userOne.setFirstName("userOne");
         userOne.setLastName("doe");
         userOne.setLangKey("en");
-        userRepository.save(userOne);
+        return userOne;
+    }
 
+    public User getUserTwo() {
         User userTwo = new User();
         userTwo.setLogin(USER_TWO_LOGIN);
-        userTwo.setPassword(RandomStringUtils.random(60));
+        userTwo.setPassword(RandomStringUtils.randomAlphanumeric(60));
         userTwo.setActivated(true);
         userTwo.setEmail(USER_TWO_EMAIL);
         userTwo.setFirstName("userTwo");
         userTwo.setLastName("doe");
         userTwo.setLangKey("en");
-        userRepository.save(userTwo);
+        return userTwo;
+    }
 
+    public User getUserThree() {
         User userThree = new User();
         userThree.setLogin(USER_THREE_LOGIN);
-        userThree.setPassword(RandomStringUtils.random(60));
+        userThree.setPassword(RandomStringUtils.randomAlphanumeric(60));
         userThree.setActivated(false);
         userThree.setEmail(USER_THREE_EMAIL);
         userThree.setFirstName("userThree");
         userThree.setLastName("doe");
         userThree.setLangKey("en");
-        userRepository.save(userThree);
+        return userThree;
+    }
+
+    @BeforeEach
+    public void init() {
+        userRepository.save(getUserOne());
+        userRepository.save(getUserTwo());
+        userRepository.save(getUserThree());
+    }
+
+    @AfterEach
+    public void cleanup() {
+        userService.deleteUser(USER_ONE_LOGIN);
+        userService.deleteUser(USER_TWO_LOGIN);
+        userService.deleteUser(USER_THREE_LOGIN);
     }
 
     @Test

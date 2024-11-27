@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { getEntity, updateEntity, createEntity, reset } from './product-unit.reducer';
-import { IProductUnit } from 'app/shared/model/product-unit.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const ProductUnitUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { createEntity, getEntity, reset, updateEntity } from './product-unit.reducer';
+
+export const ProductUnitUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const productUnitEntity = useAppSelector(state => state.productUnit.entity);
   const loading = useAppSelector(state => state.productUnit.loading);
   const updating = useAppSelector(state => state.productUnit.updating);
   const updateSuccess = useAppSelector(state => state.productUnit.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/product-unit' + props.location.search);
+    navigate(`/product-unit${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
   }, []);
 
@@ -38,6 +40,10 @@ export const ProductUnitUpdate = (props: RouteComponentProps<{ id: string }>) =>
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+
     const entity = {
       ...productUnitEntity,
       ...values,

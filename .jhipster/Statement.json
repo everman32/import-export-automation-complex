@@ -1,4 +1,7 @@
 {
+  "annotations": {
+    "changelogDate": "20230417145211"
+  },
   "applications": "*",
   "changelogDate": "20230417145211",
   "dto": "no",
@@ -34,18 +37,21 @@
       "otherEntityName": "statementType",
       "otherEntityRelationshipName": "statement",
       "relationshipName": "statementType",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "product",
       "otherEntityRelationshipName": "statement",
       "relationshipName": "product",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     },
     {
       "otherEntityName": "positioning",
       "otherEntityRelationshipName": "statement",
       "relationshipName": "positioning",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     },
@@ -53,8 +59,10 @@
       "otherEntityName": "trip",
       "otherEntityRelationshipName": "statement",
       "relationshipName": "trip",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": "no",
   "service": "no"
 }

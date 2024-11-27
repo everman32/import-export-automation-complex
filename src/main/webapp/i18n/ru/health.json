@@ -11,6 +11,7 @@
       "error": "Ошибка"
     },
     "indicator": {
+      "binders": "Брокер сообщений",
       "diskSpace": "Место на диске",
       "mail": "Эл. почта",
       "livenessState": "Живой",

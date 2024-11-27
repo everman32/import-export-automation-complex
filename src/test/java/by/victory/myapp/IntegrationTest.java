@@ -1,5 +1,8 @@
 package by.victory.myapp;
 
+import by.victory.myapp.config.AsyncSyncConfiguration;
+import by.victory.myapp.config.EmbeddedSQL;
+import by.victory.myapp.config.JacksonConfiguration;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -11,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(classes = AccountingImportExportProductsApp.class)
+@SpringBootTest(classes = { AccountingImportExportProductsApp.class, JacksonConfiguration.class, AsyncSyncConfiguration.class })
+@EmbeddedSQL
 public @interface IntegrationTest {
 }

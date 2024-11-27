@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
     <!--
         Added the constraints for entity Trip.
     -->
@@ -12,24 +14,28 @@
                                  baseTableName="trip"
                                  constraintName="fk_trip__user_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
+                                 referencedTableName="jhi_user"
+                                 />
 
         <addForeignKeyConstraint baseColumnNames="transport_id"
                                  baseTableName="trip"
                                  constraintName="fk_trip__transport_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="transport"/>
+                                 referencedTableName="transport"
+                                 />
 
         <addForeignKeyConstraint baseColumnNames="driver_id"
                                  baseTableName="trip"
                                  constraintName="fk_trip__driver_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="driver"/>
+                                 referencedTableName="driver"
+                                 />
 
         <addForeignKeyConstraint baseColumnNames="hub_positioning_id"
                                  baseTableName="trip"
                                  constraintName="fk_trip__hub_positioning_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="positioning"/>
+                                 referencedTableName="positioning"
+                                 />
     </changeSet>
 </databaseChangeLog>

@@ -1,4 +1,7 @@
 {
+  "annotations": {
+    "changelogDate": "20220422224633"
+  },
   "applications": "*",
   "changelogDate": "20220422224633",
   "dto": "no",
@@ -35,8 +38,10 @@
       "otherEntityName": "trip",
       "otherEntityRelationshipName": "transport",
       "relationshipName": "trip",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }
   ],
+  "searchEngine": "no",
   "service": "no"
 }

@@ -3,13 +3,13 @@ package by.victory.myapp.web.rest;
 import by.victory.myapp.domain.Grade;
 import by.victory.myapp.repository.GradeRepository;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.Grade}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/grades")
 @Transactional
 public class GradeResource {
 
-    private final Logger log = LoggerFactory.getLogger(GradeResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GradeResource.class);
 
     private static final String ENTITY_NAME = "grade";
 
@@ -52,16 +52,16 @@ public class GradeResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new grade, or with status {@code 400 (Bad Request)} if the grade has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/grades")
+    @PostMapping("")
     public ResponseEntity<Grade> createGrade(@Valid @RequestBody Grade grade) throws URISyntaxException {
-        log.debug("REST request to save Grade : {}", grade);
+        LOG.debug("REST request to save Grade : {}", grade);
         if (grade.getId() != null) {
             throw new BadRequestAlertException("A new grade cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Grade result = gradeRepository.save(grade);
-        return ResponseEntity.created(new URI("/api/grades/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        grade = gradeRepository.save(grade);
+        return ResponseEntity.created(new URI("/api/grades/" + grade.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, grade.getId().toString()))
+            .body(grade);
     }
 
     /**
@@ -74,10 +74,10 @@ public class GradeResource {
      * or with status {@code 500 (Internal Server Error)} if the grade couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/grades/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Grade> updateGrade(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Grade grade)
         throws URISyntaxException {
-        log.debug("REST request to update Grade : {}, {}", id, grade);
+        LOG.debug("REST request to update Grade : {}, {}", id, grade);
         if (grade.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -89,10 +89,10 @@ public class GradeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Grade result = gradeRepository.save(grade);
+        grade = gradeRepository.save(grade);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, grade.getId().toString()))
-            .body(result);
+            .body(grade);
     }
 
     /**
@@ -106,12 +106,12 @@ public class GradeResource {
      * or with status {@code 500 (Internal Server Error)} if the grade couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/grades/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Grade> partialUpdateGrade(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Grade grade
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Grade partially : {}, {}", id, grade);
+        LOG.debug("REST request to partial update Grade partially : {}, {}", id, grade);
         if (grade.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -146,9 +146,9 @@ public class GradeResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of grades in body.
      */
-    @GetMapping("/grades")
-    public ResponseEntity<List<Grade>> getAllGrades(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Grades");
+    @GetMapping("")
+    public ResponseEntity<List<Grade>> getAllGrades(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of Grades");
         Page<Grade> page = gradeRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -160,9 +160,9 @@ public class GradeResource {
      * @param id the id of the grade to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the grade, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/grades/{id}")
-    public ResponseEntity<Grade> getGrade(@PathVariable Long id) {
-        log.debug("REST request to get Grade : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Grade> getGrade(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Grade : {}", id);
         Optional<Grade> grade = gradeRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(grade);
     }
@@ -173,9 +173,9 @@ public class GradeResource {
      * @param id the id of the grade to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/grades/{id}")
-    public ResponseEntity<Void> deleteGrade(@PathVariable Long id) {
-        log.debug("REST request to delete Grade : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteGrade(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete Grade : {}", id);
         gradeRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

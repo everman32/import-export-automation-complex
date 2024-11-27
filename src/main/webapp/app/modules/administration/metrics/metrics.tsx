@@ -3,19 +3,19 @@ import { Button, Col, Row } from 'reactstrap';
 import {
   CacheMetrics,
   DatasourceMetrics,
+  EndpointsRequestsMetrics,
   GarbageCollectorMetrics,
   HttpRequestMetrics,
   JvmMemory,
   JvmThreads,
-  EndpointsRequestsMetrics,
   SystemMetrics,
   Translate,
 } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { APP_TIMESTAMP_FORMAT, APP_TWO_DIGITS_AFTER_POINT_NUMBER_FORMAT, APP_WHOLE_NUMBER_FORMAT } from 'app/config/constants';
-import { getSystemMetrics, getSystemThreadDump } from '../administration.reducer';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { getSystemMetrics, getSystemThreadDump } from '../administration.reducer';
 
 export const MetricsPage = () => {
   const dispatch = useAppDispatch();
@@ -38,7 +38,7 @@ export const MetricsPage = () => {
   return (
     <div>
       <h2 id="metrics-page-heading" data-cy="metricsPageHeading">
-        Application Metrics
+        <Translate contentKey="metrics.title">Application Metrics</Translate>
       </h2>
       <p>
         <Button onClick={getMetrics} color={isFetching ? 'btn btn-danger' : 'btn btn-primary'} disabled={isFetching}>
@@ -53,7 +53,9 @@ export const MetricsPage = () => {
 
       <Row>
         <Col sm="12">
-          <h3>JVM Metrics</h3>
+          <h3>
+            <Translate contentKey="metrics.jvm.title">JVM Metrics</Translate>
+          </h3>
           <Row>
             <Col md="4">{metrics?.jvm ? <JvmMemory jvmMetrics={metrics.jvm} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}</Col>
             <Col md="4">{threadDump ? <JvmThreads jvmThreads={threadDump} wholeNumberFormat={APP_WHOLE_NUMBER_FORMAT} /> : ''}</Col>
