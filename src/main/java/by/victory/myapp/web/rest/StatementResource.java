@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +59,7 @@ public class StatementResource {
             throw new BadRequestAlertException("A new statement cannot already have an ID", ENTITY_NAME, "idexists");
         }
         Statement result = statementRepository.save(statement);
-        return ResponseEntity
-            .created(new URI("/api/statements/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/statements/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
@@ -94,8 +92,7 @@ public class StatementResource {
         }
 
         Statement result = statementRepository.save(statement);
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, statement.getId().toString()))
             .body(result);
     }
@@ -188,8 +185,7 @@ public class StatementResource {
     public ResponseEntity<Void> deleteStatement(@PathVariable Long id) {
         log.debug("REST request to delete Statement : {}", id);
         statementRepository.deleteById(id);
-        return ResponseEntity
-            .noContent()
+        return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }

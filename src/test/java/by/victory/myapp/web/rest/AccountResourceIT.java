@@ -14,7 +14,6 @@ import by.victory.myapp.security.AuthoritiesConstants;
 import by.victory.myapp.service.UserService;
 import by.victory.myapp.service.dto.AdminUserDTO;
 import by.victory.myapp.service.dto.PasswordChangeDTO;
-import by.victory.myapp.service.dto.UserDTO;
 import by.victory.myapp.web.rest.vm.KeyAndPasswordVM;
 import by.victory.myapp.web.rest.vm.ManagedUserVM;
 import java.time.Instant;

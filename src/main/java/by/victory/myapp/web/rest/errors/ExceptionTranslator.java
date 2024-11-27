@@ -68,8 +68,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
 
         HttpServletRequest nativeRequest = request.getNativeRequest(HttpServletRequest.class);
         String requestUri = nativeRequest != null ? nativeRequest.getRequestURI() : StringUtils.EMPTY;
-        ProblemBuilder builder = Problem
-            .builder()
+        ProblemBuilder builder = Problem.builder()
             .withType(Problem.DEFAULT_TYPE.equals(problem.getType()) ? ErrorConstants.DEFAULT_TYPE : problem.getType())
             .withStatus(problem.getStatus())
             .withTitle(problem.getTitle())
@@ -104,8 +103,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
             )
             .collect(Collectors.toList());
 
-        Problem problem = Problem
-            .builder()
+        Problem problem = Problem.builder()
             .withType(ErrorConstants.CONSTRAINT_VIOLATION_TYPE)
             .withTitle("Method argument not valid")
             .withStatus(defaultConstraintViolationStatus())
@@ -170,8 +168,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
 
         if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)) {
             if (throwable instanceof HttpMessageConversionException) {
-                return Problem
-                    .builder()
+                return Problem.builder()
                     .withType(type)
                     .withTitle(status.getReasonPhrase())
                     .withStatus(status)
@@ -181,8 +178,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     );
             }
             if (throwable instanceof DataAccessException) {
-                return Problem
-                    .builder()
+                return Problem.builder()
                     .withType(type)
                     .withTitle(status.getReasonPhrase())
                     .withStatus(status)
@@ -192,8 +188,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
                     );
             }
             if (containsPackageName(throwable.getMessage())) {
-                return Problem
-                    .builder()
+                return Problem.builder()
                     .withType(type)
                     .withTitle(status.getReasonPhrase())
                     .withStatus(status)
@@ -204,8 +199,7 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
             }
         }
 
-        return Problem
-            .builder()
+        return Problem.builder()
             .withType(type)
             .withTitle(status.getReasonPhrase())
             .withStatus(status)

@@ -4,25 +4,25 @@ import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 import sinon from 'sinon';
 
+import { EntityState } from 'app/shared/reducers/reducer.utils';
+import { IExportProd, defaultValue } from 'app/shared/model/export-prod.model';
 import reducer, {
   createEntity,
   deleteEntity,
   getEntities,
   getEntity,
-  updateEntity,
   partialUpdateEntity,
   reset,
+  updateEntity,
 } from './export-prod.reducer';
-import { EntityState } from 'app/shared/reducers/reducer.utils';
-import { IExportProd, defaultValue } from 'app/shared/model/export-prod.model';
 
 describe('Entities reducer tests', () => {
   function isEmpty(element): boolean {
     if (element instanceof Array) {
       return element.length === 0;
-    } else {
+    } 
       return Object.keys(element).length === 0;
-    }
+    
   }
 
   const initialState: EntityState<IExportProd> = {
@@ -79,7 +79,7 @@ describe('Entities reducer tests', () => {
             updateSuccess: false,
             updating: true,
           });
-        }
+        },
       );
     });
 
@@ -111,7 +111,7 @@ describe('Entities reducer tests', () => {
         },
         {
           message: 'error message',
-        }
+        },
       );
     });
   });
@@ -123,7 +123,7 @@ describe('Entities reducer tests', () => {
         reducer(undefined, {
           type: getEntities.fulfilled.type,
           payload,
-        })
+        }),
       ).toEqual({
         ...initialState,
         loading: false,
@@ -138,7 +138,7 @@ describe('Entities reducer tests', () => {
         reducer(undefined, {
           type: getEntity.fulfilled.type,
           payload,
-        })
+        }),
       ).toEqual({
         ...initialState,
         loading: false,
@@ -152,7 +152,7 @@ describe('Entities reducer tests', () => {
         reducer(undefined, {
           type: createEntity.fulfilled.type,
           payload,
-        })
+        }),
       ).toEqual({
         ...initialState,
         updating: false,

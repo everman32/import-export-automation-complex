@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { ITrip } from 'app/shared/model/trip.model';
 import { IGrade } from 'app/shared/model/grade.model';
 

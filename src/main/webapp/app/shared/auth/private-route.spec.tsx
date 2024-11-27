@@ -36,7 +36,7 @@ describe('private-route component', () => {
         account: {
           authorities: [],
         },
-      })
+      }),
     ).toThrow(Error);
     console.error = originalError;
   });
@@ -53,10 +53,10 @@ describe('private-route component', () => {
         account: {
           authorities: [],
         },
-      }
+      },
     );
     expect(container.innerHTML).toEqual(
-      '<div class="insufficient-authority"><div class="alert alert-danger"><span>You are not authorized to access this page.</span></div></div>'
+      '<div class="insufficient-authority"><div class="alert alert-danger"><span>You are not authorized to access this page.</span></div></div>',
     );
   });
 
@@ -72,7 +72,7 @@ describe('private-route component', () => {
         account: {
           authorities: ['ADMIN'],
         },
-      }
+      },
     );
     expect(container.innerHTML).toEqual('<div>Test</div>');
   });
@@ -89,7 +89,7 @@ describe('private-route component', () => {
         account: {
           authorities: ['ADMIN'],
         },
-      }
+      },
     );
     expect(container.innerHTML).not.toEqual('<div>Test</div>');
   });

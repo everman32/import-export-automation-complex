@@ -1,6 +1,5 @@
 package by.victory.myapp;
 
-import by.victory.myapp.AccountingImportExportProductsApp;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

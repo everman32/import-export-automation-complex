@@ -15,7 +15,7 @@ export const Grade = (props: RouteComponentProps<{ url: string }>) => {
   const dispatch = useAppDispatch();
 
   const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search)
+    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
   );
 
   const gradeList = useAppSelector(state => state.grade.entities);
@@ -28,7 +28,7 @@ export const Grade = (props: RouteComponentProps<{ url: string }>) => {
         page: paginationState.activePage - 1,
         size: paginationState.itemsPerPage,
         sort: `${paginationState.sort},${paginationState.order}`,
-      })
+      }),
     );
   };
 

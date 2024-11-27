@@ -2,7 +2,6 @@ package by.victory.myapp.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -12,7 +11,6 @@ import by.victory.myapp.domain.User;
 import by.victory.myapp.repository.UserRepository;
 import by.victory.myapp.security.AuthoritiesConstants;
 import by.victory.myapp.service.dto.AdminUserDTO;
-import by.victory.myapp.service.dto.UserDTO;
 import by.victory.myapp.service.mapper.UserMapper;
 import by.victory.myapp.web.rest.vm.ManagedUserVM;
 import java.time.Instant;

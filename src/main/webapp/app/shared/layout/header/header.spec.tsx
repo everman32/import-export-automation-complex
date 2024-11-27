@@ -42,7 +42,7 @@ describe('Header', () => {
           <Router history={history}>
             <Header {...props} />
           </Router>
-        </Provider>
+        </Provider>,
       );
       mountedWrapper = container.innerHTML;
     }

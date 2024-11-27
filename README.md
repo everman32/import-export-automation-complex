@@ -161,7 +161,6 @@ For more information, refer to the [Code quality page][].
 
 ## Using Docker to simplify development (optional)
 
-
 For example, to start a postgresql database in a docker container, run:
 
 ```
