@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,7 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "trip")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Trip implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,31 +36,31 @@ public class Trip implements Serializable {
     @Column(name = "threshold", nullable = false)
     private Double threshold;
 
-    @OneToMany(mappedBy = "trip", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
-    @OneToOne(mappedBy = "trip")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "trip")
     private ImportProd importProd;
 
     @JsonIgnoreProperties(value = { "trip", "grade" }, allowSetters = true)
-    @OneToOne(mappedBy = "trip")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "trip")
     private ExportProd exportProd;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "trips" }, allowSetters = true)
     private Transport transport;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "trips" }, allowSetters = true)
     private Driver driver;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "statements", "trips" }, allowSetters = true)
     private Positioning hubPositioning;
 
@@ -235,7 +236,7 @@ public class Trip implements Serializable {
         if (!(o instanceof Trip)) {
             return false;
         }
-        return id != null && id.equals(((Trip) o).id);
+        return getId() != null && getId().equals(((Trip) o).getId());
     }
 
     @Override

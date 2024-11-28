@@ -1,9 +1,9 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -12,7 +12,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "statement")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Statement implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -38,11 +39,11 @@ public class Statement implements Serializable {
     @Column(name = "delivery_scope", nullable = false)
     private Double deliveryScope;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "statements" }, allowSetters = true)
     private StatementType statementType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "statements", "productUnit" }, allowSetters = true)
     private Product product;
 
@@ -51,7 +52,7 @@ public class Statement implements Serializable {
     @JsonIgnoreProperties(value = { "statements", "trips" }, allowSetters = true)
     private Positioning positioning;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
@@ -174,7 +175,7 @@ public class Statement implements Serializable {
         if (!(o instanceof Statement)) {
             return false;
         }
-        return id != null && id.equals(((Statement) o).id);
+        return getId() != null && getId().equals(((Statement) o).getId());
     }
 
     @Override

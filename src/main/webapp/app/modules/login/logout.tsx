@@ -5,13 +5,15 @@ import { logout } from 'app/shared/reducers/authentication';
 import { Translate } from 'react-jhipster';
 
 export const Logout = () => {
-  const logoutUrl = useAppSelector(state => state.authentication.logoutUrl);
+  const authentication = useAppSelector(state => state.authentication);
   const dispatch = useAppDispatch();
 
   useLayoutEffect(() => {
     dispatch(logout());
-    if (logoutUrl) {
-      window.location.href = logoutUrl;
+    if (authentication.logoutUrl) {
+      window.location.href = authentication.logoutUrl;
+    } else if (!authentication.isAuthenticated) {
+      window.location.href = '/';
     }
   });
 

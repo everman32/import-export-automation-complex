@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,7 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "driver")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Driver implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,8 +50,8 @@ public class Driver implements Serializable {
     @Column(name = "experience", nullable = false)
     private Double experience;
 
-    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "driver")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
@@ -178,7 +179,7 @@ public class Driver implements Serializable {
         if (!(o instanceof Driver)) {
             return false;
         }
-        return id != null && id.equals(((Driver) o).id);
+        return getId() != null && getId().equals(((Driver) o).getId());
     }
 
     @Override

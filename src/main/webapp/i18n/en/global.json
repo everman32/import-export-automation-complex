@@ -6,19 +6,19 @@
       "home": "Home",
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
-        "main": "Accounting",
+        "main": "Entities",
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
         "transport": "Transport",
-        "driver": "Drivers",
-        "product": "Products",
-        "trip": "Trips",
-        "importProd": "Import",
-        "exportProd": "Export",
-        "grade": "Grades",
-        "statement": "Statements",
-        "statementType": "Statement types",
-        "positioning": "Positionings",
-        "productUnit": "Product units",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "driver": "Driver",
+        "product": "Product",
+        "trip": "Trip",
+        "importProd": "Import Prod",
+        "exportProd": "Export Prod",
+        "grade": "Grade",
+        "statement": "Statement",
+        "statementType": "Statement Type",
+        "positioning": "Positioning",
+        "productUnit": "Product Unit"
       },
       "account": {
         "main": "Profile",
@@ -108,7 +108,8 @@
       "edit": "Edit",
       "open": "Open",
       "save": "Save",
-      "view": "View"
+      "view": "View",
+      "show": "Show {{otherEntity}}"
     },
     "detail": {
       "field": "Field",
@@ -129,6 +130,11 @@
       "number": "This field should be a number.",
       "datetimelocal": "This field should be a date and time.",
       "patternLogin": "This field can only contain letters, digits and e-mail addresses."
+    },
+    "filters": {
+      "set": "Following filters are set",
+      "clear": "Clear filter",
+      "clearAll": "Clear all filters"
     }
   },
   "error": {

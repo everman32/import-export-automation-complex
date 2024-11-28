@@ -3,13 +3,13 @@ package by.victory.myapp.web.rest;
 import by.victory.myapp.domain.ImportProd;
 import by.victory.myapp.repository.ImportProdRepository;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.ImportProd}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/import-prods")
 @Transactional
 public class ImportProdResource {
 
-    private final Logger log = LoggerFactory.getLogger(ImportProdResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImportProdResource.class);
 
     private static final String ENTITY_NAME = "importProd";
 
@@ -52,16 +52,16 @@ public class ImportProdResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new importProd, or with status {@code 400 (Bad Request)} if the importProd has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/import-prods")
+    @PostMapping("")
     public ResponseEntity<ImportProd> createImportProd(@Valid @RequestBody ImportProd importProd) throws URISyntaxException {
-        log.debug("REST request to save ImportProd : {}", importProd);
+        LOG.debug("REST request to save ImportProd : {}", importProd);
         if (importProd.getId() != null) {
             throw new BadRequestAlertException("A new importProd cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        ImportProd result = importProdRepository.save(importProd);
-        return ResponseEntity.created(new URI("/api/import-prods/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        importProd = importProdRepository.save(importProd);
+        return ResponseEntity.created(new URI("/api/import-prods/" + importProd.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, importProd.getId().toString()))
+            .body(importProd);
     }
 
     /**
@@ -74,12 +74,12 @@ public class ImportProdResource {
      * or with status {@code 500 (Internal Server Error)} if the importProd couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/import-prods/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<ImportProd> updateImportProd(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ImportProd importProd
     ) throws URISyntaxException {
-        log.debug("REST request to update ImportProd : {}, {}", id, importProd);
+        LOG.debug("REST request to update ImportProd : {}, {}", id, importProd);
         if (importProd.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -91,10 +91,10 @@ public class ImportProdResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        ImportProd result = importProdRepository.save(importProd);
+        importProd = importProdRepository.save(importProd);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, importProd.getId().toString()))
-            .body(result);
+            .body(importProd);
     }
 
     /**
@@ -108,12 +108,12 @@ public class ImportProdResource {
      * or with status {@code 500 (Internal Server Error)} if the importProd couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/import-prods/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<ImportProd> partialUpdateImportProd(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ImportProd importProd
     ) throws URISyntaxException {
-        log.debug("REST request to partial update ImportProd partially : {}, {}", id, importProd);
+        LOG.debug("REST request to partial update ImportProd partially : {}, {}", id, importProd);
         if (importProd.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -148,9 +148,9 @@ public class ImportProdResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of importProds in body.
      */
-    @GetMapping("/import-prods")
-    public ResponseEntity<List<ImportProd>> getAllImportProds(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of ImportProds");
+    @GetMapping("")
+    public ResponseEntity<List<ImportProd>> getAllImportProds(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of ImportProds");
         Page<ImportProd> page = importProdRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -162,9 +162,9 @@ public class ImportProdResource {
      * @param id the id of the importProd to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the importProd, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/import-prods/{id}")
-    public ResponseEntity<ImportProd> getImportProd(@PathVariable Long id) {
-        log.debug("REST request to get ImportProd : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<ImportProd> getImportProd(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get ImportProd : {}", id);
         Optional<ImportProd> importProd = importProdRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(importProd);
     }
@@ -175,9 +175,9 @@ public class ImportProdResource {
      * @param id the id of the importProd to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/import-prods/{id}")
-    public ResponseEntity<Void> deleteImportProd(@PathVariable Long id) {
-        log.debug("REST request to delete ImportProd : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteImportProd(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete ImportProd : {}", id);
         importProdRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

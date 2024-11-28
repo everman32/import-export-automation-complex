@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.StatementAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -9,10 +11,11 @@ import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.Positioning;
 import by.victory.myapp.domain.Statement;
 import by.victory.myapp.repository.StatementRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,10 @@ class StatementResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private StatementRepository statementRepository;
@@ -55,6 +61,8 @@ class StatementResourceIT {
     private MockMvc restStatementMockMvc;
 
     private Statement statement;
+
+    private Statement insertedStatement;
 
     /**
      * Create an entity for this test.
@@ -70,7 +78,7 @@ class StatementResourceIT {
         // Add required entity
         Positioning positioning;
         if (TestUtil.findAll(em, Positioning.class).isEmpty()) {
-            positioning = PositioningResourceIT.createEntity(em);
+            positioning = PositioningResourceIT.createEntity();
             em.persist(positioning);
             em.flush();
         } else {
@@ -87,21 +95,21 @@ class StatementResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Statement createUpdatedEntity(EntityManager em) {
-        Statement statement = new Statement()
+        Statement updatedStatement = new Statement()
             .name(UPDATED_NAME)
             .transportTariff(UPDATED_TRANSPORT_TARIFF)
             .deliveryScope(UPDATED_DELIVERY_SCOPE);
         // Add required entity
         Positioning positioning;
         if (TestUtil.findAll(em, Positioning.class).isEmpty()) {
-            positioning = PositioningResourceIT.createUpdatedEntity(em);
+            positioning = PositioningResourceIT.createUpdatedEntity();
             em.persist(positioning);
             em.flush();
         } else {
             positioning = TestUtil.findAll(em, Positioning.class).get(0);
         }
-        statement.setPositioning(positioning);
-        return statement;
+        updatedStatement.setPositioning(positioning);
+        return updatedStatement;
     }
 
     @BeforeEach
@@ -109,22 +117,34 @@ class StatementResourceIT {
         statement = createEntity(em);
     }
 
+    @AfterEach
+    public void cleanup() {
+        if (insertedStatement != null) {
+            statementRepository.delete(insertedStatement);
+            insertedStatement = null;
+        }
+    }
+
     @Test
     @Transactional
     void createStatement() throws Exception {
-        int databaseSizeBeforeCreate = statementRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Statement
-        restStatementMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
-            .andExpect(status().isCreated());
+        var returnedStatement = om.readValue(
+            restStatementMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            Statement.class
+        );
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeCreate + 1);
-        Statement testStatement = statementList.get(statementList.size() - 1);
-        assertThat(testStatement.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testStatement.getTransportTariff()).isEqualTo(DEFAULT_TRANSPORT_TARIFF);
-        assertThat(testStatement.getDeliveryScope()).isEqualTo(DEFAULT_DELIVERY_SCOPE);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertStatementUpdatableFieldsEquals(returnedStatement, getPersistedStatement(returnedStatement));
+
+        insertedStatement = returnedStatement;
     }
 
     @Test
@@ -133,74 +153,70 @@ class StatementResourceIT {
         // Create the Statement with an existing ID
         statement.setId(1L);
 
-        int databaseSizeBeforeCreate = statementRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restStatementMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
             .andExpect(status().isBadRequest());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = statementRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         statement.setName(null);
 
         // Create the Statement, which fails.
 
         restStatementMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
             .andExpect(status().isBadRequest());
 
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkTransportTariffIsRequired() throws Exception {
-        int databaseSizeBeforeTest = statementRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         statement.setTransportTariff(null);
 
         // Create the Statement, which fails.
 
         restStatementMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
             .andExpect(status().isBadRequest());
 
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkDeliveryScopeIsRequired() throws Exception {
-        int databaseSizeBeforeTest = statementRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         statement.setDeliveryScope(null);
 
         // Create the Statement, which fails.
 
         restStatementMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
             .andExpect(status().isBadRequest());
 
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllStatements() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
         // Get all the statementList
         restStatementMockMvc
@@ -217,7 +233,7 @@ class StatementResourceIT {
     @Transactional
     void getStatement() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
         // Get the statement
         restStatementMockMvc
@@ -239,14 +255,14 @@ class StatementResourceIT {
 
     @Test
     @Transactional
-    void putNewStatement() throws Exception {
+    void putExistingStatement() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statement
-        Statement updatedStatement = statementRepository.findById(statement.getId()).get();
+        Statement updatedStatement = statementRepository.findById(statement.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedStatement are not directly saved in db
         em.detach(updatedStatement);
         updatedStatement.name(UPDATED_NAME).transportTariff(UPDATED_TRANSPORT_TARIFF).deliveryScope(UPDATED_DELIVERY_SCOPE);
@@ -255,113 +271,102 @@ class StatementResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedStatement.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedStatement))
+                    .content(om.writeValueAsBytes(updatedStatement))
             )
             .andExpect(status().isOk());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
-        Statement testStatement = statementList.get(statementList.size() - 1);
-        assertThat(testStatement.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testStatement.getTransportTariff()).isEqualTo(UPDATED_TRANSPORT_TARIFF);
-        assertThat(testStatement.getDeliveryScope()).isEqualTo(UPDATED_DELIVERY_SCOPE);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedStatementToMatchAllProperties(updatedStatement);
     }
 
     @Test
     @Transactional
     void putNonExistingStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStatementMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, statement.getId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(statement))
+                put(ENTITY_API_URL_ID, statement.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(statement))
+                    .content(om.writeValueAsBytes(statement))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statement)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statement)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateStatementWithPatch() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statement using partial update
         Statement partialUpdatedStatement = new Statement();
         partialUpdatedStatement.setId(statement.getId());
 
-        partialUpdatedStatement.transportTariff(UPDATED_TRANSPORT_TARIFF);
-
         restStatementMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedStatement.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStatement))
+                    .content(om.writeValueAsBytes(partialUpdatedStatement))
             )
             .andExpect(status().isOk());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
-        Statement testStatement = statementList.get(statementList.size() - 1);
-        assertThat(testStatement.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testStatement.getTransportTariff()).isEqualTo(UPDATED_TRANSPORT_TARIFF);
-        assertThat(testStatement.getDeliveryScope()).isEqualTo(DEFAULT_DELIVERY_SCOPE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertStatementUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedStatement, statement),
+            getPersistedStatement(statement)
+        );
     }
 
     @Test
     @Transactional
     void fullUpdateStatementWithPatch() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statement using partial update
         Statement partialUpdatedStatement = new Statement();
@@ -373,84 +378,76 @@ class StatementResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedStatement.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStatement))
+                    .content(om.writeValueAsBytes(partialUpdatedStatement))
             )
             .andExpect(status().isOk());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
-        Statement testStatement = statementList.get(statementList.size() - 1);
-        assertThat(testStatement.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testStatement.getTransportTariff()).isEqualTo(UPDATED_TRANSPORT_TARIFF);
-        assertThat(testStatement.getDeliveryScope()).isEqualTo(UPDATED_DELIVERY_SCOPE);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertStatementUpdatableFieldsEquals(partialUpdatedStatement, getPersistedStatement(partialUpdatedStatement));
     }
 
     @Test
     @Transactional
     void patchNonExistingStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStatementMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, statement.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(statement))
+                    .content(om.writeValueAsBytes(statement))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(statement))
+                    .content(om.writeValueAsBytes(statement))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamStatement() throws Exception {
-        int databaseSizeBeforeUpdate = statementRepository.findAll().size();
-        statement.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statement.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(statement))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(statement)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Statement in the database
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteStatement() throws Exception {
         // Initialize the database
-        statementRepository.saveAndFlush(statement);
+        insertedStatement = statementRepository.saveAndFlush(statement);
 
-        int databaseSizeBeforeDelete = statementRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the statement
         restStatementMockMvc
@@ -458,7 +455,34 @@ class StatementResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Statement> statementList = statementRepository.findAll();
-        assertThat(statementList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return statementRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected Statement getPersistedStatement(Statement statement) {
+        return statementRepository.findById(statement.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedStatementToMatchAllProperties(Statement expectedStatement) {
+        assertStatementAllPropertiesEquals(expectedStatement, getPersistedStatement(expectedStatement));
+    }
+
+    protected void assertPersistedStatementToMatchUpdatableProperties(Statement expectedStatement) {
+        assertStatementAllUpdatablePropertiesEquals(expectedStatement, getPersistedStatement(expectedStatement));
     }
 }

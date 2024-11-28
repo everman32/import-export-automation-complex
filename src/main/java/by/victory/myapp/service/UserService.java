@@ -31,7 +31,7 @@ import tech.jhipster.security.RandomUtil;
 @Transactional
 public class UserService {
 
-    private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
 
@@ -54,7 +54,7 @@ public class UserService {
     }
 
     public Optional<User> activateRegistration(String key) {
-        log.debug("Activating user for activation key {}", key);
+        LOG.debug("Activating user for activation key {}", key);
         return userRepository
             .findOneByActivationKey(key)
             .map(user -> {
@@ -62,13 +62,13 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 this.clearUserCaches(user);
-                log.debug("Activated user: {}", user);
+                LOG.debug("Activated user: {}", user);
                 return user;
             });
     }
 
     public Optional<User> completePasswordReset(String newPassword, String key) {
-        log.debug("Reset user password for reset key {}", key);
+        LOG.debug("Reset user password for reset key {}", key);
         return userRepository
             .findOneByResetKey(key)
             .filter(user -> user.getResetDate().isAfter(Instant.now().minus(1, ChronoUnit.DAYS)))
@@ -131,7 +131,7 @@ public class UserService {
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
-        log.debug("Created Information for User: {}", newUser);
+        LOG.debug("Created Information for User: {}", newUser);
         return newUser;
     }
 
@@ -176,7 +176,7 @@ public class UserService {
         }
         userRepository.save(user);
         this.clearUserCaches(user);
-        log.debug("Created Information for User: {}", user);
+        LOG.debug("Created Information for User: {}", user);
         return user;
     }
 
@@ -210,8 +210,9 @@ public class UserService {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .forEach(managedAuthorities::add);
+                userRepository.save(user);
                 this.clearUserCaches(user);
-                log.debug("Changed Information for User: {}", user);
+                LOG.debug("Changed Information for User: {}", user);
                 return user;
             })
             .map(AdminUserDTO::new);
@@ -223,7 +224,7 @@ public class UserService {
             .ifPresent(user -> {
                 userRepository.delete(user);
                 this.clearUserCaches(user);
-                log.debug("Deleted User: {}", user);
+                LOG.debug("Deleted User: {}", user);
             });
     }
 
@@ -247,8 +248,9 @@ public class UserService {
                 }
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                userRepository.save(user);
                 this.clearUserCaches(user);
-                log.debug("Changed Information for User: {}", user);
+                LOG.debug("Changed Information for User: {}", user);
             });
     }
 
@@ -264,7 +266,7 @@ public class UserService {
                 String encryptedPassword = passwordEncoder.encode(newPassword);
                 user.setPassword(encryptedPassword);
                 this.clearUserCaches(user);
-                log.debug("Changed password for User: {}", user);
+                LOG.debug("Changed password for User: {}", user);
             });
     }
 
@@ -298,7 +300,7 @@ public class UserService {
         userRepository
             .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
             .forEach(user -> {
-                log.debug("Deleting not activated user {}", user.getLogin());
+                LOG.debug("Deleting not activated user {}", user.getLogin());
                 userRepository.delete(user);
                 this.clearUserCaches(user);
             });
@@ -310,7 +312,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<String> getAuthorities() {
-        return authorityRepository.findAll().stream().map(Authority::getName).collect(Collectors.toList());
+        return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
 
     private void clearUserCaches(User user) {

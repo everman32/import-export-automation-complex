@@ -3,13 +3,13 @@ package by.victory.myapp.web.rest;
 import by.victory.myapp.domain.StatementType;
 import by.victory.myapp.repository.StatementTypeRepository;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.StatementType}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/statement-types")
 @Transactional
 public class StatementTypeResource {
 
-    private final Logger log = LoggerFactory.getLogger(StatementTypeResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StatementTypeResource.class);
 
     private static final String ENTITY_NAME = "statementType";
 
@@ -52,16 +52,16 @@ public class StatementTypeResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new statementType, or with status {@code 400 (Bad Request)} if the statementType has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/statement-types")
+    @PostMapping("")
     public ResponseEntity<StatementType> createStatementType(@Valid @RequestBody StatementType statementType) throws URISyntaxException {
-        log.debug("REST request to save StatementType : {}", statementType);
+        LOG.debug("REST request to save StatementType : {}", statementType);
         if (statementType.getId() != null) {
             throw new BadRequestAlertException("A new statementType cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        StatementType result = statementTypeRepository.save(statementType);
-        return ResponseEntity.created(new URI("/api/statement-types/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        statementType = statementTypeRepository.save(statementType);
+        return ResponseEntity.created(new URI("/api/statement-types/" + statementType.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, statementType.getId().toString()))
+            .body(statementType);
     }
 
     /**
@@ -74,12 +74,12 @@ public class StatementTypeResource {
      * or with status {@code 500 (Internal Server Error)} if the statementType couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/statement-types/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<StatementType> updateStatementType(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody StatementType statementType
     ) throws URISyntaxException {
-        log.debug("REST request to update StatementType : {}, {}", id, statementType);
+        LOG.debug("REST request to update StatementType : {}, {}", id, statementType);
         if (statementType.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -91,10 +91,10 @@ public class StatementTypeResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        StatementType result = statementTypeRepository.save(statementType);
+        statementType = statementTypeRepository.save(statementType);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, statementType.getId().toString()))
-            .body(result);
+            .body(statementType);
     }
 
     /**
@@ -108,12 +108,12 @@ public class StatementTypeResource {
      * or with status {@code 500 (Internal Server Error)} if the statementType couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/statement-types/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<StatementType> partialUpdateStatementType(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody StatementType statementType
     ) throws URISyntaxException {
-        log.debug("REST request to partial update StatementType partially : {}, {}", id, statementType);
+        LOG.debug("REST request to partial update StatementType partially : {}, {}", id, statementType);
         if (statementType.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -148,9 +148,9 @@ public class StatementTypeResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of statementTypes in body.
      */
-    @GetMapping("/statement-types")
-    public ResponseEntity<List<StatementType>> getAllStatementTypes(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of StatementTypes");
+    @GetMapping("")
+    public ResponseEntity<List<StatementType>> getAllStatementTypes(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of StatementTypes");
         Page<StatementType> page = statementTypeRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -162,9 +162,9 @@ public class StatementTypeResource {
      * @param id the id of the statementType to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the statementType, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/statement-types/{id}")
-    public ResponseEntity<StatementType> getStatementType(@PathVariable Long id) {
-        log.debug("REST request to get StatementType : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<StatementType> getStatementType(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get StatementType : {}", id);
         Optional<StatementType> statementType = statementTypeRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(statementType);
     }
@@ -175,9 +175,9 @@ public class StatementTypeResource {
      * @param id the id of the statementType to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/statement-types/{id}")
-    public ResponseEntity<Void> deleteStatementType(@PathVariable Long id) {
-        log.debug("REST request to delete StatementType : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteStatementType(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete StatementType : {}", id);
         statementTypeRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

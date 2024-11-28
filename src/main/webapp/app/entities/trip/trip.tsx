@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, getSortState, JhiPagination, JhiItemCount } from 'react-jhipster';
+import { JhiItemCount, JhiPagination, Translate, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { getEntities } from './trip.reducer';
-import { ITrip } from 'app/shared/model/trip.model';
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const Trip = (props: RouteComponentProps<{ url: string }>) => {
+import { getEntities } from './trip.reducer';
+
+export const Trip = () => {
   const dispatch = useAppDispatch();
 
+  const pageLocation = useLocation();
+  const navigate = useNavigate();
+
   const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
+    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
   const tripList = useAppSelector(state => state.trip.entities);
@@ -35,8 +37,8 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
   const sortEntities = () => {
     getAllEntities();
     const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
-    if (props.location.search !== endURL) {
-      props.history.push(`${props.location.pathname}${endURL}`);
+    if (pageLocation.search !== endURL) {
+      navigate(`${pageLocation.pathname}${endURL}`);
     }
   };
 
@@ -45,7 +47,7 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
   }, [paginationState.activePage, paginationState.order, paginationState.sort]);
 
   useEffect(() => {
-    const params = new URLSearchParams(props.location.search);
+    const params = new URLSearchParams(pageLocation.search);
     const page = params.get('page');
     const sort = params.get(SORT);
     if (page && sort) {
@@ -57,7 +59,7 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
         order: sortSplit[1],
       });
     }
-  }, [props.location.search]);
+  }, [pageLocation.search]);
 
   const sort = p => () => {
     setPaginationState({
@@ -77,7 +79,14 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
     sortEntities();
   };
 
-  const { match } = props;
+  const getSortIconByFieldName = (fieldName: string) => {
+    const sortFieldName = paginationState.sort;
+    const order = paginationState.order;
+    if (sortFieldName !== fieldName) {
+      return faSort;
+    }
+    return order === ASC ? faSortUp : faSortDown;
+  };
 
   return (
     <div>
@@ -88,7 +97,7 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="accountingImportExportProductsApp.trip.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/trip/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="accountingImportExportProductsApp.trip.home.createLabel">Create new Trip</Translate>
@@ -101,7 +110,8 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
             <thead>
               <tr>
                 <th className="hand" onClick={sort('id')}>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.id">ID</Translate> <FontAwesomeIcon icon="sort" />
+                <Translate contentKey="accountingImportExportProductsApp.trip.id">ID</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.trip.statement">Statement</Translate>{' '}
@@ -109,11 +119,11 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                 </th>
                 <th className="hand" onClick={sort('authorizedCapital')}>
                   <Translate contentKey="accountingImportExportProductsApp.trip.authorizedCapital">Authorized Capital</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
+                  <FontAwesomeIcon icon={getSortIconByFieldName('authorizedCapital')} />
                 </th>
-                <th>
-                  <Translate contentKey="accountingImportExportProductsApp.trip.hubPositioning">Hub Positioning</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
+                <th className="hand" onClick={sort('threshold')}>
+                  <Translate contentKey="accountingImportExportProductsApp.trip.threshold">Threshold</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('threshold')} />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.trip.transport">Transport</Translate>{' '}
@@ -132,7 +142,7 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
               {tripList.map((trip, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`${match.url}/${trip.id}`} color="link" size="sm">
+                    <Button tag={Link} to={`/trip/${trip.id}`} color="link" size="sm">
                       {trip.id}
                     </Button>
                   </td>
@@ -147,21 +157,14 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                       : ''}
                   </td>
                   <td>{trip.authorizedCapital}</td>
-                  <td>
-                    {trip.hubPositioning ? (
-                      <Link to={`positioning/${trip.hubPositioning.id}`}>
-                        {trip.hubPositioning.latitude}, {trip.hubPositioning.longitude}
-                      </Link>
-                    ) : (
-                      ''
-                    )}
-                  </td>
-                  <td>{trip.transport ? <Link to={`transport/${trip.transport.id}`}>{trip.transport.id}</Link> : ''}</td>
-                  <td>{trip.driver ? <Link to={`driver/${trip.driver.id}`}>{trip.driver.id}</Link> : ''}</td>
+                  <td>{trip.threshold}</td>
                   <td>{trip.user ? trip.user.login : ''}</td>
+                  <td>{trip.transport ? <Link to={`/transport/${trip.transport.id}`}>{trip.transport.id}</Link> : ''}</td>
+                  <td>{trip.driver ? <Link to={`/driver/${trip.driver.id}`}>{trip.driver.id}</Link> : ''}</td>
+                  <td>{trip.hubPositioning ? <Link to={`/positioning/${trip.hubPositioning.id}`}>{trip.hubPositioning.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`${match.url}/${trip.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/trip/${trip.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" />{' '}
                         <span className="d-none d-md-inline">
                           <Translate contentKey="entity.action.view">View</Translate>
@@ -169,7 +172,7 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                       </Button>
                       <Button
                         tag={Link}
-                        to={`${match.url}/${trip.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/trip/${trip.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -180,8 +183,9 @@ export const Trip = (props: RouteComponentProps<{ url: string }>) => {
                         </span>
                       </Button>
                       <Button
-                        tag={Link}
-                        to={`${match.url}/${trip.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        onClick={() =>
+                          (window.location.href = `/trip/${trip.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                        }
                         color="danger"
                         size="sm"
                         data-cy="entityDeleteButton"

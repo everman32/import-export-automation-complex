@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.StatementTypeAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.StatementType;
 import by.victory.myapp.repository.StatementTypeRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +39,10 @@ class StatementTypeResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private StatementTypeRepository statementTypeRepository;
@@ -49,15 +55,16 @@ class StatementTypeResourceIT {
 
     private StatementType statementType;
 
+    private StatementType insertedStatementType;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static StatementType createEntity(EntityManager em) {
-        StatementType statementType = new StatementType().name(DEFAULT_NAME);
-        return statementType;
+    public static StatementType createEntity() {
+        return new StatementType().name(DEFAULT_NAME);
     }
 
     /**
@@ -66,30 +73,43 @@ class StatementTypeResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static StatementType createUpdatedEntity(EntityManager em) {
-        StatementType statementType = new StatementType().name(UPDATED_NAME);
-        return statementType;
+    public static StatementType createUpdatedEntity() {
+        return new StatementType().name(UPDATED_NAME);
     }
 
     @BeforeEach
     public void initTest() {
-        statementType = createEntity(em);
+        statementType = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedStatementType != null) {
+            statementTypeRepository.delete(insertedStatementType);
+            insertedStatementType = null;
+        }
     }
 
     @Test
     @Transactional
     void createStatementType() throws Exception {
-        int databaseSizeBeforeCreate = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the StatementType
-        restStatementTypeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statementType)))
-            .andExpect(status().isCreated());
+        var returnedStatementType = om.readValue(
+            restStatementTypeMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statementType)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            StatementType.class
+        );
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeCreate + 1);
-        StatementType testStatementType = statementTypeList.get(statementTypeList.size() - 1);
-        assertThat(testStatementType.getName()).isEqualTo(DEFAULT_NAME);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertStatementTypeUpdatableFieldsEquals(returnedStatementType, getPersistedStatementType(returnedStatementType));
+
+        insertedStatementType = returnedStatementType;
     }
 
     @Test
@@ -98,40 +118,38 @@ class StatementTypeResourceIT {
         // Create the StatementType with an existing ID
         statementType.setId(1L);
 
-        int databaseSizeBeforeCreate = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restStatementTypeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statementType)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statementType)))
             .andExpect(status().isBadRequest());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         statementType.setName(null);
 
         // Create the StatementType, which fails.
 
         restStatementTypeMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statementType)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statementType)))
             .andExpect(status().isBadRequest());
 
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllStatementTypes() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
         // Get all the statementTypeList
         restStatementTypeMockMvc
@@ -146,7 +164,7 @@ class StatementTypeResourceIT {
     @Transactional
     void getStatementType() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
         // Get the statementType
         restStatementTypeMockMvc
@@ -166,14 +184,14 @@ class StatementTypeResourceIT {
 
     @Test
     @Transactional
-    void putNewStatementType() throws Exception {
+    void putExistingStatementType() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statementType
-        StatementType updatedStatementType = statementTypeRepository.findById(statementType.getId()).get();
+        StatementType updatedStatementType = statementTypeRepository.findById(statementType.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedStatementType are not directly saved in db
         em.detach(updatedStatementType);
         updatedStatementType.name(UPDATED_NAME);
@@ -182,80 +200,75 @@ class StatementTypeResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedStatementType.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedStatementType))
+                    .content(om.writeValueAsBytes(updatedStatementType))
             )
             .andExpect(status().isOk());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
-        StatementType testStatementType = statementTypeList.get(statementTypeList.size() - 1);
-        assertThat(testStatementType.getName()).isEqualTo(UPDATED_NAME);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedStatementTypeToMatchAllProperties(updatedStatementType);
     }
 
     @Test
     @Transactional
     void putNonExistingStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, statementType.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(statementType))
+                    .content(om.writeValueAsBytes(statementType))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(statementType))
+                    .content(om.writeValueAsBytes(statementType))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(statementType)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(statementType)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateStatementTypeWithPatch() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statementType using partial update
         StatementType partialUpdatedStatementType = new StatementType();
@@ -265,24 +278,26 @@ class StatementTypeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedStatementType.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStatementType))
+                    .content(om.writeValueAsBytes(partialUpdatedStatementType))
             )
             .andExpect(status().isOk());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
-        StatementType testStatementType = statementTypeList.get(statementTypeList.size() - 1);
-        assertThat(testStatementType.getName()).isEqualTo(DEFAULT_NAME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertStatementTypeUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedStatementType, statementType),
+            getPersistedStatementType(statementType)
+        );
     }
 
     @Test
     @Transactional
     void fullUpdateStatementTypeWithPatch() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the statementType using partial update
         StatementType partialUpdatedStatementType = new StatementType();
@@ -294,82 +309,76 @@ class StatementTypeResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedStatementType.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedStatementType))
+                    .content(om.writeValueAsBytes(partialUpdatedStatementType))
             )
             .andExpect(status().isOk());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
-        StatementType testStatementType = statementTypeList.get(statementTypeList.size() - 1);
-        assertThat(testStatementType.getName()).isEqualTo(UPDATED_NAME);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertStatementTypeUpdatableFieldsEquals(partialUpdatedStatementType, getPersistedStatementType(partialUpdatedStatementType));
     }
 
     @Test
     @Transactional
     void patchNonExistingStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, statementType.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(statementType))
+                    .content(om.writeValueAsBytes(statementType))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(statementType))
+                    .content(om.writeValueAsBytes(statementType))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamStatementType() throws Exception {
-        int databaseSizeBeforeUpdate = statementTypeRepository.findAll().size();
-        statementType.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        statementType.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restStatementTypeMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(statementType))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(statementType)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the StatementType in the database
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteStatementType() throws Exception {
         // Initialize the database
-        statementTypeRepository.saveAndFlush(statementType);
+        insertedStatementType = statementTypeRepository.saveAndFlush(statementType);
 
-        int databaseSizeBeforeDelete = statementTypeRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the statementType
         restStatementTypeMockMvc
@@ -377,7 +386,34 @@ class StatementTypeResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<StatementType> statementTypeList = statementTypeRepository.findAll();
-        assertThat(statementTypeList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return statementTypeRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected StatementType getPersistedStatementType(StatementType statementType) {
+        return statementTypeRepository.findById(statementType.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedStatementTypeToMatchAllProperties(StatementType expectedStatementType) {
+        assertStatementTypeAllPropertiesEquals(expectedStatementType, getPersistedStatementType(expectedStatementType));
+    }
+
+    protected void assertPersistedStatementTypeToMatchUpdatableProperties(StatementType expectedStatementType) {
+        assertStatementTypeAllUpdatablePropertiesEquals(expectedStatementType, getPersistedStatementType(expectedStatementType));
     }
 }

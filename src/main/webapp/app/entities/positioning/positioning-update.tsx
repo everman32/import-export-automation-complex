@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, isNumber, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { getEntity, updateEntity, createEntity, reset } from './positioning.reducer';
-import { IPositioning } from 'app/shared/model/positioning.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const PositioningUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { createEntity, getEntity, reset, updateEntity } from './positioning.reducer';
+
+export const PositioningUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const positioningEntity = useAppSelector(state => state.positioning.entity);
   const loading = useAppSelector(state => state.positioning.loading);
   const updating = useAppSelector(state => state.positioning.updating);
   const updateSuccess = useAppSelector(state => state.positioning.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/positioning' + props.location.search);
+    navigate(`/positioning${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
   }, []);
 
@@ -38,6 +40,16 @@ export const PositioningUpdate = (props: RouteComponentProps<{ id: string }>) =>
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+    if (values.latitude !== undefined && typeof values.latitude !== 'number') {
+      values.latitude = Number(values.latitude);
+    }
+    if (values.longitude !== undefined && typeof values.longitude !== 'number') {
+      values.longitude = Number(values.longitude);
+    }
+
     const entity = {
       ...positioningEntity,
       ...values,

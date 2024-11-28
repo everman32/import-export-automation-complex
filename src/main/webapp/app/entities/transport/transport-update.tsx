@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { getEntity, updateEntity, createEntity, reset } from './transport.reducer';
-import { ITransport } from 'app/shared/model/transport.model';
-import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const TransportUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { createEntity, getEntity, reset, updateEntity } from './transport.reducer';
+
+export const TransportUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const transportEntity = useAppSelector(state => state.transport.entity);
   const loading = useAppSelector(state => state.transport.loading);
   const updating = useAppSelector(state => state.transport.updating);
   const updateSuccess = useAppSelector(state => state.transport.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/transport' + props.location.search);
+    navigate(`/transport${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
   }, []);
 
@@ -38,6 +40,10 @@ export const TransportUpdate = (props: RouteComponentProps<{ id: string }>) => {
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
+
     const entity = {
       ...transportEntity,
       ...values,

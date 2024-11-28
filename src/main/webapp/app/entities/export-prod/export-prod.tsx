@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, TextFormat, getSortState, JhiPagination, JhiItemCount } from 'react-jhipster';
+import { JhiItemCount, JhiPagination, TextFormat, Translate, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { getEntities } from './export-prod.reducer';
-import { IExportProd } from 'app/shared/model/export-prod.model';
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { APP_DATE_FORMAT } from 'app/config/constants';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
+import { getEntities } from './export-prod.reducer';
+
+export const ExportProd = () => {
   const dispatch = useAppDispatch();
 
+  const pageLocation = useLocation();
+  const navigate = useNavigate();
+
   const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
+    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
   const exportProdList = useAppSelector(state => state.exportProd.entities);
@@ -35,8 +38,8 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
   const sortEntities = () => {
     getAllEntities();
     const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
-    if (props.location.search !== endURL) {
-      props.history.push(`${props.location.pathname}${endURL}`);
+    if (pageLocation.search !== endURL) {
+      navigate(`${pageLocation.pathname}${endURL}`);
     }
   };
 
@@ -45,7 +48,7 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
   }, [paginationState.activePage, paginationState.order, paginationState.sort]);
 
   useEffect(() => {
-    const params = new URLSearchParams(props.location.search);
+    const params = new URLSearchParams(pageLocation.search);
     const page = params.get('page');
     const sort = params.get(SORT);
     if (page && sort) {
@@ -57,7 +60,7 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
         order: sortSplit[1],
       });
     }
-  }, [props.location.search]);
+  }, [pageLocation.search]);
 
   const sort = p => () => {
     setPaginationState({
@@ -77,7 +80,14 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
     sortEntities();
   };
 
-  const { match } = props;
+  const getSortIconByFieldName = (fieldName: string) => {
+    const sortFieldName = paginationState.sort;
+    const order = paginationState.order;
+    if (sortFieldName !== fieldName) {
+      return faSort;
+    }
+    return order === ASC ? faSortUp : faSortDown;
+  };
 
   return (
     <div>
@@ -88,7 +98,7 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="accountingImportExportProductsApp.exportProd.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/export-prod/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="accountingImportExportProductsApp.exportProd.home.createLabel">Create new Export Prod</Translate>
@@ -103,12 +113,16 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('id')}>
                   <Translate contentKey="accountingImportExportProductsApp.exportProd.id">ID</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
+                <th className="hand" onClick={sort('departureDate')}>
+                  <Translate contentKey="accountingImportExportProductsApp.exportProd.departureDate">Departure Date</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('departureDate')} />
+                </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.exportProd.trip">Trip</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th className="hand" onClick={sort('departureDate')}>
                   <Translate contentKey="accountingImportExportProductsApp.exportProd.departureDate">Departure Date</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
+                  <FontAwesomeIcon icon={getSortIconByFieldName('departureDate')} />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.exportProd.grade">Grade</Translate>{' '}
@@ -121,7 +135,7 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
               {exportProdList.map((exportProd, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`${match.url}/${exportProd.id}`} color="link" size="sm">
+                    <Button tag={Link} to={`/export-prod/${exportProd.id}`} color="link" size="sm">
                       {exportProd.id}
                     </Button>
                   </td>
@@ -129,10 +143,11 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
                   <td>
                     {exportProd.departureDate ? <TextFormat type="date" value={exportProd.departureDate} format={APP_DATE_FORMAT} /> : null}
                   </td>
-                  <td>{exportProd.grade ? <Link to={`grade/${exportProd.grade.id}`}>{exportProd.grade.id}</Link> : ''}</td>
+                  <td>{exportProd.trip ? <Link to={`/trip/${exportProd.trip.id}`}>{exportProd.trip.id}</Link> : ''}</td>
+                  <td>{exportProd.grade ? <Link to={`/grade/${exportProd.grade.id}`}>{exportProd.grade.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`${match.url}/${exportProd.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/export-prod/${exportProd.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" />{' '}
                         <span className="d-none d-md-inline">
                           <Translate contentKey="entity.action.view">View</Translate>
@@ -140,7 +155,7 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
                       </Button>
                       <Button
                         tag={Link}
-                        to={`${match.url}/${exportProd.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/export-prod/${exportProd.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -151,8 +166,9 @@ export const ExportProd = (props: RouteComponentProps<{ url: string }>) => {
                         </span>
                       </Button>
                       <Button
-                        tag={Link}
-                        to={`${match.url}/${exportProd.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        onClick={() =>
+                          (window.location.href = `/export-prod/${exportProd.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                        }
                         color="danger"
                         size="sm"
                         data-cy="entityDeleteButton"

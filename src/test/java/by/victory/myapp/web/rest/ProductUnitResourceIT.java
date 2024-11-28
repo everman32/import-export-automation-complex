@@ -1,5 +1,7 @@
 package by.victory.myapp.web.rest;
 
+import static by.victory.myapp.domain.ProductUnitAsserts.*;
+import static by.victory.myapp.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -8,10 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import by.victory.myapp.IntegrationTest;
 import by.victory.myapp.domain.ProductUnit;
 import by.victory.myapp.repository.ProductUnitRepository;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +42,10 @@ class ProductUnitResourceIT {
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
     private static Random random = new Random();
-    private static AtomicLong count = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
+
+    @Autowired
+    private ObjectMapper om;
 
     @Autowired
     private ProductUnitRepository productUnitRepository;
@@ -52,15 +58,16 @@ class ProductUnitResourceIT {
 
     private ProductUnit productUnit;
 
+    private ProductUnit insertedProductUnit;
+
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static ProductUnit createEntity(EntityManager em) {
-        ProductUnit productUnit = new ProductUnit().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION);
-        return productUnit;
+    public static ProductUnit createEntity() {
+        return new ProductUnit().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION);
     }
 
     /**
@@ -69,31 +76,43 @@ class ProductUnitResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static ProductUnit createUpdatedEntity(EntityManager em) {
-        ProductUnit productUnit = new ProductUnit().name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
-        return productUnit;
+    public static ProductUnit createUpdatedEntity() {
+        return new ProductUnit().name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
     }
 
     @BeforeEach
     public void initTest() {
-        productUnit = createEntity(em);
+        productUnit = createEntity();
+    }
+
+    @AfterEach
+    public void cleanup() {
+        if (insertedProductUnit != null) {
+            productUnitRepository.delete(insertedProductUnit);
+            insertedProductUnit = null;
+        }
     }
 
     @Test
     @Transactional
     void createProductUnit() throws Exception {
-        int databaseSizeBeforeCreate = productUnitRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the ProductUnit
-        restProductUnitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(productUnit)))
-            .andExpect(status().isCreated());
+        var returnedProductUnit = om.readValue(
+            restProductUnitMockMvc
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productUnit)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(),
+            ProductUnit.class
+        );
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeCreate + 1);
-        ProductUnit testProductUnit = productUnitList.get(productUnitList.size() - 1);
-        assertThat(testProductUnit.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testProductUnit.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
+        assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        assertProductUnitUpdatableFieldsEquals(returnedProductUnit, getPersistedProductUnit(returnedProductUnit));
+
+        insertedProductUnit = returnedProductUnit;
     }
 
     @Test
@@ -102,57 +121,54 @@ class ProductUnitResourceIT {
         // Create the ProductUnit with an existing ID
         productUnit.setId(1L);
 
-        int databaseSizeBeforeCreate = productUnitRepository.findAll().size();
+        long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProductUnitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(productUnit)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productUnit)))
             .andExpect(status().isBadRequest());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeCreate);
+        assertSameRepositoryCount(databaseSizeBeforeCreate);
     }
 
     @Test
     @Transactional
     void checkNameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = productUnitRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         productUnit.setName(null);
 
         // Create the ProductUnit, which fails.
 
         restProductUnitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(productUnit)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productUnit)))
             .andExpect(status().isBadRequest());
 
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void checkDescriptionIsRequired() throws Exception {
-        int databaseSizeBeforeTest = productUnitRepository.findAll().size();
+        long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         productUnit.setDescription(null);
 
         // Create the ProductUnit, which fails.
 
         restProductUnitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(productUnit)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productUnit)))
             .andExpect(status().isBadRequest());
 
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeTest);
+        assertSameRepositoryCount(databaseSizeBeforeTest);
     }
 
     @Test
     @Transactional
     void getAllProductUnits() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
         // Get all the productUnitList
         restProductUnitMockMvc
@@ -168,7 +184,7 @@ class ProductUnitResourceIT {
     @Transactional
     void getProductUnit() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
         // Get the productUnit
         restProductUnitMockMvc
@@ -189,14 +205,14 @@ class ProductUnitResourceIT {
 
     @Test
     @Transactional
-    void putNewProductUnit() throws Exception {
+    void putExistingProductUnit() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the productUnit
-        ProductUnit updatedProductUnit = productUnitRepository.findById(productUnit.getId()).get();
+        ProductUnit updatedProductUnit = productUnitRepository.findById(productUnit.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedProductUnit are not directly saved in db
         em.detach(updatedProductUnit);
         updatedProductUnit.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
@@ -205,81 +221,75 @@ class ProductUnitResourceIT {
             .perform(
                 put(ENTITY_API_URL_ID, updatedProductUnit.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedProductUnit))
+                    .content(om.writeValueAsBytes(updatedProductUnit))
             )
             .andExpect(status().isOk());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
-        ProductUnit testProductUnit = productUnitList.get(productUnitList.size() - 1);
-        assertThat(testProductUnit.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testProductUnit.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertPersistedProductUnitToMatchAllProperties(updatedProductUnit);
     }
 
     @Test
     @Transactional
     void putNonExistingProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, productUnit.getId())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(productUnit))
+                    .content(om.writeValueAsBytes(productUnit))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithIdMismatchProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, count.incrementAndGet())
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(productUnit))
+                    .content(om.writeValueAsBytes(productUnit))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void putWithMissingIdPathParamProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(productUnit)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productUnit)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void partialUpdateProductUnitWithPatch() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the productUnit using partial update
         ProductUnit partialUpdatedProductUnit = new ProductUnit();
@@ -291,25 +301,26 @@ class ProductUnitResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProductUnit.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedProductUnit))
+                    .content(om.writeValueAsBytes(partialUpdatedProductUnit))
             )
             .andExpect(status().isOk());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
-        ProductUnit testProductUnit = productUnitList.get(productUnitList.size() - 1);
-        assertThat(testProductUnit.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testProductUnit.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertProductUnitUpdatableFieldsEquals(
+            createUpdateProxyForBean(partialUpdatedProductUnit, productUnit),
+            getPersistedProductUnit(productUnit)
+        );
     }
 
     @Test
     @Transactional
     void fullUpdateProductUnitWithPatch() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
+        long databaseSizeBeforeUpdate = getRepositoryCount();
 
         // Update the productUnit using partial update
         ProductUnit partialUpdatedProductUnit = new ProductUnit();
@@ -321,83 +332,76 @@ class ProductUnitResourceIT {
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProductUnit.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(partialUpdatedProductUnit))
+                    .content(om.writeValueAsBytes(partialUpdatedProductUnit))
             )
             .andExpect(status().isOk());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
-        ProductUnit testProductUnit = productUnitList.get(productUnitList.size() - 1);
-        assertThat(testProductUnit.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testProductUnit.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
+
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
+        assertProductUnitUpdatableFieldsEquals(partialUpdatedProductUnit, getPersistedProductUnit(partialUpdatedProductUnit));
     }
 
     @Test
     @Transactional
     void patchNonExistingProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, productUnit.getId())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(productUnit))
+                    .content(om.writeValueAsBytes(productUnit))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithIdMismatchProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, count.incrementAndGet())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(productUnit))
+                    .content(om.writeValueAsBytes(productUnit))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void patchWithMissingIdPathParamProductUnit() throws Exception {
-        int databaseSizeBeforeUpdate = productUnitRepository.findAll().size();
-        productUnit.setId(count.incrementAndGet());
+        long databaseSizeBeforeUpdate = getRepositoryCount();
+        productUnit.setId(longCount.incrementAndGet());
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProductUnitMockMvc
-            .perform(
-                patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(TestUtil.convertObjectToJsonBytes(productUnit))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(productUnit)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the ProductUnit in the database
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeUpdate);
+        assertSameRepositoryCount(databaseSizeBeforeUpdate);
     }
 
     @Test
     @Transactional
     void deleteProductUnit() throws Exception {
         // Initialize the database
-        productUnitRepository.saveAndFlush(productUnit);
+        insertedProductUnit = productUnitRepository.saveAndFlush(productUnit);
 
-        int databaseSizeBeforeDelete = productUnitRepository.findAll().size();
+        long databaseSizeBeforeDelete = getRepositoryCount();
 
         // Delete the productUnit
         restProductUnitMockMvc
@@ -405,7 +409,34 @@ class ProductUnitResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<ProductUnit> productUnitList = productUnitRepository.findAll();
-        assertThat(productUnitList).hasSize(databaseSizeBeforeDelete - 1);
+        assertDecrementedRepositoryCount(databaseSizeBeforeDelete);
+    }
+
+    protected long getRepositoryCount() {
+        return productUnitRepository.count();
+    }
+
+    protected void assertIncrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore + 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertDecrementedRepositoryCount(long countBefore) {
+        assertThat(countBefore - 1).isEqualTo(getRepositoryCount());
+    }
+
+    protected void assertSameRepositoryCount(long countBefore) {
+        assertThat(countBefore).isEqualTo(getRepositoryCount());
+    }
+
+    protected ProductUnit getPersistedProductUnit(ProductUnit productUnit) {
+        return productUnitRepository.findById(productUnit.getId()).orElseThrow();
+    }
+
+    protected void assertPersistedProductUnitToMatchAllProperties(ProductUnit expectedProductUnit) {
+        assertProductUnitAllPropertiesEquals(expectedProductUnit, getPersistedProductUnit(expectedProductUnit));
+    }
+
+    protected void assertPersistedProductUnitToMatchUpdatableProperties(ProductUnit expectedProductUnit) {
+        assertProductUnitAllUpdatablePropertiesEquals(expectedProductUnit, getPersistedProductUnit(expectedProductUnit));
     }
 }

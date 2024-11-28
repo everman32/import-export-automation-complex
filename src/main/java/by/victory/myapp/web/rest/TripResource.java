@@ -7,15 +7,14 @@ import by.victory.myapp.repository.TripRepository;
 import by.victory.myapp.service.PositioningAPIService;
 import by.victory.myapp.service.StatementService;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -37,11 +36,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.Trip}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/trips")
 @Transactional
 public class TripResource {
 
-    private final Logger log = LoggerFactory.getLogger(TripResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TripResource.class);
 
     private static final String ENTITY_NAME = "trip";
 
@@ -67,14 +66,14 @@ public class TripResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new trip, or with status {@code 400 (Bad Request)} if the trip has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/trips")
+    @PostMapping("")
     public ResponseEntity<Trip> createTrip(@Valid @RequestBody Trip trip) throws URISyntaxException {
-        log.debug("REST request to save Trip : {}", trip);
+        LOG.debug("REST request to save Trip : {}", trip);
         if (trip.getId() != null) {
             throw new BadRequestAlertException("A new trip cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-        Trip result = tripRepository.save(trip);
+        trip = tripRepository.save(trip);
 
         List<Statement> statements = statementService.setTripForAllStatement(trip);
         JSONObject positioningJsonObject = positioningService.buildPositioningJsonObject(trip, statements);
@@ -82,9 +81,9 @@ public class TripResource {
         Positioning positioning = positioningService.getPositioningFromAPI(positioningJsonObject);
         trip.setHubPositioning(positioning);
 
-        return ResponseEntity.created(new URI("/api/trips/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        return ResponseEntity.created(new URI("/api/trips/" + trip.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, trip.getId().toString()))
+            .body(trip);
     }
 
     /**
@@ -98,10 +97,10 @@ public class TripResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      * @throws JSONException
      */
-    @PutMapping("/trips/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Trip trip)
         throws URISyntaxException, JSONException {
-        log.debug("REST request to update Trip : {}, {}", id, trip);
+        LOG.debug("REST request to update Trip : {}, {}", id, trip);
         if (trip.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -119,10 +118,10 @@ public class TripResource {
         Positioning positioning = positioningService.getPositioningFromAPI(positioningJsonObject);
         trip.setHubPositioning(positioning);
 
-        Trip result = tripRepository.save(trip);
+        trip = tripRepository.save(trip);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, trip.getId().toString()))
-            .body(result);
+            .body(trip);
     }
 
     /**
@@ -136,12 +135,12 @@ public class TripResource {
      * or with status {@code 500 (Internal Server Error)} if the trip couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/trips/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Trip> partialUpdateTrip(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Trip trip
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Trip partially : {}, {}", id, trip);
+        LOG.debug("REST request to partial update Trip partially : {}, {}", id, trip);
         if (trip.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -181,32 +180,28 @@ public class TripResource {
      * @param filter the filter of the request.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of trips in body.
      */
-    @GetMapping("/trips")
+    @GetMapping("")
     public ResponseEntity<List<Trip>> getAllTrips(
-        @org.springdoc.api.annotations.ParameterObject Pageable pageable,
-        @RequestParam(required = false) String filter,
-        @RequestParam(required = false, defaultValue = "true") boolean eagerload
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "filter", required = false) String filter,
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
     ) {
         if ("importprod-is-null".equals(filter)) {
-            log.debug("REST request to get all Trips where importProd is null");
+            LOG.debug("REST request to get all Trips where importProd is null");
             return new ResponseEntity<>(
-                StreamSupport.stream(tripRepository.findAll().spliterator(), false)
-                    .filter(trip -> trip.getImportProd() == null)
-                    .collect(Collectors.toList()),
+                StreamSupport.stream(tripRepository.findAll().spliterator(), false).filter(trip -> trip.getImportProd() == null).toList(),
                 HttpStatus.OK
             );
         }
 
         if ("exportprod-is-null".equals(filter)) {
-            log.debug("REST request to get all Trips where exportProd is null");
+            LOG.debug("REST request to get all Trips where exportProd is null");
             return new ResponseEntity<>(
-                StreamSupport.stream(tripRepository.findAll().spliterator(), false)
-                    .filter(trip -> trip.getExportProd() == null)
-                    .collect(Collectors.toList()),
+                StreamSupport.stream(tripRepository.findAll().spliterator(), false).filter(trip -> trip.getExportProd() == null).toList(),
                 HttpStatus.OK
             );
         }
-        log.debug("REST request to get a page of Trips");
+        LOG.debug("REST request to get a page of Trips");
         Page<Trip> page;
         if (eagerload) {
             page = tripRepository.findAllWithEagerRelationships(pageable);
@@ -223,9 +218,9 @@ public class TripResource {
      * @param id the id of the trip to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the trip, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/trips/{id}")
-    public ResponseEntity<Trip> getTrip(@PathVariable Long id) {
-        log.debug("REST request to get Trip : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Trip> getTrip(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Trip : {}", id);
         Optional<Trip> trip = tripRepository.findOneWithEagerRelationships(id);
         return ResponseUtil.wrapOrNotFound(trip);
     }
@@ -236,11 +231,11 @@ public class TripResource {
      * @param id the id of the trip to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/trips/{id}")
-    public ResponseEntity<Void> deleteTrip(@PathVariable Long id) {
-        log.debug("REST request to delete Trip : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTrip(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete Trip : {}", id);
 
-        Trip trip = tripRepository.getById(id);
+        Trip trip = tripRepository.findById(id).get();
         statementService.setTripToNullByIdForAllStatement(trip);
         tripRepository.deleteById(id);
 

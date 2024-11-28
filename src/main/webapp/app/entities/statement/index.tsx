@@ -1,23 +1,23 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
-import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
+import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import Statement from './statement';
 import StatementDetail from './statement-detail';
 import StatementUpdate from './statement-update';
 import StatementDeleteDialog from './statement-delete-dialog';
 
-const Routes = ({ match }) => (
-  <>
-    <Switch>
-      <ErrorBoundaryRoute exact path={`${match.url}/new`} component={StatementUpdate} />
-      <ErrorBoundaryRoute exact path={`${match.url}/:id/edit`} component={StatementUpdate} />
-      <ErrorBoundaryRoute exact path={`${match.url}/:id`} component={StatementDetail} />
-      <ErrorBoundaryRoute path={match.url} component={Statement} />
-    </Switch>
-    <ErrorBoundaryRoute exact path={`${match.url}/:id/delete`} component={StatementDeleteDialog} />
-  </>
+const StatementRoutes = () => (
+  <ErrorBoundaryRoutes>
+    <Route index element={<Statement />} />
+    <Route path="new" element={<StatementUpdate />} />
+    <Route path=":id">
+      <Route index element={<StatementDetail />} />
+      <Route path="edit" element={<StatementUpdate />} />
+      <Route path="delete" element={<StatementDeleteDialog />} />
+    </Route>
+  </ErrorBoundaryRoutes>
 );
 
-export default Routes;
+export default StatementRoutes;

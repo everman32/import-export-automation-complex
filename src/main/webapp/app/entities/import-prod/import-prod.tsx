@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, TextFormat, getSortState, JhiPagination, JhiItemCount } from 'react-jhipster';
+import { JhiItemCount, JhiPagination, TextFormat, Translate, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { getEntities } from './import-prod.reducer';
-import { IImportProd } from 'app/shared/model/import-prod.model';
-import { APP_DATE_FORMAT, APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
+import { APP_DATE_FORMAT } from 'app/config/constants';
 import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
 import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
+import { getEntities } from './import-prod.reducer';
+
+export const ImportProd = () => {
   const dispatch = useAppDispatch();
 
+  const pageLocation = useLocation();
+  const navigate = useNavigate();
+
   const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getSortState(props.location, ITEMS_PER_PAGE, 'id'), props.location.search),
+    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
   );
 
   const importProdList = useAppSelector(state => state.importProd.entities);
@@ -35,8 +38,8 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
   const sortEntities = () => {
     getAllEntities();
     const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
-    if (props.location.search !== endURL) {
-      props.history.push(`${props.location.pathname}${endURL}`);
+    if (pageLocation.search !== endURL) {
+      navigate(`${pageLocation.pathname}${endURL}`);
     }
   };
 
@@ -45,7 +48,7 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
   }, [paginationState.activePage, paginationState.order, paginationState.sort]);
 
   useEffect(() => {
-    const params = new URLSearchParams(props.location.search);
+    const params = new URLSearchParams(pageLocation.search);
     const page = params.get('page');
     const sort = params.get(SORT);
     if (page && sort) {
@@ -57,7 +60,7 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
         order: sortSplit[1],
       });
     }
-  }, [props.location.search]);
+  }, [pageLocation.search]);
 
   const sort = p => () => {
     setPaginationState({
@@ -77,7 +80,14 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
     sortEntities();
   };
 
-  const { match } = props;
+  const getSortIconByFieldName = (fieldName: string) => {
+    const sortFieldName = paginationState.sort;
+    const order = paginationState.order;
+    if (sortFieldName !== fieldName) {
+      return faSort;
+    }
+    return order === ASC ? faSortUp : faSortDown;
+  };
 
   return (
     <div>
@@ -88,7 +98,7 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="accountingImportExportProductsApp.importProd.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to={`${match.url}/new`} className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/import-prod/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="accountingImportExportProductsApp.importProd.home.createLabel">Create new Import Prod</Translate>
@@ -103,12 +113,16 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                 <th className="hand" onClick={sort('id')}>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.id">ID</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
+                <th className="hand" onClick={sort('arrivalDate')}>
+                  <Translate contentKey="accountingImportExportProductsApp.importProd.arrivalDate">Arrival Date</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('arrivalDate')} />
+                </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.trip">Trip</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th className="hand" onClick={sort('arrivalDate')}>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.arrivalDate">Arrival Date</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
+                  <FontAwesomeIcon icon={getSortIconByFieldName('arrivalDate')} />
                 </th>
                 <th>
                   <Translate contentKey="accountingImportExportProductsApp.importProd.grade">Grade</Translate>{' '}
@@ -121,7 +135,7 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
               {importProdList.map((importProd, i) => (
                 <tr key={`entity-${i}`} data-cy="entityTable">
                   <td>
-                    <Button tag={Link} to={`${match.url}/${importProd.id}`} color="link" size="sm">
+                    <Button tag={Link} to={`/import-prod/${importProd.id}`} color="link" size="sm">
                       {importProd.id}
                     </Button>
                   </td>
@@ -129,10 +143,11 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                   <td>
                     {importProd.arrivalDate ? <TextFormat type="date" value={importProd.arrivalDate} format={APP_DATE_FORMAT} /> : null}
                   </td>
-                  <td>{importProd.grade ? <Link to={`grade/${importProd.grade.id}`}>{importProd.grade.id}</Link> : ''}</td>
+                  <td>{importProd.trip ? <Link to={`/trip/${importProd.trip.id}`}>{importProd.trip.id}</Link> : ''}</td>
+                  <td>{importProd.grade ? <Link to={`/grade/${importProd.grade.id}`}>{importProd.grade.id}</Link> : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`${match.url}/${importProd.id}`} color="info" size="sm" data-cy="entityDetailsButton">
+                      <Button tag={Link} to={`/import-prod/${importProd.id}`} color="info" size="sm" data-cy="entityDetailsButton">
                         <FontAwesomeIcon icon="eye" />{' '}
                         <span className="d-none d-md-inline">
                           <Translate contentKey="entity.action.view">View</Translate>
@@ -140,7 +155,7 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                       </Button>
                       <Button
                         tag={Link}
-                        to={`${match.url}/${importProd.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        to={`/import-prod/${importProd.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -151,8 +166,9 @@ export const ImportProd = (props: RouteComponentProps<{ url: string }>) => {
                         </span>
                       </Button>
                       <Button
-                        tag={Link}
-                        to={`${match.url}/${importProd.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
+                        onClick={() =>
+                          (window.location.href = `/import-prod/${importProd.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                        }
                         color="danger"
                         size="sm"
                         data-cy="entityDeleteButton"

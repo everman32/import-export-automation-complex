@@ -1,4 +1,7 @@
 {
+  "annotations": {
+    "changelogDate": "20220422224636"
+  },
   "applications": "*",
   "changelogDate": "20220422224636",
   "dto": "no",
@@ -28,14 +31,17 @@
       "otherEntityName": "statement",
       "otherEntityRelationshipName": "product",
       "relationshipName": "statement",
+      "relationshipSide": "left",
       "relationshipType": "one-to-many"
     },
     {
       "otherEntityName": "productUnit",
       "otherEntityRelationshipName": "product",
       "relationshipName": "productUnit",
+      "relationshipSide": "right",
       "relationshipType": "many-to-one"
     }
   ],
+  "searchEngine": "no",
   "service": "no"
 }

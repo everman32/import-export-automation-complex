@@ -3,13 +3,13 @@ package by.victory.myapp.web.rest;
 import by.victory.myapp.domain.Transport;
 import by.victory.myapp.repository.TransportRepository;
 import by.victory.myapp.web.rest.errors.BadRequestAlertException;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +28,11 @@ import tech.jhipster.web.util.ResponseUtil;
  * REST controller for managing {@link by.victory.myapp.domain.Transport}.
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/transports")
 @Transactional
 public class TransportResource {
 
-    private final Logger log = LoggerFactory.getLogger(TransportResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransportResource.class);
 
     private static final String ENTITY_NAME = "transport";
 
@@ -52,16 +52,16 @@ public class TransportResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new transport, or with status {@code 400 (Bad Request)} if the transport has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/transports")
+    @PostMapping("")
     public ResponseEntity<Transport> createTransport(@Valid @RequestBody Transport transport) throws URISyntaxException {
-        log.debug("REST request to save Transport : {}", transport);
+        LOG.debug("REST request to save Transport : {}", transport);
         if (transport.getId() != null) {
             throw new BadRequestAlertException("A new transport cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        Transport result = transportRepository.save(transport);
-        return ResponseEntity.created(new URI("/api/transports/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        transport = transportRepository.save(transport);
+        return ResponseEntity.created(new URI("/api/transports/" + transport.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, transport.getId().toString()))
+            .body(transport);
     }
 
     /**
@@ -74,12 +74,12 @@ public class TransportResource {
      * or with status {@code 500 (Internal Server Error)} if the transport couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/transports/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Transport> updateTransport(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody Transport transport
     ) throws URISyntaxException {
-        log.debug("REST request to update Transport : {}, {}", id, transport);
+        LOG.debug("REST request to update Transport : {}, {}", id, transport);
         if (transport.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -91,10 +91,10 @@ public class TransportResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Transport result = transportRepository.save(transport);
+        transport = transportRepository.save(transport);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, transport.getId().toString()))
-            .body(result);
+            .body(transport);
     }
 
     /**
@@ -108,12 +108,12 @@ public class TransportResource {
      * or with status {@code 500 (Internal Server Error)} if the transport couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/transports/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Transport> partialUpdateTransport(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Transport transport
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Transport partially : {}, {}", id, transport);
+        LOG.debug("REST request to partial update Transport partially : {}, {}", id, transport);
         if (transport.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -154,9 +154,9 @@ public class TransportResource {
      * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of transports in body.
      */
-    @GetMapping("/transports")
-    public ResponseEntity<List<Transport>> getAllTransports(@org.springdoc.api.annotations.ParameterObject Pageable pageable) {
-        log.debug("REST request to get a page of Transports");
+    @GetMapping("")
+    public ResponseEntity<List<Transport>> getAllTransports(@org.springdoc.core.annotations.ParameterObject Pageable pageable) {
+        LOG.debug("REST request to get a page of Transports");
         Page<Transport> page = transportRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
@@ -168,9 +168,9 @@ public class TransportResource {
      * @param id the id of the transport to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the transport, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/transports/{id}")
-    public ResponseEntity<Transport> getTransport(@PathVariable Long id) {
-        log.debug("REST request to get Transport : {}", id);
+    @GetMapping("/{id}")
+    public ResponseEntity<Transport> getTransport(@PathVariable("id") Long id) {
+        LOG.debug("REST request to get Transport : {}", id);
         Optional<Transport> transport = transportRepository.findById(id);
         return ResponseUtil.wrapOrNotFound(transport);
     }
@@ -181,9 +181,9 @@ public class TransportResource {
      * @param id the id of the transport to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/transports/{id}")
-    public ResponseEntity<Void> deleteTransport(@PathVariable Long id) {
-        log.debug("REST request to delete Transport : {}", id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTransport(@PathVariable("id") Long id) {
+        LOG.debug("REST request to delete Transport : {}", id);
         transportRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))

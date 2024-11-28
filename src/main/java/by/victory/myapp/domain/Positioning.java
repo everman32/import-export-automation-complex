@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,7 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "positioning")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Positioning implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,13 +38,13 @@ public class Positioning implements Serializable {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @OneToMany(mappedBy = "positioning", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "positioning")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "statementType", "product", "positioning", "trip" }, allowSetters = true)
     private Set<Statement> statements = new HashSet<>();
 
-    @OneToMany(mappedBy = "hubPositioning", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "hubPositioning")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
@@ -163,7 +164,7 @@ public class Positioning implements Serializable {
         if (!(o instanceof Positioning)) {
             return false;
         }
-        return id != null && id.equals(((Positioning) o).id);
+        return getId() != null && getId().equals(((Positioning) o).getId());
     }
 
     @Override

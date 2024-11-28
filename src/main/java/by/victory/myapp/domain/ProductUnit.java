@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,7 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "product_unit")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProductUnit implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -34,8 +35,8 @@ public class ProductUnit implements Serializable {
     @Column(name = "description", nullable = false, unique = true)
     private String description;
 
-    @OneToMany(mappedBy = "productUnit", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productUnit")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "statements", "productUnit" }, allowSetters = true)
     private Set<Product> products = new HashSet<>();
 
@@ -121,7 +122,7 @@ public class ProductUnit implements Serializable {
         if (!(o instanceof ProductUnit)) {
             return false;
         }
-        return id != null && id.equals(((ProductUnit) o).id);
+        return getId() != null && getId().equals(((ProductUnit) o).getId());
     }
 
     @Override

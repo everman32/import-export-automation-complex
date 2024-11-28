@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, FormText } from 'reactstrap';
-import { isNumber, Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Col, Row } from 'reactstrap';
+import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { ITrip } from 'app/shared/model/trip.model';
-import { getEntities as getTrips } from 'app/entities/trip/trip.reducer';
-import { IGrade } from 'app/shared/model/grade.model';
-import { getEntities as getGrades } from 'app/entities/grade/grade.reducer';
-import { getEntity, updateEntity, createEntity, reset } from './import-prod.reducer';
-import { IImportProd } from 'app/shared/model/import-prod.model';
 import { convertDateTimeFromServer, convertDateTimeToServer, displayDefaultDateTime } from 'app/shared/util/date-utils';
-import { mapIdList } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
-export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => {
+import { getEntities as getTrips } from 'app/entities/trip/trip.reducer';
+import { getEntities as getGrades } from 'app/entities/grade/grade.reducer';
+import { createEntity, getEntity, reset, updateEntity } from './import-prod.reducer';
+
+export const ImportProdUpdate = () => {
   const dispatch = useAppDispatch();
 
-  const [isNew] = useState(!props.match.params || !props.match.params.id);
+  const navigate = useNavigate();
+
+  const { id } = useParams<'id'>();
+  const isNew = id === undefined;
 
   const trips = useAppSelector(state => state.trip.entities);
   const grades = useAppSelector(state => state.grade.entities);
@@ -25,15 +25,16 @@ export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
   const loading = useAppSelector(state => state.importProd.loading);
   const updating = useAppSelector(state => state.importProd.updating);
   const updateSuccess = useAppSelector(state => state.importProd.updateSuccess);
+
   const handleClose = () => {
-    props.history.push('/import-prod' + props.location.search);
+    navigate(`/import-prod${location.search}`);
   };
 
   useEffect(() => {
     if (isNew) {
       dispatch(reset());
     } else {
-      dispatch(getEntity(props.match.params.id));
+      dispatch(getEntity(id));
     }
 
     dispatch(getTrips({}));
@@ -47,13 +48,16 @@ export const ImportProdUpdate = (props: RouteComponentProps<{ id: string }>) => 
   }, [updateSuccess]);
 
   const saveEntity = values => {
+    if (values.id !== undefined && typeof values.id !== 'number') {
+      values.id = Number(values.id);
+    }
     values.arrivalDate = convertDateTimeToServer(values.arrivalDate);
 
     const entity = {
       ...importProdEntity,
       ...values,
-      trip: trips.find(it => it.id.toString() === values.trip.toString()),
-      grade: grades.find(it => it.id.toString() === values.grade.toString()),
+      trip: trips.find(it => it.id.toString() === values.trip?.toString()),
+      grade: grades.find(it => it.id.toString() === values.grade?.toString()),
     };
 
     if (isNew) {

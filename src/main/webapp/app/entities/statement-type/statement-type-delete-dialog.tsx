@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
-import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-import { getEntity, deleteEntity } from './statement-type.reducer';
+import { deleteEntity, getEntity } from './statement-type.reducer';
 
-export const StatementTypeDeleteDialog = (props: RouteComponentProps<{ id: string }>) => {
-  const [loadModal, setLoadModal] = useState(false);
+export const StatementTypeDeleteDialog = () => {
   const dispatch = useAppDispatch();
 
+  const pageLocation = useLocation();
+  const navigate = useNavigate();
+  const { id } = useParams<'id'>();
+
+  const [loadModal, setLoadModal] = useState(false);
+
   useEffect(() => {
-    dispatch(getEntity(props.match.params.id));
+    dispatch(getEntity(id));
     setLoadModal(true);
   }, []);
 
@@ -20,7 +25,7 @@ export const StatementTypeDeleteDialog = (props: RouteComponentProps<{ id: strin
   const updateSuccess = useAppSelector(state => state.statementType.updateSuccess);
 
   const handleClose = () => {
-    props.history.push('/statement-type' + props.location.search);
+    navigate(`/statement-type${pageLocation.search}`);
   };
 
   useEffect(() => {

@@ -1,11 +1,11 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -14,7 +14,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "transport")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class Transport implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -40,8 +41,8 @@ public class Transport implements Serializable {
     @Column(name = "vin", length = 17, nullable = false, unique = true)
     private String vin;
 
-    @OneToMany(mappedBy = "transport", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.NONE)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transport")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
@@ -143,7 +144,7 @@ public class Transport implements Serializable {
         if (!(o instanceof Transport)) {
             return false;
         }
-        return id != null && id.equals(((Transport) o).id);
+        return getId() != null && getId().equals(((Transport) o).getId());
     }
 
     @Override

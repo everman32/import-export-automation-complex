@@ -1,10 +1,10 @@
 package by.victory.myapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
-import javax.persistence.*;
-import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -13,7 +13,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "import_prod")
-@Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ImportProd implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,11 +33,11 @@ public class ImportProd implements Serializable {
         value = { "statements", "user", "importProd", "exportProd", "transport", "driver", "hubPositioning" },
         allowSetters = true
     )
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(unique = true)
     private Trip trip;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "importProds", "exportProds" }, allowSetters = true)
     private Grade grade;
 
@@ -104,7 +105,7 @@ public class ImportProd implements Serializable {
         if (!(o instanceof ImportProd)) {
             return false;
         }
-        return id != null && id.equals(((ImportProd) o).id);
+        return getId() != null && getId().equals(((ImportProd) o).getId());
     }
 
     @Override

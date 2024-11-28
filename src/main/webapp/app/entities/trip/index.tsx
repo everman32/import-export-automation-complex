@@ -1,23 +1,23 @@
 import React from 'react';
-import { Switch } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
-import ErrorBoundaryRoute from 'app/shared/error/error-boundary-route';
+import ErrorBoundaryRoutes from 'app/shared/error/error-boundary-routes';
 
 import Trip from './trip';
 import TripDetail from './trip-detail';
 import TripUpdate from './trip-update';
 import TripDeleteDialog from './trip-delete-dialog';
 
-const Routes = ({ match }) => (
-  <>
-    <Switch>
-      <ErrorBoundaryRoute exact path={`${match.url}/new`} component={TripUpdate} />
-      <ErrorBoundaryRoute exact path={`${match.url}/:id/edit`} component={TripUpdate} />
-      <ErrorBoundaryRoute exact path={`${match.url}/:id`} component={TripDetail} />
-      <ErrorBoundaryRoute path={match.url} component={Trip} />
-    </Switch>
-    <ErrorBoundaryRoute exact path={`${match.url}/:id/delete`} component={TripDeleteDialog} />
-  </>
+const TripRoutes = () => (
+  <ErrorBoundaryRoutes>
+    <Route index element={<Trip />} />
+    <Route path="new" element={<TripUpdate />} />
+    <Route path=":id">
+      <Route index element={<TripDetail />} />
+      <Route path="edit" element={<TripUpdate />} />
+      <Route path="delete" element={<TripDeleteDialog />} />
+    </Route>
+  </ErrorBoundaryRoutes>
 );
 
-export default Routes;
+export default TripRoutes;

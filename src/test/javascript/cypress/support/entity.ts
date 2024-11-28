@@ -1,7 +1,4 @@
 /* eslint-disable @typescript-eslint/no-namespace */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-// eslint-disable-next-line spaced-comment
-/// <reference types="cypress" />
 
 // ***********************************************
 // Begin Specific Selector Attributes for Cypress
@@ -62,11 +59,11 @@ Cypress.Commands.add('setFieldSelectToLastOfEntity', (fieldName: string) => {
       return cy.get(`[data-cy="${fieldName}"] option`).then((options: JQuery<HTMLElement>) => {
         const elements = [...options].map((o: HTMLElement) => (o as HTMLOptionElement).label);
         const lastElement = elements.length - 1;
-        cy.get(`[data-cy="${fieldName}"]`).select(lastElement).type('{downarrow}');
+        cy.get(`[data-cy="${fieldName}"]`).select(lastElement);
+        cy.get(`[data-cy="${fieldName}"]`).type('{downarrow}');
       });
-    } 
-      return cy.get(`[data-cy="${fieldName}"]`).type('{downarrow}');
-    
+    }
+    return cy.get(`[data-cy="${fieldName}"]`).type('{downarrow}');
   });
 });
 
