@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getUsers } from 'app/modules/administration/user-management/user-management.reducer';
+import { getEntities as getStatements } from '../statement/statement.reducer';
 import { getEntities as getTransports } from 'app/entities/transport/transport.reducer';
 import { getEntities as getDrivers } from 'app/entities/driver/driver.reducer';
 import { getEntities as getPositionings } from 'app/entities/positioning/positioning.reducer';
