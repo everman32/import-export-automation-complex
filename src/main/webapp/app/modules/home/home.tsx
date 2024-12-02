@@ -22,7 +22,6 @@ export const Home = () => {
         <p className="lead">
           <Translate contentKey="home.subtitle">This is your homepage</Translate>
         </p>
-        */}
         {account?.login ? (
           <div>
             <Alert color="success">

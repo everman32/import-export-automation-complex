@@ -121,7 +121,7 @@ export const RegisterPage = () => {
                 <br />- Administrator (login=&quot;admin&quot; and password=&quot;admin&quot;)
                 <br />- User (login=&quot;user&quot; and password=&quot;user&quot;).
               </Translate>
-            </span> */}
+            </span>
           </Alert>
         </Col>
       </Row>
