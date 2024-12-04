@@ -1,5 +1,5 @@
 const webpackMerge = require('webpack-merge').merge;
-const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-v3-webpack-plugin');
 const SimpleProgressWebpackPlugin = require('simple-progress-webpack-plugin');
 const WebpackNotifierPlugin = require('webpack-notifier');
 const path = require('path');
